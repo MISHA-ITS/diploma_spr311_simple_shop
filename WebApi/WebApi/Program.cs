@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.DAL;
+using WebApi.DAL.Entities.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,20 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add identity
+builder.Services
+    .AddIdentity<AppUser, AppRole>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+        // password settings
+        options.Password.RequiredUniqueChars = 0;
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
