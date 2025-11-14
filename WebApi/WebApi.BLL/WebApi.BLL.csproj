@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WebApi.DAL\WebApi.DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MapperProfiles\" />
   </ItemGroup>
 
 </Project>
