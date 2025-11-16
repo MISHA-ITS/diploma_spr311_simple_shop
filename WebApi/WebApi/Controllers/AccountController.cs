@@ -10,7 +10,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
 {
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync(RegisterDto dto)
+    public async Task<IActionResult> RegisterAsync([FromForm]RegisterDto dto)
     {
         var user = await accountService.RegisterAsync(dto);
 
@@ -23,9 +23,8 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync(LoginDto dto)
+    public async Task<IActionResult> LoginAsync([FromForm]LoginDto dto)
     {
-
         var response = await accountService.LoginAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
