@@ -27,8 +27,6 @@ public class AccountService(UserManager<AppUser> userManager) : IAccountService
             return null;
         }
 
-
-
         return user;
     }
 
