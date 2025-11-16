@@ -16,9 +16,17 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
         if (user == null)
         {
-            return BadRequest("Registration failed.");
+            return BadRequest("Register error");
         }
 
         return Ok(user);
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> LoginAsync(LoginDto dto)
+    {
+
+        var response = await accountService.LoginAsync(dto);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 }
