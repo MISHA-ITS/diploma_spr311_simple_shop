@@ -1,6 +1,6 @@
 ﻿namespace WebApi.BLL.DTOs.Seeder;
 
-public class SeederUserModel
+public class SeederUserDto
 {
     public string Email { get; set; } = "";
     public string FirstName { get; set; } = "";

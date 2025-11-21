@@ -33,12 +33,11 @@ public class ImageService(IConfiguration configuration) : IImageService
         await Task.WhenAll(tasks);
     }
 
-    public async Task<string> SaveImageFromUrlAsync(string imageUrl)
+    public async Task<string> SaveImageFromUrlAsync(string imageUrl, string folder)
     {
         using var httpClient = new HttpClient();
         var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
-        //return await SaveImageAsync(imageBytes);
-        throw new InvalidOperationException("SaveImageFromUrlAsync must be called with a folder!");
+        return await SaveImageAsync(imageBytes, folder);
     }
 
 

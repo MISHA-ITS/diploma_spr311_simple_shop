@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using System.Text;
 using WebApi.BLL.Services.User;
+using WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,31 +80,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-string rootPath = builder.Environment.ContentRootPath;
-string wwwroot = Path.Combine(rootPath, "wwwroot");
-string imagesPath = Path.Combine(wwwroot, "images");
-
-Settings.ImagesPath = imagesPath;
-
-if (!Directory.Exists(wwwroot))
-{
-    Directory.CreateDirectory(wwwroot);
-}
-
-if (!Directory.Exists(imagesPath))
-{
-    Directory.CreateDirectory(imagesPath);
-}
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(imagesPath),
-    RequestPath = "/images"
-});
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var dir = builder.Configuration["ImagesDir"];
+string path = Path.Combine(Directory.GetCurrentDirectory(), dir);
+Directory.CreateDirectory(path);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(path),
+    RequestPath = $"/{dir}"
+});
+
+await app.SeedData();
 
 app.Run();

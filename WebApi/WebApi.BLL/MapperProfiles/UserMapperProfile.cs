@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using WebApi.BLL.DTOs.Seeder;
 using WebApi.BLL.DTOs.User;
 using WebApi.DAL.Entities.Identity;
 
@@ -8,6 +9,10 @@ public class UserMapperProfile : Profile
 {
     public UserMapperProfile()
     {
+        //SeederUserDTO -> AppUser
+        CreateMap<SeederUserDto, AppUser>()
+            .ForMember(opt => opt.UserName, opt => opt.MapFrom(x => x.Email));
+
         //CreateUserDTO -> AppUser
         CreateMap<CreateUserDto, AppUser>()
             .ForMember(dest => dest.Image, opt => opt.Ignore());

@@ -13,7 +13,7 @@ public class AppUser : IdentityUser<long>
     [MaxLength(255)]
     public string? Image { get; set; }
 
-    public DateTime DateCreated { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
+    public DateTime CreatedAt { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
     public DateTime DateOnline { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 
     public virtual ICollection<AppUserClaim> Claims { get; set; } = [];

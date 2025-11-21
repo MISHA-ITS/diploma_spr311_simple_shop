@@ -1,0 +1,84 @@
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using WebApi.BLL.Constatnts;
+using WebApi.BLL.DTOs.Seeder;
+using WebApi.BLL.Services.Image;
+using WebApi.DAL;
+using WebApi.DAL.Entities.Identity;
+
+namespace WebApi;
+
+public static class DbSeeder
+{
+    public static async Task SeedData(this WebApplication webApplication)
+    {
+        using var scope = webApplication.Services.CreateScope();
+        //Цей об'єкт буде верта посилання на конткетс, який зараєстрвоано в Program.cs
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
+        context.Database.Migrate();
+
+        if (!context.Roles.Any())
+        {
+            foreach (var roleName in Roles.AllRoles)
+            {
+                var result = await roleManager.CreateAsync(new(roleName));
+                if (!result.Succeeded)
+                {
+                    Console.WriteLine("Error Create Role {0}", roleName);
+                }
+            }
+        }
+
+        if (!context.Users.Any())
+        {
+            var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
+            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Users.json");
+            if (File.Exists(jsonFile))
+            {
+                var jsonData = await File.ReadAllTextAsync(jsonFile);
+                try
+                {
+                    var users = JsonSerializer.Deserialize<List<SeederUserDto>>(jsonData);
+                    foreach (var user in users)
+                    {
+                        var entity = mapper.Map<AppUser>(user);
+                        entity.UserName = user.Email;
+                        entity.Image = await imageService.SaveImageFromUrlAsync(user.Image, "users");
+                        var result = await userManager.CreateAsync(entity, user.Password);
+                        if (!result.Succeeded)
+                        {
+                            Console.WriteLine("Error Create User {0}", user.Email);
+                            continue;
+                        }
+                        foreach (var role in user.Roles)
+                        {
+                            if (await roleManager.RoleExistsAsync(role))
+                            {
+                                await userManager.AddToRoleAsync(entity, role);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Not Found Role {0}", role);
+                            }
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error Json Parse Data {0}", ex.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Not Found File Users.json");
+            }
+        }
+    }
+}
