@@ -18,13 +18,15 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
 
         var user = mapper.Map<AppUser>(dto);
 
+        user.UserName = dto.Email.Split('@')[0];
+
         if (dto.Image != null)
         {
-            string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
+            string? imageName = await imageService.SaveImageAsync(dto.Image);
 
             if (!string.IsNullOrEmpty(imageName))
             {
-                user.Image = Settings.CategoriesDir + "/" + imageName;
+                user.Image = imageName;
             }
         }
 
@@ -35,7 +37,8 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             return ServiceResponse.Success($"Користувача {user.UserName} успішно додано", dto);
         }
 
-        return ServiceResponse.Error($"Не вдалося створити користувача");
+        var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+        return ServiceResponse.Error($"Не вдалося створити користувача: {errors}");
     }
 
     public async Task<ServiceResponse> DeleteAsync(string id)
@@ -83,41 +86,39 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
         var user = await userManager.FindByIdAsync(dto.Id.ToString());
 
         if (user == null)
-        {
             return ServiceResponse.Error($"Користувача з Id {dto.Id} не знайдено");
-        }
 
         var existingUser = await userManager.FindByEmailAsync(dto.Email);
 
         if (existingUser != null && existingUser.Id != dto.Id)
-        {
             return ServiceResponse.Error($"Користувач з електронною адресою {dto.Email} вже існує");
-        }
 
-        user = mapper.Map(dto, user);
+        // Оновлюємо User за допомогою AutoMapper
+        mapper.Map(dto, user);
 
+        // Якщо прийшло нове фото
         if (dto.Image != null)
         {
-            string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
-
+            // Видаляємо старий аватар, якщо є
             if (!string.IsNullOrEmpty(user.Image))
             {
-                imageService.DeleteImage(Path.Combine(Settings.UsersDir, user.Image));
+                await imageService.DeleteImageAsync(user.Image);
             }
 
-            if (!string.IsNullOrEmpty(user.Image))
-            {
-                user.Image = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
-            }
+            // Завантажуємо нове фото
+            string newImageName = await imageService.SaveImageAsync(dto.Image);
+
+            // Присвоюємо нове ім’я файла
+            user.Image = newImageName;
         }
 
+        // Оновлюємо користувача
         var result = await userManager.UpdateAsync(user);
 
         if (result.Succeeded)
-        {
             return ServiceResponse.Success($"Користувача {user.UserName} успішно оновлено", dto);
-        }
 
         return ServiceResponse.Error($"Не вдалося оновити користувача", dto);
     }
+
 }

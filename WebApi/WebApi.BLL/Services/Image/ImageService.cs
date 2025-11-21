@@ -8,65 +8,87 @@ namespace WebApi.BLL.Services.Image;
 
 public class ImageService(IConfiguration configuration) : IImageService
 {
-    public void DeleteImage(string filePath)
+    public async Task DeleteImageAsync(string name)
     {
-        if (string.IsNullOrEmpty(Settings.ImagesPath))
-        {
-            return;
-        }
+        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
+        var dir = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!);
 
-        string workPath = Path.Combine(Settings.ImagesPath, filePath);
+        Task[] tasks = sizes
+            .AsParallel()
+            .Select(size =>
+            {
+                return Task.Run(() =>
+                {
+                    var path = Path.Combine(dir, $"{size}_{name}");
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                });
+            })
+            .ToArray();
 
-        if (File.Exists(workPath))
-        {
-            File.Delete(workPath);
-        }
+        await Task.WhenAll(tasks);
     }
 
-    public async Task<string?> SaveImageAsync(IFormFile image, string directory)
+    public async Task<string> SaveImageFromUrlAsync(string imageUrl)
     {
-        if (string.IsNullOrEmpty(Settings.ImagesPath))
-        {
-            return null;
-        }
-
-        var types = image.ContentType.Split('/');
-
-        if (types[0] == "image")
-        {
-            string imageName = $"{Guid.NewGuid()}.{types[1]}";
-            string workPath = Path.Combine(Settings.ImagesPath, directory);
-            string filePath = Path.Combine(workPath, imageName);
-
-            if (!Directory.Exists(workPath))
-            {
-                Directory.CreateDirectory(workPath);
-            }
-
-            using (var stream = File.Create(filePath))
-            {
-                await image.CopyToAsync(stream);
-            }
-
-            return imageName;
-        }
-
-        return null;
+        using var httpClient = new HttpClient();
+        var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+        return await SaveImageAsync(imageBytes);
     }
 
-    public async Task<List<string>> SaveProductImagesAsync(List<IFormFile> images, string path)
+
+    public async Task<string> SaveImageAsync(IFormFile file)
     {
-        List<string> imagesName = new List<string>();
+        using MemoryStream ms = new();
+        await file.CopyToAsync(ms);
+        var bytes = ms.ToArray();
 
-        foreach (var image in images)
+        var imageName = await SaveImageAsync(bytes);
+        return imageName;
+    }
+
+    private async Task<string> SaveImageAsync(byte[] bytes)
+    {
+        string imageName = $"{Path.GetRandomFileName()}.webp";
+        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
+
+        Task[] tasks = sizes
+            .AsParallel()
+            .Select(s => SaveImageAsync(bytes, imageName, s))
+            .ToArray();
+
+        await Task.WhenAll(tasks);
+
+        return imageName;
+    }
+
+    public async Task<string> SaveImageFromBase64Async(string input)
+    {
+        var base64Data = input.Contains(",")
+           ? input.Substring(input.IndexOf(",") + 1)
+           : input;
+
+        byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+        return await SaveImageAsync(imageBytes);
+    }
+
+    private async Task SaveImageAsync(byte[] bytes, string name, int size)
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!,
+            $"{size}_{name}");
+
+        using var image = SixLabors.ImageSharp.Image.Load(bytes);
+        image.Mutate(imgConext =>
         {
-            string? imageName = await SaveImageAsync(image, path);
-            if (imageName != null)
+            imgConext.Resize(new ResizeOptions
             {
-                imagesName.Add(imageName);
-            }
-        }
-
-        return imagesName;
+                Size = new Size(size, size),
+                Mode = ResizeMode.Max
+            });
+        });
+        await image.SaveAsync(path, new WebpEncoder());
     }
 }

@@ -8,6 +8,14 @@ namespace WebApi.Controllers;
 [Route("api/role")]
 public class RoleController(IRoleService roleService) : ControllerBase
 {
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync([FromForm] CreateRoleDto dto)
+    {
+        var result = await roleService.CreateAsync(dto);
+        return result ? Ok("Role created successfully.")
+                      : BadRequest("Failed to create role.");
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAsync(long? id)
     {
@@ -19,11 +27,12 @@ public class RoleController(IRoleService roleService) : ControllerBase
         return result == null ? NotFound("Role not found.") : Ok(result);
     }
 
-    [HttpGet("list")]
-    public async Task<IActionResult> GetAllAsync()
+    [HttpPut]
+    public async Task<IActionResult> UpdateAsync([FromForm] UpdateRoleDto dto)
     {
-        var result = await roleService.GetAllAsync();
-        return Ok(result);
+        var result = await roleService.UpdateAsync(dto);
+        return result ? Ok("Role updated successfully.")
+                      : BadRequest("Failed to update role.");
     }
 
     [HttpDelete]
@@ -36,20 +45,11 @@ public class RoleController(IRoleService roleService) : ControllerBase
         return result ? Ok("Role deleted") : NotFound("Role not found.");
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromForm]CreateRoleDto dto)
+    [HttpGet("list")]
+    public async Task<IActionResult> GetAllAsync()
     {
-        var result = await roleService.CreateAsync(dto);
-        return result ? Ok("Role created successfully.")
-                      : BadRequest("Failed to create role.");
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> UpdateAsync([FromForm]UpdateRoleDto dto)
-    {
-        var result = await roleService.UpdateAsync(dto);
-        return result ? Ok("Role updated successfully.")
-                      : BadRequest("Failed to update role.");
+        var result = await roleService.GetAllAsync();
+        return Ok(result);
     }
 }
 

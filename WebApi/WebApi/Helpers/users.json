@@ -1,0 +1,30 @@
+[
+  {
+    "Email": "mybox018@gmail.com",
+    "FullName": "Дрожевський Михайло",
+    "AvatarUrl": "https://thispersondoesnotexist.com",
+    "Password": "Admin123!",
+    "Roles": [ "Admin" ]
+  },
+  {
+    "Email": "vladkidun5@gmail.com",
+    "FullName": "Кидун Владислав",
+    "AvatarUrl": "https://thispersondoesnotexist.com",
+    "Password": "Admin123!",
+    "Roles": [ "Admin" ]
+  },
+  {
+    "Email": "dudiimaksym@gmail.com",
+    "FullName": "Дудій Максим",
+    "AvatarUrl": "https://thispersondoesnotexist.com",
+    "Password": "Admin123!",
+    "Roles": [ "Admin" ]
+  },
+  {
+    "Email": "novakvova@gmail.com",
+    "FullName": "Новак Вова",
+    "AvatarUrl": "https://thispersondoesnotexist.com",
+    "Password": "Admin123!",
+    "Roles": [ "User" ]
+  }
+]

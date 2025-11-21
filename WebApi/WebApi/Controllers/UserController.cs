@@ -15,6 +15,18 @@ public class UserController(IUserService userService) : ControllerBase
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAsync(string? id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest("id is required!");
+        }
+
+        var response = await userService.GetByIdAsync(id);
+        return response?.IsSuccess == true ? Ok(response) : BadRequest(response);
+    }
+
     [HttpPut]
     public async Task<IActionResult> UpdateAsync(UpdateUserDto dto)
     {
@@ -32,18 +44,6 @@ public class UserController(IUserService userService) : ControllerBase
 
         var response = await userService.DeleteAsync(id);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAsync(string? id)
-    {
-        if (string.IsNullOrEmpty(id))
-        {
-            return BadRequest("id is required!");
-        }
-
-        var response = await userService.GetByIdAsync(id);
-        return response?.IsSuccess == true ? Ok(response) : BadRequest(response);
     }
 
     [HttpGet("List")]

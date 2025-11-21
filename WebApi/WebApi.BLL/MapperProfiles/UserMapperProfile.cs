@@ -16,7 +16,7 @@ public class UserMapperProfile : Profile
         CreateMap<UpdateUserDto, AppUser>()
             .ForMember(dest => dest.Image, opt => opt.Ignore());
 
-        //UserEntity -> CategoryDTO
+        //UserEntity -> UserDTO
         CreateMap<AppUser, UserDTO>();
     }
 }
