@@ -4,8 +4,8 @@ namespace WebApi.BLL.Services.Image;
 
 public interface IImageService
 {
-    Task<string> SaveImageAsync(IFormFile file);
+    Task<string> SaveImageAsync(IFormFile file, string folder);
     Task<string> SaveImageFromUrlAsync(string imageUrl);
-    Task<string> SaveImageFromBase64Async(string input);
-    Task DeleteImageAsync(string name);
+    Task<string> SaveImageFromBase64Async(string input, string folder);
+    Task DeleteImageAsync(string name, string folder);
 }

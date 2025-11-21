@@ -22,7 +22,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
 
         if (dto.Image != null)
         {
-            string? imageName = await imageService.SaveImageAsync(dto.Image);
+            string? imageName = await imageService.SaveImageAsync(dto.Image, "users");
 
             if (!string.IsNullOrEmpty(imageName))
             {
@@ -47,6 +47,27 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
         if (user == null)
         {
             return ServiceResponse.Error($"Користувача з Id {id} не знайдено");
+        }
+
+        if (!string.IsNullOrEmpty(user.Image))
+        {
+            try
+            {
+                // отримуємо тільки файл (без каталогу)
+                var imageFileName = Path.GetFileName(user.Image);
+
+                if (!string.IsNullOrEmpty(imageFileName))
+                {
+                    // видаляємо всі варіанти розмірів у папці "users"
+                    await imageService.DeleteImageAsync(imageFileName, "users");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Логування помилки видалення картинки — не перериваємо видалення користувача
+                // Замініть Console.WriteLine на ILogger у реальному коді
+                Console.WriteLine($"Error deleting user image for user {id}: {ex.Message}");
+            }
         }
 
         var result = await userManager.DeleteAsync(user);
@@ -102,11 +123,11 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             // Видаляємо старий аватар, якщо є
             if (!string.IsNullOrEmpty(user.Image))
             {
-                await imageService.DeleteImageAsync(user.Image);
+                await imageService.DeleteImageAsync(user.Image, "users");
             }
 
             // Завантажуємо нове фото
-            string newImageName = await imageService.SaveImageAsync(dto.Image);
+            string newImageName = await imageService.SaveImageAsync(dto.Image, "users");
 
             // Присвоюємо нове ім’я файла
             user.Image = newImageName;
