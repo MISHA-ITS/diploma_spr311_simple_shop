@@ -1,20 +1,22 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using WebApi.DAL;
-using WebApi.DAL.Entities.Identity;
-using WebApi.BLL.Services.Account;
-using WebApi.BLL.Services.Role;
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using WebApi;
 using WebApi.BLL;
+using WebApi.BLL.Services.Account;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-
-using System.Text;
+using WebApi.BLL.Services.Role;
 using WebApi.BLL.Services.User;
-using WebApi;
+using WebApi.DAL;
+using WebApi.DAL.Entities.Identity;
+using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +72,18 @@ builder.Services
 
 //Add automapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
+builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
 
 var app = builder.Build();
 

@@ -32,13 +32,15 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
 
         var result = await userManager.CreateAsync(user, dto.Password);
 
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            return ServiceResponse.Success($"Користувача {user.UserName} успішно додано", dto);
+            var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+            return ServiceResponse.Error($"Не вдалося створити користувача: {errors}");
         }
 
-        var errors = string.Join("; ", result.Errors.Select(e => e.Description));
-        return ServiceResponse.Error($"Не вдалося створити користувача: {errors}");
+        var roleResult = await userManager.AddToRoleAsync(user, "User");
+
+        return ServiceResponse.Success($"Користувача {user.UserName} успішно доданота призначено роль User", dto);
     }
 
     public async Task<ServiceResponse> DeleteAsync(string id)
@@ -84,7 +86,17 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
     {
         var users = await userManager.Users.ToListAsync();
 
-        var dtos = mapper.Map<List<UserDTO>>(users);
+        var dtos = new List<UserDTO>();
+
+        foreach (var user in users)
+        {
+            var dto = mapper.Map<UserDTO>(user);
+
+            var roles = await userManager.GetRolesAsync(user);
+            dto.Roles = roles.ToArray();
+
+            dtos.Add(dto);
+        }
 
         return ServiceResponse.Success("Користувачів отримано", dtos);
     }
@@ -96,6 +108,8 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
         if (user != null)
         {
             var dto = mapper.Map<UserDTO>(user);
+            var roles = await userManager.GetRolesAsync(user);
+            dto.Roles = roles.ToArray();
             return ServiceResponse.Success($"Користувача з Id {id} отримано", dto);
         }
 
