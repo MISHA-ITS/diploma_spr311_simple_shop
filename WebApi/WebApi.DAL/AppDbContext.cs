@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using WebApi.DAL.Entities;
 using WebApi.DAL.Entities.Identity;
 
 namespace WebApi.DAL;
@@ -12,6 +13,8 @@ public class AppDbContext
 {
     public AppDbContext(DbContextOptions options)
         : base(options) { }
+
+    public DbSet<CategoryEntity> Categories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
