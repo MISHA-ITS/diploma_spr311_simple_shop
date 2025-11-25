@@ -2,7 +2,7 @@
 
 namespace WebApi.DAL.Repositories.Category
 {
-    interface ICategoryRepository : IGenericRepository<CategoryEntity, long>
+    public interface ICategoryRepository : IGenericRepository<CategoryEntity, long>
     {
 
     }
