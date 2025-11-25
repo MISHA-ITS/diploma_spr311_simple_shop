@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.Category;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities;
@@ -27,12 +28,9 @@ namespace WebApi.BLL.Services.Category
                 entity.ImageUrl = imageName;
             }
 
-            var result = await categoryRepository.CreateAsync(entity);
-
-            if (result)
-                return ServiceResponse.Success("Category created successfully");
-
-            return ServiceResponse.Error("Failed to create category");
+            return await categoryRepository.CreateAsync(entity)
+                ? ServiceResponse.Success("Category created successfully")
+                : ServiceResponse.Error("Failed to create category");
         }
 
         public async Task<ServiceResponse> DeleteAsync(long id)
@@ -42,24 +40,13 @@ namespace WebApi.BLL.Services.Category
             if (entity == null)
                 return ServiceResponse.Error($"Category with Id {id} not found");
 
-            if (entity.ImageUrl != null)
-            {
-                try
-                {
-                    await imageService.DeleteImageAsync(entity.ImageUrl, "categories");
-                }
-                catch (Exception ex)
-                {
-                    return ServiceResponse.Error($"Error deleting category image: {ex.Message}");
-                }
-            }
+            var imageDeleteResult = await TryDeleteImageAsync(entity.ImageUrl);
+            if (imageDeleteResult != null)
+                return imageDeleteResult;
 
-            var result = await categoryRepository.DeleteAsync(entity);
-
-            if (result)
-                return ServiceResponse.Success("Category deleted successfully");
-
-            return ServiceResponse.Error("Failed to delete category");
+            return await categoryRepository.DeleteAsync(entity)
+                ? ServiceResponse.Success("Category deleted successfully")
+                : ServiceResponse.Error("Failed to delete category");
         }
 
         public async Task<ServiceResponse> GetAllAsync()
@@ -92,19 +79,11 @@ namespace WebApi.BLL.Services.Category
 
             if (dto.Image != null)
             {
-                if (entity.ImageUrl != null)
-                {
-                    try
-                    { 
-                        await imageService.DeleteImageAsync(entity.ImageUrl, "categories");
-                    }
-                    catch (Exception ex)
-                    {
-                        return ServiceResponse.Error($"Error deleting old category image: {ex.Message}");
-                    }
-                }
+                var imageDeleteResult = await TryDeleteImageAsync(entity.ImageUrl);
+                if (imageDeleteResult != null)
+                    return imageDeleteResult;
 
-                string? imageName = await imageService.SaveImageAsync(dto.Image, "categories");
+                string? imageName = await imageService.SaveImageAsync(dto.Image, PathSetting.CategoriesFolder);
 
                 if (string.IsNullOrEmpty(imageName))
                     return ServiceResponse.Error("Failed to save new category image");
@@ -114,12 +93,25 @@ namespace WebApi.BLL.Services.Category
 
             mapper.Map(dto, entity);
 
-            var result = await categoryRepository.UpdateAsync(entity);
+            return await categoryRepository.UpdateAsync(entity)
+                ?  ServiceResponse.Success("Category updated successfully")
+                :  ServiceResponse.Error("Failed to update category");
+        }
 
-            if (result)
-                return ServiceResponse.Success("Category updated successfully");
+        private async Task<ServiceResponse?> TryDeleteImageAsync(string? url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return null;
 
-            return ServiceResponse.Error("Failed to update category");
+            try
+            {
+                await imageService.DeleteImageAsync(url, PathSetting.CategoriesFolder);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse.Error($"Error deleting category image: {ex.Message}");
+            }
         }
     }
 }
