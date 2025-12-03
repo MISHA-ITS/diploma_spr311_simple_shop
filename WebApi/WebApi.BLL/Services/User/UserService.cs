@@ -21,7 +21,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
 
         if (dto.Image != null)
         {
-            string? imageName = await imageService.SaveImageAsync(dto.Image, PathSetting.UsersFolder);
+            string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
 
             if (!string.IsNullOrEmpty(imageName))
                 user.Image = imageName;
@@ -57,7 +57,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
                 if (!string.IsNullOrEmpty(imageFileName))
                 {
                     // видаляємо всі варіанти розмірів у папці "users"
-                    await imageService.DeleteImageAsync(imageFileName, PathSetting.UsersFolder);
+                    await imageService.DeleteImageAsync(imageFileName, Settings.UsersDir);
                 }
             }
             catch (Exception ex)
@@ -131,11 +131,11 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             // Видаляємо старий аватар, якщо є
             if (!string.IsNullOrEmpty(user.Image))
             {
-                await imageService.DeleteImageAsync(user.Image, PathSetting.UsersFolder);
+                await imageService.DeleteImageAsync(user.Image, Settings.UsersDir);
             }
 
             // Завантажуємо нове фото
-            string newImageName = await imageService.SaveImageAsync(dto.Image, PathSetting.UsersFolder);
+            string newImageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
 
             // Присвоюємо нове ім’я файла
             user.Image = newImageName;

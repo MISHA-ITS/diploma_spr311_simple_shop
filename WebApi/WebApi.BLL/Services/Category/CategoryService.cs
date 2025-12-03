@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.Category;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities;
@@ -20,7 +19,7 @@ namespace WebApi.BLL.Services.Category
 
             if(dto.Image != null)
             {
-                string? imageName = await imageService.SaveImageAsync(dto.Image, "categories");
+                string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
 
                 if (string.IsNullOrEmpty(imageName))
                     return ServiceResponse.Error("Failed to save category image");
@@ -83,7 +82,7 @@ namespace WebApi.BLL.Services.Category
                 if (imageDeleteResult != null)
                     return imageDeleteResult;
 
-                string? imageName = await imageService.SaveImageAsync(dto.Image, PathSetting.CategoriesFolder);
+                string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
 
                 if (string.IsNullOrEmpty(imageName))
                     return ServiceResponse.Error("Failed to save new category image");
@@ -105,7 +104,7 @@ namespace WebApi.BLL.Services.Category
 
             try
             {
-                await imageService.DeleteImageAsync(url, PathSetting.CategoriesFolder);
+                await imageService.DeleteImageAsync(url, Settings.CategoriesDir);
                 return null;
             }
             catch (Exception ex)
