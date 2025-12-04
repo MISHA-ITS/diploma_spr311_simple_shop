@@ -9,7 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApi;
 using WebApi.BLL;
+using WebApi.BLL.Configuration;
 using WebApi.BLL.Services.Account;
+using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
 using WebApi.BLL.Services.Role;
@@ -26,6 +28,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddControllers();
 
@@ -55,6 +58,10 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+
+//Email settings
+var EmailSection = builder.Configuration.GetSection("EmailSettings");
+builder.Services.Configure<EmailSettings>(EmailSection);
 
 // Add identity
 builder.Services
@@ -103,12 +110,19 @@ var dir = builder.Configuration["ImagesDir"];
 string path = Path.Combine(Directory.GetCurrentDirectory(), dir);
 Directory.CreateDirectory(path);
 
+string rootPath = builder.Environment.ContentRootPath;
+string wwwroot = Path.Combine(rootPath, "wwwroot");
+string imagesPath = Path.Combine(wwwroot, "images");
+
+Settings.ImagesPath = imagesPath;
+Settings.RootPath = wwwroot;
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(path),
     RequestPath = $"/{dir}"
 });
 
-await app.SeedData();
+//await app.SeedData();
 
 app.Run();

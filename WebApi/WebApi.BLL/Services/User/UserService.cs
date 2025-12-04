@@ -22,7 +22,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
 
         if (dto.Image != null)
         {
-            string? imageName = await imageService.SaveImageAsync(dto.Image, "users");
+            string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
 
             if (!string.IsNullOrEmpty(imageName))
             {
@@ -38,7 +38,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             return ServiceResponse.Error($"Не вдалося створити користувача: {errors}");
         }
 
-        var roleResult = await userManager.AddToRoleAsync(user, "User");
+        var roleResult = await userManager.AddToRoleAsync(user, Settings.UsersDir);
 
         return ServiceResponse.Success($"Користувача {user.UserName} успішно доданота призначено роль User", dto);
     }
@@ -61,7 +61,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
                 if (!string.IsNullOrEmpty(imageFileName))
                 {
                     // видаляємо всі варіанти розмірів у папці "users"
-                    await imageService.DeleteImageAsync(imageFileName, "users");
+                    await imageService.DeleteImageAsync(imageFileName, Settings.UsersDir);
                 }
             }
             catch (Exception ex)
@@ -137,11 +137,11 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             // Видаляємо старий аватар, якщо є
             if (!string.IsNullOrEmpty(user.Image))
             {
-                await imageService.DeleteImageAsync(user.Image, "users");
+                await imageService.DeleteImageAsync(user.Image, Settings.UsersDir);
             }
 
             // Завантажуємо нове фото
-            string newImageName = await imageService.SaveImageAsync(dto.Image, "users");
+            string newImageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
 
             // Присвоюємо нове ім’я файла
             user.Image = newImageName;

@@ -28,4 +28,22 @@ public class AccountController(IAccountService accountService) : ControllerBase
         var response = await accountService.LoginAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
+
+    [HttpGet("confirmEmail")]
+    public async Task<IActionResult> ConfirmEmail(string? userId, string? token)
+    {
+        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+        {
+            return BadRequest("Некоректний запит на підтвердження електронної пошти.");
+        }
+
+        var response = await accountService.ConfirmEmailAsync(userId, token);
+
+        if (response.IsSuccess)
+        {
+            return Redirect("http://Localhost:3000");
+        }
+
+        return BadRequest(response);
+    }
 }
