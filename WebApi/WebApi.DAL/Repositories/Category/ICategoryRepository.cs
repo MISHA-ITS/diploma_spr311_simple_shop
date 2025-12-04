@@ -4,6 +4,6 @@ namespace WebApi.DAL.Repositories.Category
 {
     public interface ICategoryRepository : IGenericRepository<CategoryEntity, long>
     {
-
+        Task<bool> CreateRangeAsync(IEnumerable<CategoryEntity> categories);
     }
 }

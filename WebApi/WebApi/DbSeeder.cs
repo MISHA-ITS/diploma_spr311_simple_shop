@@ -2,11 +2,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using WebApi.BLL;
 using WebApi.BLL.Constatnts;
+using WebApi.BLL.DTOs.Category;
 using WebApi.BLL.DTOs.Seeder;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL;
+using WebApi.DAL.Entities;
 using WebApi.DAL.Entities.Identity;
+using WebApi.DAL.Repositories.Category;
 
 namespace WebApi;
 
@@ -20,6 +24,8 @@ public static class DbSeeder
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+        var categoryRepository = scope.ServiceProvider.GetRequiredService<ICategoryRepository>();
+        var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
 
         context.Database.Migrate();
 
@@ -37,7 +43,7 @@ public static class DbSeeder
 
         if (!context.Users.Any())
         {
-            var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
+            
             var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Users.json");
             if (File.Exists(jsonFile))
             {
@@ -49,7 +55,7 @@ public static class DbSeeder
                     {
                         var entity = mapper.Map<AppUser>(user);
                         entity.UserName = user.Email;
-                        entity.Image = await imageService.SaveImageFromUrlAsync(user.Image, "users");
+                        entity.Image = await imageService.SaveImageFromUrlAsync(user.Image, Settings.UsersDir);
                         var result = await userManager.CreateAsync(entity, user.Password);
                         if (!result.Succeeded)
                         {
@@ -78,6 +84,50 @@ public static class DbSeeder
             else
             {
                 Console.WriteLine("Not Found File Users.json");
+            }
+        }
+
+        if(!context.Categories.Any())
+        {
+            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Categories.json");
+            if (File.Exists(jsonFile))
+            {
+                var jsonData = await File.ReadAllTextAsync(jsonFile);
+                try
+                {
+                    var categories = JsonSerializer.Deserialize<List<SeederCategoryDTO>>(jsonData);
+                    if (categories == null) return;
+
+                    IEnumerable<CategoryEntity> entities = [];
+
+                    foreach (var category in categories)
+                    {
+                        var entity = mapper.Map<CategoryEntity>(category);
+
+                        if (!string.IsNullOrWhiteSpace(category.image))
+                        {
+                            entity.ImageUrl = await imageService.SaveImageFromUrlAsync(
+                                category.image,
+                                Settings.CategoriesDir
+                            );
+                        }
+                        else
+                        {
+                            entity.ImageUrl = null;
+                        }
+
+                        entities = entities.Append(entity);
+                    }
+                    await categoryRepository.CreateRangeAsync(entities);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error Json Parse Data {0}", ex.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Not Found File Categories.json");
             }
         }
     }

@@ -41,6 +41,10 @@ namespace WebApi.DAL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 

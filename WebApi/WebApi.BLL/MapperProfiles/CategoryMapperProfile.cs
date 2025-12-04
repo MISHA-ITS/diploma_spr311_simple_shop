@@ -18,5 +18,8 @@ public class CategoryMapperProfile : Profile
 
         //CategoryEntity -> CategoryDTO
         CreateMap<CategoryEntity, CategoryDTO>();
+
+        CreateMap<SeederCategoryDTO, CategoryEntity>()
+            .ForMember(dest => dest.Slug, opt => opt.MapFrom(src => src.urlSlug));
     }
 }
