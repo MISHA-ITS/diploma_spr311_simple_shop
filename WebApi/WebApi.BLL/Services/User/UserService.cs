@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.User;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities.Identity;
@@ -12,9 +13,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
     public async Task<ServiceResponse> CreateAsync(CreateUserDto dto)
     {
         if (await userManager.FindByEmailAsync(dto.Email) != null)
-        {
             return ServiceResponse.Error($"Користувач з електронною адресою {dto.Email} вже існує");
-        }
 
         var user = mapper.Map<AppUser>(dto);
 
@@ -25,9 +24,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
 
             if (!string.IsNullOrEmpty(imageName))
-            {
                 user.Image = imageName;
-            }
         }
 
         var result = await userManager.CreateAsync(user, dto.Password);
@@ -38,7 +35,11 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             return ServiceResponse.Error($"Не вдалося створити користувача: {errors}");
         }
 
+<<<<<<< HEAD
         var roleResult = await userManager.AddToRoleAsync(user, Settings.UsersDir);
+=======
+        var roleResult = await userManager.AddToRoleAsync(user, Roles.User);
+>>>>>>> origin/Develop
 
         return ServiceResponse.Success($"Користувача {user.UserName} успішно доданота призначено роль User", dto);
     }
@@ -46,10 +47,9 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
     public async Task<ServiceResponse> DeleteAsync(string id)
     {
         var user = await userManager.FindByIdAsync(id);
+
         if (user == null)
-        {
             return ServiceResponse.Error($"Користувача з Id {id} не знайдено");
-        }
 
         if (!string.IsNullOrEmpty(user.Image))
         {
@@ -75,9 +75,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
         var result = await userManager.DeleteAsync(user);
 
         if (result.Succeeded)
-        {
             return ServiceResponse.Success($"Користувача {user.UserName} успішно видалено");
-        }
 
         return ServiceResponse.Error($"Не вдалося видалити користувача");
     }
