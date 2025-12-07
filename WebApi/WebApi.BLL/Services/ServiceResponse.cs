@@ -1,4 +1,5 @@
-﻿namespace WebApi.BLL.Services;
+﻿
+namespace WebApi.BLL.Services;
 
 public class ServiceResponse
 {
@@ -24,5 +25,10 @@ public class ServiceResponse
             Message = message,
             Payload = payLoad
         };
+    }
+
+    public static implicit operator string(ServiceResponse v)
+    {
+        throw new NotImplementedException();
     }
 }

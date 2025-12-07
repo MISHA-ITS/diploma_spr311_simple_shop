@@ -1,3 +1,9 @@
 lociyo9405@gyknife.com
 
 lociyo9405@gyknife.comQ
+
+
+
+Client ID: 16864250430-8a8gfp1d8dje5rghoabebi3qsajmbagm.apps.googleusercontent.com
+
+Client secret: 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

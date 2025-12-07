@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-namespace WebApi.BLL.DTOs.User;
+﻿namespace WebApi.BLL.DTOs.User;
 
 public class UserDTO
 {

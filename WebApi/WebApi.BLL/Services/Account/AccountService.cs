@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using WebApi.BLL.Services.Email;
+using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using WebApi.BLL.DTOs.Account;
+using WebApi.BLL.Services.Email;
+using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
 using WebApi.DAL.Entities.Identity;
 
 
 namespace WebApi.BLL.Services.Account;
 
-public class AccountService(UserManager<AppUser> userManager, IJwtTokenService jwtTokenService, IEmailService emailService) : IAccountService
+public class AccountService(UserManager<AppUser> userManager, IJwtTokenService jwtTokenService, IEmailService emailService, IConfiguration configuration, IImageService imageService) : IAccountService
 {
     public async Task<ServiceResponse?> RegisterAsync(RegisterDto dto)
     {
@@ -58,38 +62,6 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         await emailService.SendMessageAsync(user.Email, "Підтвердження електронної пошти", html);
     }
 
-    public async Task<ServiceResponse> LoginAsync(LoginDto dto)
-    {
-        var user = await userManager.FindByEmailAsync(dto.Email);
-        if (user == null)
-        {
-            return ServiceResponse.Error($"Користувача {dto.Email} не знайдено!");
-        }
-
-        var result = await userManager.CheckPasswordAsync(user, dto.Password);
-
-        if (!result)
-        {
-            return ServiceResponse.Error($"Неправильний пароль!");
-        }
-
-        string jwtToken = await jwtTokenService.GenerateTokenAsync(user);
-
-        return ServiceResponse.Success("Успішний вхід", jwtToken);
-    }
-
-    private async Task<bool> IsUniqueEmailAsync(string email)
-    {
-        var user = await userManager.FindByEmailAsync(email);
-        return user == null;
-    }
-
-    private async Task<bool> IsUniqueNameAsync(string name)
-    {
-        var user = await userManager.FindByNameAsync(name);
-        return user == null;
-    }
-
     public async Task<ServiceResponse> ConfirmEmailAsync(string userId, string token)
     {
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
@@ -122,5 +94,130 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         }
 
         return ServiceResponse.Success("Електронна пошта успішно підтверджена.");
+    }
+
+    public async Task<ServiceResponse> LoginAsync(LoginDto dto)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user == null)
+        {
+            return ServiceResponse.Error($"Користувача {dto.Email} не знайдено!");
+        }
+
+        var result = await userManager.CheckPasswordAsync(user, dto.Password);
+
+        if (!result)
+        {
+            return ServiceResponse.Error($"Неправильний пароль!");
+        }
+
+        string jwtToken = await jwtTokenService.GenerateTokenAsync(user);
+
+        return ServiceResponse.Success("Успішний вхід", jwtToken);
+    }
+
+
+
+    private async Task<bool> IsUniqueEmailAsync(string email)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+        return user == null;
+    }
+
+    private async Task<bool> IsUniqueNameAsync(string name)
+    {
+        var user = await userManager.FindByNameAsync(name);
+        return user == null;
+    }
+
+    public async Task<ServiceResponse> LoginByGoogleAsync(string token)
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var userInfoUrl = configuration["GoogleUserInfo"]
+                              ?? "https://www.googleapis.com/oauth2/v3/userinfo";
+
+            var response = await httpClient.GetAsync(userInfoUrl);
+            if (!response.IsSuccessStatusCode)
+                return ServiceResponse.Error("Недійсний токен Google.");
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var googleUser = JsonSerializer.Deserialize<GoogleAccountDto>(json, options);
+
+            if (googleUser == null || string.IsNullOrWhiteSpace(googleUser.Email))
+                return ServiceResponse.Error("Не вдалося отримати інформацію про користувача з Google.");
+
+            var existingUser = await userManager.FindByEmailAsync(googleUser.Email);
+            if (existingUser != null)
+            {
+                if (!string.IsNullOrWhiteSpace(googleUser.GoogleId))
+                {
+                    var userLoginGoogle = await userManager.FindByLoginAsync("Google", googleUser.GoogleId);
+                    if (userLoginGoogle == null)
+                    {
+                        await userManager.AddLoginAsync(existingUser,
+                            new UserLoginInfo("Google", googleUser.GoogleId, "Google"));
+                    }
+                }
+                var existingUserJwtToken = await jwtTokenService.GenerateTokenAsync(existingUser);
+                return ServiceResponse.Success("Успішний вхід через Google.", existingUserJwtToken);
+            }
+
+            var user = new AppUser
+            {
+                Email = googleUser.Email,
+                UserName = googleUser.Email,
+                FirstName = googleUser.Name
+            };
+
+            if (!string.IsNullOrWhiteSpace(googleUser.Picture))
+            {
+                try
+                {
+                    user.Image = await imageService.SaveImageFromUrlAsync(googleUser.Picture, Settings.UsersDir);
+                }
+                catch
+                {
+
+                }
+            }
+
+            var createRes = await userManager.CreateAsync(user);
+            if (!createRes.Succeeded)
+                return ServiceResponse.Error("Не вдалося створити користувача.");
+
+            if (!string.IsNullOrWhiteSpace(googleUser.GoogleId))
+            {
+                await userManager.AddLoginAsync(user, new UserLoginInfo(
+                    loginProvider: "Google",
+                    providerKey: googleUser.GoogleId,
+                    displayName: "Google"
+                ));
+            }
+
+            var jwtToken = await jwtTokenService.GenerateTokenAsync(user);
+            return ServiceResponse.Success("Успішний вхід через Google.", jwtToken);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResponse.Error($"Помилка при вході через Google: {ex.Message}");
+        }
+    }
+
+    public sealed class GoogleAccountDto
+    {
+        public string? Sub { get; set; }
+        public string? Email { get; set; }
+        public string? Name { get; set; }
+        public string? Picture { get; set; }
+
+        // зручно звести до однієї властивості
+        public string? GoogleId => !string.IsNullOrWhiteSpace(Sub) ? Sub : null;
     }
 }

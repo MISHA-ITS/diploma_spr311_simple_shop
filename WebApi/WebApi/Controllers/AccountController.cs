@@ -46,4 +46,24 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
         return BadRequest(response);
     }
+
+    [HttpPost("googleLogin")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto model)
+    {
+        var result = await accountService.LoginByGoogleAsync(model.Token);
+
+        if (string.IsNullOrEmpty(result))
+        {
+            return BadRequest(new
+            {
+                Status = 400,
+                IsValid = false,
+                Errors = new { Email = "Помилка реєстрації" }
+            });
+        }
+        return Ok(new
+        {
+            Token = result
+        });
+    }
 }
