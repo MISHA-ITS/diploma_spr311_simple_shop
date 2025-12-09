@@ -2,72 +2,97 @@
 using WebApi.BLL.DTOs.Role;
 using WebApi.DAL.Entities.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace WebApi.BLL.Services.Role;
 
-public class RoleService(RoleManager<AppRole> roleManager) : IRoleService
+public class RoleService(RoleManager<AppRole> roleManager, IMapper mapper) : IRoleService
 {
-    public async Task<bool> CreateAsync(CreateRoleDto dto)
+    public async Task<ServiceResponse> CreateAsync(CreateRoleDto dto)
     {
-        var entity = new AppRole
+        if (!await IsUniqueNameAsync(dto.Name))
         {
-            Name = dto.Name
-        };
+            return ServiceResponse.Error($"Роль з іменем {dto.Name} вже існує");
+        }
+
+        var entity = mapper.Map<AppRole>(dto);
+
         var result = await roleManager.CreateAsync(entity);
-        return result.Succeeded;
+        entity.NormalizedName = dto.Name.ToUpper();
+
+        if (result.Succeeded)
+        {
+            return ServiceResponse.Success($"Роль {entity.Name} успішно додано", dto);
+        }
+        return ServiceResponse.Error($"Не вдалося створити роль");
     }
 
-    public async Task<bool> DeleteAsync(long id)
+    public async Task<ServiceResponse> DeleteAsync(long id)
     {
         var entity = await roleManager.FindByIdAsync(id.ToString());
+
         if (entity == null)
         {
-            return false;
+            return ServiceResponse.Error($"Роль з id {id} не знайдено");
         }
+
         var result = await roleManager.DeleteAsync(entity);
-        return result.Succeeded;
+
+        if (result.Succeeded)
+        {
+            return ServiceResponse.Success($"Роль {entity.Name} успішно видалено");
+        }
+        return ServiceResponse.Error($"Не вдалося видалити роль {entity.Name}");
     }
 
-    public async Task<IEnumerable<RoleDto>> GetAllAsync()
+    public async Task<ServiceResponse> GetAllAsync()
     {
         var entities = await roleManager.Roles.ToListAsync();
 
-        var dtos = entities.Select(e => new RoleDto
-        {
-            Id = e.Id,
-            Name = e.Name ?? "Noname"
-        });
+        var dtos = mapper.Map<List<RoleDto>>(entities);
 
-        return dtos;
+        return ServiceResponse.Success("Ролі успішно отримано", dtos);
     }
 
-    public async Task<RoleDto?> GetByIdAsync(long id)
+    public async Task<ServiceResponse> GetByIdAsync(long id)
     {
         var entity = await roleManager.FindByIdAsync(id.ToString());
 
         if (entity == null)
         {
-            return null;
+            return ServiceResponse.Error($"Роль з id {id} не знайдено");
         }
 
-        var dto = new RoleDto
-        {
-            Id = entity.Id,
-            Name = entity.Name ?? "Noname"
-        };
+        var dto = mapper.Map<RoleDto>(entity);
 
-        return dto;
+        return ServiceResponse.Success($"Роль {entity.Name} успішно отримано", dto);
     }
 
-    public async Task<bool> UpdateAsync(UpdateRoleDto dto)
+    public async Task<ServiceResponse> UpdateAsync(UpdateRoleDto dto)
     {
-        var entity = new AppRole
+        var entity = mapper.Map<AppRole>(dto);
+
+        if (!await IsUniqueNameAsync(dto.Name))
         {
-            Id = dto.Id,
-            Name = dto.Name
-        };
+            var existingRole = await roleManager.FindByNameAsync(dto.Name);
+            if (existingRole != null && existingRole.Id != dto.Id)
+            {
+                return ServiceResponse.Error($"Роль з іменем {dto.Name} вже існує");
+            }
+        }
 
         var result = await roleManager.UpdateAsync(entity);
-        return result.Succeeded;
+
+        if (result.Succeeded)
+        {
+            return ServiceResponse.Success($"Роль {entity.Name} успішно оновлено", dto);
+        }
+        return ServiceResponse.Error($"Не вдалося оновити роль {entity.Name}");
+    }
+
+    public async Task<bool> IsUniqueNameAsync(string name)
+    {
+        return !await roleManager.Roles
+            .AnyAsync(c => c.NormalizedName == name.Trim().ToUpper());
     }
 }

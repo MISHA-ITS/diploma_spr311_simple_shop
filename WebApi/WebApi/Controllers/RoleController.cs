@@ -5,15 +5,14 @@ using WebApi.BLL.Services.Role;
 namespace WebApi.Controllers;
 
 [ApiController]
-[Route("api/role")]
+[Route("api/[controller]/[action]")]
 public class RoleController(IRoleService roleService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromForm] CreateRoleDto dto)
     {
-        var result = await roleService.CreateAsync(dto);
-        return result ? Ok("Role created successfully.")
-                      : BadRequest("Failed to create role.");
+        var response = await roleService.CreateAsync(dto);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
     [HttpGet]
@@ -22,34 +21,32 @@ public class RoleController(IRoleService roleService) : ControllerBase
         if (id == null)
             return BadRequest("Id is required.");
 
-        var result = await roleService.GetByIdAsync(id.Value);
-
-        return result == null ? NotFound("Role not found.") : Ok(result);
+        var response = await roleService.GetByIdAsync(id.Value);
+        return response.IsSuccess ? Ok(response) : NotFound(response);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateAsync([FromForm] UpdateRoleDto dto)
     {
-        var result = await roleService.UpdateAsync(dto);
-        return result ? Ok("Role updated successfully.")
-                      : BadRequest("Failed to update role.");
+        var response = await roleService.UpdateAsync(dto);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
     [HttpDelete]
     public async Task<IActionResult> DeleteAsync(long id)
     {
         if (id <= 0)
-            return BadRequest("Invalid id.");
+            return BadRequest("Id is required and must be greater than 0!");
 
-        var result = await roleService.DeleteAsync(id);
-        return result ? Ok("Role deleted") : NotFound("Role not found.");
+        var response = await roleService.DeleteAsync(id);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
     [HttpGet("list")]
     public async Task<IActionResult> GetAllAsync()
     {
-        var result = await roleService.GetAllAsync();
-        return Ok(result);
+        var response = await roleService.GetAllAsync();
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 }
 

@@ -11,13 +11,17 @@ using WebApi;
 using WebApi.BLL;
 using WebApi.BLL.Configuration;
 using WebApi.BLL.Services.Account;
+using WebApi.BLL.Services.Category;
+
 using WebApi.BLL.Services.Email;
+using WebApi.BLL.Services.Category;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
 using WebApi.BLL.Services.Role;
 using WebApi.BLL.Services.User;
 using WebApi.DAL;
 using WebApi.DAL.Entities.Identity;
+using WebApi.DAL.Repositories.Category;
 using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +33,9 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddControllers();
 

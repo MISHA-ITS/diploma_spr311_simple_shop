@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using WebApi.BLL.DTOs.Role;
+using WebApi.DAL.Entities.Identity;
 
 namespace WebApi.BLL.MapperProfiles;
 
@@ -8,13 +8,13 @@ public class RoleMapperProfile : Profile
 {
     public RoleMapperProfile()
     {
-        //CreateRoleDTO -> RoleEntity
-        CreateMap<CreateRoleDto, IdentityRole>();
+        // CreateRoleDto -> AppRole
+        CreateMap<CreateRoleDto, AppRole>();
 
-        //UpdateRoleDTO -> RoleEntity
-        CreateMap<UpdateRoleDto, IdentityRole>();
+        // UpdateRoleDto -> AppRole
+        CreateMap<UpdateRoleDto, AppRole>();
 
-        //RoleEntity -> RoleDTO
-        CreateMap<IdentityRole, RoleDto>();
+        // AppRole -> RoleDto
+        CreateMap<AppRole, RoleDto>();
     }
 }
