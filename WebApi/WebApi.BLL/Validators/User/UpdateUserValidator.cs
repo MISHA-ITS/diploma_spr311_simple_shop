@@ -1,22 +1,17 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebApi.BLL.DTOs.User;
 
-namespace WebApi.BLL.Validators;
+namespace WebApi.BLL.Validators.User;
 
-public class CreateUserValidator : AbstractValidator<CreateUserDto>
+public class UpdateUserValidator : AbstractValidator<UpdateUserDto>
 {
-    public CreateUserValidator()
+    public UpdateUserValidator()
     {
-        RuleFor(x => x.Email).NotEmpty().WithMessage("Вкажіть адресу електронної пошти.")
-            .EmailAddress().WithMessage("Невірний формат електронної пошти.");
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("Id обов'язковий для оновлення");
 
-        RuleFor(x => x.Password).NotEmpty().WithMessage("Пароль обов'язковий")
-            .MinimumLength(6).WithMessage("Мінімальна довжина паролю 6 символів");
+        RuleFor(x => x.Email).NotEmpty().WithMessage("Вкажіть адресу електронної пошти")
+            .EmailAddress().WithMessage("Невірний формат електронної пошти");
 
         RuleFor(x => x.FirstName).NotEmpty().WithMessage("Вкажіть ім'я користувача")
             .MinimumLength(3).WithMessage("Ім'я повинно містити не менше трьох символів")

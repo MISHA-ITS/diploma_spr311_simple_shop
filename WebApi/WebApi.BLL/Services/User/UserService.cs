@@ -34,12 +34,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
             var errors = string.Join("; ", result.Errors.Select(e => e.Description));
             return ServiceResponse.Error($"Не вдалося створити користувача: {errors}");
         }
-
-<<<<<<< HEAD
-        var roleResult = await userManager.AddToRoleAsync(user, Settings.UsersDir);
-=======
         var roleResult = await userManager.AddToRoleAsync(user, Roles.User);
->>>>>>> origin/Develop
 
         return ServiceResponse.Success($"Користувача {user.UserName} успішно доданота призначено роль User", dto);
     }

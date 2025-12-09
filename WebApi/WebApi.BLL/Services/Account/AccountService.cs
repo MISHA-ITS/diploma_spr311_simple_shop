@@ -9,7 +9,6 @@ using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
 using WebApi.DAL.Entities.Identity;
 
-
 namespace WebApi.BLL.Services.Account;
 
 public class AccountService(UserManager<AppUser> userManager, IJwtTokenService jwtTokenService, IEmailService emailService, IConfiguration configuration, IImageService imageService) : IAccountService
@@ -115,8 +114,6 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
         return ServiceResponse.Success("Успішний вхід", jwtToken);
     }
-
-
 
     private async Task<bool> IsUniqueEmailAsync(string email)
     {

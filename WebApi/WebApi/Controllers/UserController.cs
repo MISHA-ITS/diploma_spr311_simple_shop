@@ -5,7 +5,7 @@ using WebApi.BLL.Services.User;
 namespace WebApi.Controllers;
 
 [ApiController]
-[Route("api/user")]
+[Route("api/[controller]/[action]")]
 public class UserController(IUserService userService) : ControllerBase
 {
     [HttpPost]

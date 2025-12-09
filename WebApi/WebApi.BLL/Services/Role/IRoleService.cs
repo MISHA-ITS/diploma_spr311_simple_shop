@@ -4,9 +4,9 @@ namespace WebApi.BLL.Services.Role;
 
 public interface IRoleService
 {
-    Task<bool> CreateAsync(CreateRoleDto dto);
-    Task<bool> UpdateAsync(UpdateRoleDto dto);
-    Task<bool> DeleteAsync(long id);
-    Task<RoleDto?> GetByIdAsync(long id);
-    Task<IEnumerable<RoleDto>> GetAllAsync();
+    Task<ServiceResponse> CreateAsync(CreateRoleDto dto);
+    Task<ServiceResponse> UpdateAsync(UpdateRoleDto dto);
+    Task<ServiceResponse> DeleteAsync(long id);
+    Task<ServiceResponse> GetByIdAsync(long id);
+    Task<ServiceResponse> GetAllAsync();
 }
