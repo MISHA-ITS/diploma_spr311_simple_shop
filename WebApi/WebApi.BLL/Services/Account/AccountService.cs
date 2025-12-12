@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Web;
 using WebApi.BLL.DTOs.Account;
 using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
@@ -58,7 +59,7 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         string url = $"http://localhost:5172/api/account/confirmEmail?userId={user.Id}&token={token}";
         html = html.Replace("action_url", url);
 
-        await emailService.SendMessageAsync(user.Email, "Підтвердження електронної пошти", html);
+        await emailService.SendMessageAsync(user.Email!, "Підтвердження електронної пошти", html, true);
     }
 
     public async Task<ServiceResponse> ConfirmEmailAsync(string userId, string token)
@@ -205,6 +206,80 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         {
             return ServiceResponse.Error($"Помилка при вході через Google: {ex.Message}");
         }
+    }
+
+    public async Task<ServiceResponse> ForgotPasswordAsync(ForgotPasswordDto dto)
+    { 
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+            return ServiceResponse.Error("Користувача з такою електронною поштою не знайдено");
+
+        // 1. Генерація токена
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        //byte[] bytes = Encoding.UTF8.GetBytes(token);
+        //var encodedToken = Convert.ToBase64String(bytes);
+
+        // 2. Кодуємо токен для URL (ЦЕ ПРАВИЛЬНО)
+        var encodedToken = HttpUtility.UrlEncode(token);
+
+        // 3. Завантажуємо HTML-шаблон
+        string htmlPath = Path.Combine(Settings.RootPath ?? "/", "templates", "html", "reset_password.html");
+        string html = File.ReadAllText(htmlPath);
+
+        // 4. Формуємо URL з токеном
+        string url = $"http://localhost:5172/reset-password?email={user.Email}&token={encodedToken}";
+
+        // 5. Підставляємо action_url у HTML
+        html = html.Replace("action_url", url);
+
+        // 6. Відправляємо лист
+        await emailService.SendMessageAsync(user.Email!, "Скидання пароля", html, true);
+
+        return ServiceResponse.Success("Лист для скидання пароля успішно надіслано");
+    }
+
+    public async Task<ServiceResponse> ValidateResetTokenAsync(ValidateResetTokenDto dto)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+            return ServiceResponse.Error("Користувача з такою електронною поштою не знайдено");
+
+        // Розкодовуємо Base64 назад у токен
+        var token = HttpUtility.UrlDecode(dto.Token);
+        //byte[] tokenBytes = Convert.FromBase64String(dto.Token);
+        //var token = Encoding.UTF8.GetString(tokenBytes);
+
+        var isValid = await userManager.VerifyUserTokenAsync(
+            user,
+            TokenOptions.DefaultProvider,
+            "ResetPassword",
+            token 
+        );
+
+        if (!isValid)
+            return ServiceResponse.Error("Токен недійсний або прострочений");
+
+        return ServiceResponse.Success("Токен валідний");
+    }
+
+    public async Task<ServiceResponse> ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+            return ServiceResponse.Error("Користувача з такою електронною поштою не знайдено");
+
+        // Декодуємо токен
+        var token = HttpUtility.UrlDecode(dto.Token);
+
+        var result = await userManager.ResetPasswordAsync(user, token, dto.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+            return ServiceResponse.Error("Не вдалося скинути пароль: " + errors);
+        }
+
+        return ServiceResponse.Success("Пароль успішно змінено");
     }
 
     public sealed class GoogleAccountDto
