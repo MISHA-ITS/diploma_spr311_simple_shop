@@ -9,4 +9,5 @@ public class CategoryEntity : BaseEntity<long>
     public required string Name { get; set; }
     public string Slug { get; set; } = null!;
     public string? ImageUrl { get; set; }
+    public ICollection<ProductEntity> Products { get; set; } = [];
 }

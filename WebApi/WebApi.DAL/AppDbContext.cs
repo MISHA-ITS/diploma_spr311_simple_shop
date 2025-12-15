@@ -63,5 +63,10 @@ public class AppDbContext
                 .HasForeignKey(rc => rc.RoleId)
                 .IsRequired();
         });
+
+        modelBuilder.Entity<ProductEntity>()
+            .HasMany(p => p.Categories)
+            .WithMany(c => c.Products)
+            .UsingEntity(j => j.ToTable("ProductCategories"));
     }
 }
