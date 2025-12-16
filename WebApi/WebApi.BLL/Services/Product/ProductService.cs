@@ -23,7 +23,6 @@ namespace WebApi.BLL.Services.Product
 
             if (dto.Images != null)
             {
-                entity.Images = new List<ProductImageEntity>();
 
                 foreach (var image in dto.Images)
                 {
@@ -34,7 +33,7 @@ namespace WebApi.BLL.Services.Product
 
                     entity.Images.Add(new ProductImageEntity
                     {
-                        Name = imageName
+                        ImageUrl = imageName
                     });
                 }
             }
@@ -43,6 +42,8 @@ namespace WebApi.BLL.Services.Product
                 .GetAll()
                 .Where(c => dto.Categories.Select(x => x.ToUpper()).Contains(c.Name.ToUpper()))
                 .ToList();
+
+            entity.Categories = categories;
 
             return await productRepository.CreateAsync(entity)
                 ? ServiceResponse.Success("Product created successfully")
@@ -56,9 +57,13 @@ namespace WebApi.BLL.Services.Product
             if (entity == null)
                 return ServiceResponse.Error($"Product with Id {id} not found");
 
-            var imageDeleteResult = await TryDeleteImageAsync(entity.Name);
-            if (imageDeleteResult != null)
-                return imageDeleteResult;
+
+            foreach (var image in entity.Images)
+            {
+                var imageDeleteResult = await TryDeleteImageAsync(image.ImageUrl);
+                if (imageDeleteResult != null)
+                    return imageDeleteResult;
+            }
 
             return await productRepository.DeleteAsync(entity)
                 ? ServiceResponse.Success("product deleted successfully")
@@ -92,12 +97,13 @@ namespace WebApi.BLL.Services.Product
 
             if (entity == null)
                 return ServiceResponse.Error($"Product with Id {dto.Id} not found");
+;
 
             if (dto.Images != null)
             {
                 foreach (var image in entity.Images)
                 {
-                    var imageDeleteResult = await TryDeleteImageAsync(entity.Name);
+                    var imageDeleteResult = await TryDeleteImageAsync(image.ImageUrl);
                     if (imageDeleteResult != null)
                         return imageDeleteResult;
                 }
@@ -113,7 +119,7 @@ namespace WebApi.BLL.Services.Product
 
                     entity.Images.Add(new ProductImageEntity
                     {
-                        Name = imageName
+                        ImageUrl = imageName,
                     });
                 }
             }

@@ -23,6 +23,8 @@ using WebApi.DAL;
 using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Repositories.Category;
 using WebApi.Filters;
+using WebApi.BLL.Services.Product;
+using WebApi.DAL.Repositories.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,8 +36,10 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddControllers();
 
