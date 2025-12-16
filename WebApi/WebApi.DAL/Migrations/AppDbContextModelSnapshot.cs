@@ -34,7 +34,7 @@ namespace WebApi.DAL.Migrations
 
                     b.HasIndex("ProductsId");
 
-                    b.ToTable("ProductCategories", (string)null);
+                    b.ToTable("CategoryEntityProductEntity");
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.CategoryEntity", b =>
@@ -330,12 +330,7 @@ namespace WebApi.DAL.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
                     b.Property<long>("ProductId")
