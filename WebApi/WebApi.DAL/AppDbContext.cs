@@ -63,11 +63,5 @@ public class AppDbContext
                 .HasForeignKey(rc => rc.RoleId)
                 .IsRequired();
         });
-
-        modelBuilder.Entity<ProductImageEntity>()
-        .HasOne(pi => pi.Product)
-        .WithMany(p => p.Images)
-        .HasForeignKey(pi => pi.ProductId)
-        .OnDelete(DeleteBehavior.Cascade);
     }
 }
