@@ -22,6 +22,21 @@ namespace WebApi.DAL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("CategoryEntityProductEntity", b =>
+                {
+                    b.Property<long>("CategoriesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CategoriesId", "ProductsId");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("CategoryEntityProductEntity");
+                });
+
             modelBuilder.Entity("WebApi.DAL.Entities.CategoryEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -41,9 +56,6 @@ namespace WebApi.DAL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<long?>("ProductEntityId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("text");
@@ -52,8 +64,6 @@ namespace WebApi.DAL.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductEntityId");
 
                     b.ToTable("Categories");
                 });
@@ -320,12 +330,7 @@ namespace WebApi.DAL.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
                     b.Property<long>("ProductId")
@@ -341,11 +346,19 @@ namespace WebApi.DAL.Migrations
                     b.ToTable("ProductImages");
                 });
 
-            modelBuilder.Entity("WebApi.DAL.Entities.CategoryEntity", b =>
+            modelBuilder.Entity("CategoryEntityProductEntity", b =>
                 {
+                    b.HasOne("WebApi.DAL.Entities.CategoryEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebApi.DAL.Entities.ProductEntity", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("ProductEntityId");
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.Identity.AppRoleClaim", b =>
@@ -442,8 +455,6 @@ namespace WebApi.DAL.Migrations
 
             modelBuilder.Entity("WebApi.DAL.Entities.ProductEntity", b =>
                 {
-                    b.Navigation("Categories");
-
                     b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
