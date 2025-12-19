@@ -86,10 +86,8 @@ public class ImageService(IConfiguration configuration) : IImageService
 
     private async Task SaveImageAsync(byte[] bytes, string name, int size, string folder)
     {
-        var ImagesDir = configuration["ImagesDir"]!;
-
         // wwwroot/images/users, etc.
-        var targetDir = Path.Combine(Directory.GetCurrentDirectory(), ImagesDir, folder);
+        var targetDir = Path.Combine(Settings.ImagesPath, folder);
 
         // Створюємо папку якщо її немає
         if (!Directory.Exists(targetDir))
