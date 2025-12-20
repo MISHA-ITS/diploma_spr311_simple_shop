@@ -1,0 +1,8 @@
+2025-12-20 09:15:32 [Information] Now listening on: "http://localhost:5172"
+2025-12-20 09:15:50 [Debug] Retrieving all categories
+2025-12-20 09:16:11 [Debug] Fetching all entities of type "CategoryEntity"
+2025-12-20 09:16:11 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-20 09:16:11 [Information] Hosting environment: "Development"
+2025-12-20 09:16:11 [Information] Content root path: "D:\ITStep\Diplom\diploma_spr311_simple_shop\WebApi\WebApi"
+2025-12-20 09:16:11 [Information] Retrieved 44 categories
+2025-12-20 09:16:11 [Information] HTTP "GET" "/api/Category/list" responded 200 in 20985.3211 ms
