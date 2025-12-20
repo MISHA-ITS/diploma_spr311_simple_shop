@@ -3,7 +3,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using Microsoft.Extensions.Configuration;
-using Org.BouncyCastle.Asn1.X509;
 
 namespace WebApi.BLL.Services.Image;
 
@@ -11,9 +10,10 @@ public class ImageService(IConfiguration configuration) : IImageService
 {
     public async Task DeleteImageAsync(string name, string folder)
     {
-        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
+        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>()
+            ?? throw new InvalidOperationException("ImageSizes configuration is missing or invalid");
 
-        var dir = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!, folder);
+        var dir = Path.Combine(Settings.ImagesPath, folder);
 
         Task[] tasks = sizes
             .AsParallel()
@@ -54,11 +54,10 @@ public class ImageService(IConfiguration configuration) : IImageService
     private async Task<string> SaveImageAsync(byte[] bytes, string folder)
     {
         string imageName = $"{Path.GetRandomFileName()}.webp";
-        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
+        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>()
+            ?? throw new InvalidOperationException("ImageSizes configuration is missing or invalid");
 
-        var baseDir = configuration["ImagesDir"]!;
-
-        string folderPath = Path.Combine(Directory.GetCurrentDirectory(), baseDir, folder);
+        string folderPath = Path.Combine(Settings.ImagesPath, folder);
 
         if (!Directory.Exists(folderPath))
             Directory.CreateDirectory(folderPath);
@@ -87,10 +86,8 @@ public class ImageService(IConfiguration configuration) : IImageService
 
     private async Task SaveImageAsync(byte[] bytes, string name, int size, string folder)
     {
-        var ImagesDir = configuration["ImagesDir"]!;
-
         // wwwroot/images/users, etc.
-        var targetDir = Path.Combine(Directory.GetCurrentDirectory(), ImagesDir, folder);
+        var targetDir = Path.Combine(Settings.ImagesPath, folder);
 
         // Створюємо папку якщо її немає
         if (!Directory.Exists(targetDir))

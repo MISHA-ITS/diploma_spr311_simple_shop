@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using WebApi.BLL.DTOs.Category;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebApi.BLL.DTOs.Product;
-using WebApi.BLL.Services.Category;
 using WebApi.BLL.Services.Product;
 
 namespace WebApi.Controllers;
@@ -26,9 +23,9 @@ public class ProductController(IProductService productService) : ControllerBase
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] ProductFilterDto filter)
     {
-        var responce = await productService.GetAllAsync();
+        var responce = await productService.GetAllAsync(filter);
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -12,17 +13,27 @@ using WebApi.DAL.Entities.Identity;
 
 namespace WebApi.BLL.Services.Account;
 
-public class AccountService(UserManager<AppUser> userManager, IJwtTokenService jwtTokenService, IEmailService emailService, IConfiguration configuration, IImageService imageService) : IAccountService
+public class AccountService(UserManager<AppUser> userManager, 
+    IJwtTokenService jwtTokenService, 
+    IEmailService emailService, 
+    IConfiguration configuration, 
+    IImageService imageService,
+    ILogger<AccountService> logger) : IAccountService
 {
     public async Task<ServiceResponse?> RegisterAsync(RegisterDto dto)
     {
+        logger.LogInformation("Starting user registration. Email: {Email}, UserName: {UserName}", 
+            dto.Email, dto.UserName);
+
         if (!await IsUniqueEmailAsync(dto.Email))
         {
+            logger.LogWarning("Registration failed. Email already exists: {Email}", dto.Email);
             return ServiceResponse.Error($"Адреса електронної пошти {dto.Email} вже існує");
         }
 
         if (!await IsUniqueNameAsync(dto.UserName))
         {
+            logger.LogWarning("Registration failed. Username already exists: {UserName}", dto.UserName);
             return ServiceResponse.Error($"Ім'я {dto.UserName} вже існує");
         }
 
@@ -34,38 +45,66 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
             Email = dto.Email
         };
 
+        logger.LogDebug("Creating user entity for {UserName}", user.UserName);
+
         var result = await userManager.CreateAsync(user, dto.Password);
 
         if (result.Succeeded)
         {
+            logger.LogInformation("User successfully created. UserId: {UserId}, Email: {Email}", 
+                user.Id, user.Email);
+
             await SendEmailConfirmMessageAsync(user);
+            logger.LogInformation("Confirmation email sent. UserId: {UserId}", user.Id);
 
             string jwtToken = await jwtTokenService.GenerateTokenAsync(user);
+            logger.LogInformation("JWT token generated for UserId: {UserId}", user.Id);
 
             return ServiceResponse.Success("Реєтрація успішна", jwtToken);
         }
 
-        return ServiceResponse.Error(result.Errors.First().Description);
+        var error = result.Errors.First();
+        logger.LogError("User registration failed. Email: {Email}, ErrorCode: {Code}, Error: {Error}", 
+            dto.Email, error.Code, error.Description);
+
+        return ServiceResponse.Error(error.Description);
     }
 
     private async Task SendEmailConfirmMessageAsync(AppUser user)
     {
+        logger.LogInformation("Starting email confirmation message sending. UserId: {UserId}, Email: {Email}", 
+            user.Id, user.Email);
+
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        logger.LogDebug("Email confirmation token generated for UserId: {UserId}", user.Id);
+
         byte[] bytes = Encoding.UTF8.GetBytes(token);
         token = Convert.ToBase64String(bytes);
 
         string htmlPath = Path.Combine(Settings.RootPath ?? "/", "templates", "html", "confirm_emaill.html");
+
+        if (!File.Exists(htmlPath))
+        {
+            logger.LogError("Email confirmation template not found. Path: {Path}", htmlPath);
+            throw new FileNotFoundException("Email template not found", htmlPath);
+        }
+
         string html = File.ReadAllText(htmlPath);
         string url = $"http://localhost:5172/api/account/confirmEmail?userId={user.Id}&token={token}";
         html = html.Replace("action_url", url);
 
         await emailService.SendMessageAsync(user.Email!, "Підтвердження електронної пошти", html, true);
+        logger.LogInformation("Email confirmation message successfully sent. UserId: {UserId}, Email: {Email}", 
+            user.Id, user.Email);
     }
 
     public async Task<ServiceResponse> ConfirmEmailAsync(string userId, string token)
     {
+        logger.LogInformation("Starting email confirmation. UserId: {UserId}", userId);
+
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
         {
+            logger.LogWarning("Email confirmation failed due to invalid request data. UserId: {UserId}", userId);
             return ServiceResponse.Error("Невірний запит на підтвердження.");
         }
 
@@ -73,6 +112,7 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
         if (user == null)
         {
+            logger.LogWarning("Email confirmation failed. User not found. UserId: {UserId}", userId);
             return ServiceResponse.Error("Користувача не знайдено.");
         }
 
@@ -80,9 +120,12 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         {
             byte[] bytes = Convert.FromBase64String(token);
             token = Encoding.UTF8.GetString(bytes);
+
+            logger.LogDebug("Email confirmation token successfully decoded. UserId: {UserId}", userId);
         }
-        catch
+        catch (Exception ex)
         {
+            logger.LogWarning(ex, "Invalid email confirmation token format. UserId: {UserId}", userId);
             return ServiceResponse.Error("Некоректний токен.");
         }
 
@@ -90,17 +133,25 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
         if (!result.Succeeded)
         {
+            logger.LogError("Email confirmation failed. UserId: {UserId}, Errors: {Errors}", 
+                userId, result.Errors.Select(e => e.Description));
             return ServiceResponse.Error("Не вдалося підтвердити електронну пошту.");
         }
+
+        logger.LogInformation("Email successfully confirmed. UserId: {UserId}, Email: {Email}", 
+            user.Id, user.Email);
 
         return ServiceResponse.Success("Електронна пошта успішно підтверджена.");
     }
 
     public async Task<ServiceResponse> LoginAsync(LoginDto dto)
     {
+        logger.LogInformation("Login attempt started. Email: {Email}", dto.Email);
+
         var user = await userManager.FindByEmailAsync(dto.Email);
         if (user == null)
         {
+            logger.LogWarning("Login failed. User not found. Email: {Email}", dto.Email);
             return ServiceResponse.Error($"Користувача {dto.Email} не знайдено!");
         }
 
@@ -108,10 +159,14 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
         if (!result)
         {
+            logger.LogWarning("Login failed. Invalid password. UserId: {UserId}, Email: {Email}", 
+                user.Id, user.Email);
             return ServiceResponse.Error($"Неправильний пароль!");
         }
 
         string jwtToken = await jwtTokenService.GenerateTokenAsync(user);
+        logger.LogInformation("Login successful. UserId: {UserId}, Email: {Email}", 
+            user.Id, user.Email);
 
         return ServiceResponse.Success("Успішний вхід", jwtToken);
     }
@@ -130,6 +185,8 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
     public async Task<ServiceResponse> LoginByGoogleAsync(string token)
     {
+        logger.LogInformation("Google login attempt started");
+
         try
         {
             // Створюємо HTTP-клієнт для запиту до Google API
@@ -148,7 +205,11 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
             var response = await httpClient.GetAsync(userInfoUrl);
             // Якщо статус неуспішний — токен недійсний або прострочений
             if (!response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("Google login failed. Invalid or expired Google token. StatusCode: {StatusCode}", 
+                    response.StatusCode);
                 return ServiceResponse.Error("Недійсний або прострочений токен Google.");
+            }
 
             // Читаємо відповідь у JSON-форматі
             var json = await response.Content.ReadAsStringAsync();
@@ -160,13 +221,20 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
             // Перевірка: якщо Google не повернув email — це критична помилка
             if (googleUser == null || string.IsNullOrWhiteSpace(googleUser.Email))
+            {
+                logger.LogError("Google login failed. Google did not return email.");
                 return ServiceResponse.Error("Не вдалося отримати інформацію про користувача з Google.");
+            }
+
+            logger.LogInformation("Google user info received. Email: {Email}", googleUser.Email);
 
             // Перевіряємо, чи існує користувач з таким email у нашій системі
             var existingUser = await userManager.FindByEmailAsync(googleUser.Email);
             
             if (existingUser != null)
             {
+                logger.LogInformation("Existing user logging in via Google. UserId: {UserId}, Email: {Email}", 
+                    existingUser.Id, existingUser.Email);
                 // Якщо Google повернув свій GoogleId — перевіряємо логіни
                 if (!string.IsNullOrWhiteSpace(googleUser.GoogleId))
                 {
@@ -177,12 +245,16 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
                     {
                         await userManager.AddLoginAsync(existingUser,
                             new UserLoginInfo("Google", googleUser.GoogleId, "Google"));
+
+                        logger.LogInformation("Google login linked to existing user. UserId: {UserId}", existingUser.Id);
                     }
                 }
                 // Генеруємо JWT для існуючого користувача
                 var existingUserJwtToken = await jwtTokenService.GenerateTokenAsync(existingUser);
                 return ServiceResponse.Success("Успішний вхід через Google.", existingUserJwtToken);
             }
+
+            logger.LogInformation("Creating new user from Google account. Email: {Email}", googleUser.Email);
 
             // Якщо користувача немає — створюємо нового
             var user = new AppUser
@@ -199,17 +271,22 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
                 {
                     // Завантажуємо фото на сервер у каталог користувачів
                     user.Image = await imageService.SaveImageFromUrlAsync(googleUser.Picture, Settings.UsersDir);
+                    logger.LogDebug("Google user avatar saved. Email: {Email}", googleUser.Email);
                 }
-                catch
+                catch(Exception ex)
                 {
-                    // Якщо збереження фото не вдалося — не перериваємо логіку
+                    logger.LogWarning(ex, "Failed to save Google user avatar. Email: {Email}", googleUser.Email);
                 }
             }
 
             // Створюємо користувача в Identity
             var createRes = await userManager.CreateAsync(user);
             if (!createRes.Succeeded)
+            {
+                logger.LogError("Failed to create user from Google account. Email: {Email}, Errors: {Errors}", 
+                    googleUser.Email, createRes.Errors.Select(e => e.Description));
                 return ServiceResponse.Error("Не вдалося створити користувача.");
+            }
 
             // Якщо є GoogleId — додаємо прив’язку «LoginProvider: Google»
             if (!string.IsNullOrWhiteSpace(googleUser.GoogleId))
@@ -223,22 +300,30 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
             // Генеруємо JWT для нового користувача
             var jwtToken = await jwtTokenService.GenerateTokenAsync(user);
+
+            logger.LogInformation("New user successfully logged in via Google. UserId: {UserId}, Email: {Email}",
+                user.Id, user.Email);
+
             return ServiceResponse.Success("Успішний вхід через Google.", jwtToken);
         }
         catch (Exception ex)
         {
-            // Ловимо всі інші помилки, щоб не зламати програму
+            logger.LogError(ex, "Unexpected error during Google login");
             return ServiceResponse.Error($"Помилка при вході через Google: {ex.Message}");
         }
     }
 
     public async Task<ServiceResponse> ForgotPasswordAsync(ForgotPasswordDto dto)
     {
+        logger.LogInformation("Forgot password request started. Email: {Email}", dto.Email);
         // Шукаємо користувача за email
         var user = await userManager.FindByEmailAsync(dto.Email);
         // Якщо користувача немає — далі немає сенсу перевіряти токен
         if (user is null)
+        {
+            logger.LogWarning("Forgot password failed. User not found. Email: {Email}", dto.Email);
             return ServiceResponse.Error("Користувача з такою електронною поштою не знайдено");
+        }
 
         // Генеруємо токен для скидання пароля.
         // Це довгий рядок з символами (+, =, /), які ламаються у URL.
@@ -254,6 +339,13 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         // Завантажуємо HTML шаблон листа.
         // Шаблон містить місце для посилання (action_url), яке ми нижче замінимо.
         string htmlPath = Path.Combine(Settings.RootPath ?? "/", "templates", "html", "reset_password.html");
+
+        if (!File.Exists(htmlPath))
+        {
+            logger.LogError("Password reset template not found. Path: {Path}", htmlPath);
+            throw new FileNotFoundException("Password reset template not found", htmlPath);
+        }
+
         string html = File.ReadAllText(htmlPath);
 
         // Формуємо посилання для листа.
@@ -267,17 +359,24 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         // Надсилаємо email з готовим HTML.
         await emailService.SendMessageAsync(user.Email!, "Скидання пароля", html, true);
 
+        logger.LogInformation("Forgot password email sent successfully. UserId: {UserId}, Email: {Email}",
+            user.Id, user.Email);
+
         // Повертаємо інформацію про успішну відправку.
         return ServiceResponse.Success("Лист для скидання пароля успішно надіслано");
     }
 
     public async Task<ServiceResponse> ValidateResetTokenAsync(ValidateResetTokenDto dto)
     {
+        logger.LogInformation("Validate reset token request started. Email: {Email}", dto.Email);
         // Шукаємо користувача за email
         var user = await userManager.FindByEmailAsync(dto.Email);
         // Якщо користувача немає — далі немає сенсу перевіряти токен
         if (user is null)
+        {
+            logger.LogWarning("Validate reset token failed. User not found. Email: {Email}", dto.Email);
             return ServiceResponse.Error("Користувача з такою електронною поштою не знайдено");
+        }
 
         // Декодуємо токен з URL-кодування (наприклад: %2B замість +, %2F замість /)
         // Це потрібно, оскільки токен проходить у query string, і браузер його автоматично кодує
@@ -299,18 +398,29 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
 
         // Якщо токен невалідний або його термін дії вичерпано
         if (!isValid)
+        {
+            logger.LogWarning("Invalid or expired reset password token. UserId: {UserId}, Email: {Email}",
+                user.Id, user.Email);
             return ServiceResponse.Error("Токен недійсний або прострочений");
+        }
+
+        logger.LogInformation("Reset password token is valid. UserId: {UserId}, Email: {Email}",
+            user.Id, user.Email);
         // Все добре — Повертаємо інформацію про валідний токен
         return ServiceResponse.Success("Токен валідний");
     }
 
     public async Task<ServiceResponse> ResetPasswordAsync(ResetPasswordDto dto)
     {
+        logger.LogInformation("Reset password attempt started. Email: {Email}", dto.Email);
         // Знаходимо користувача за email
         var user = await userManager.FindByEmailAsync(dto.Email);
         // Якщо не існує — немає сенсу продовжувати процедуру скидання
         if (user is null)
+        {
+            logger.LogWarning("Reset password failed. User not found. Email: {Email}", dto.Email);
             return ServiceResponse.Error("Користувача з такою електронною поштою не знайдено");
+        }
 
         // Декодуємо токен скидання пароля з URL-кодування
         // Токен у вигляді Base64 потрапляє в URL, де символи типу +, /, = замінюються на (%2B, %2F, %3D)
@@ -332,8 +442,15 @@ public class AccountService(UserManager<AppUser> userManager, IJwtTokenService j
         {
             // Об'єднуємо всі описання помилок у один текст
             var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+            logger.LogWarning("Reset password failed. UserId: {UserId}, Email: {Email}, Errors: {Errors}",
+                user.Id, user.Email, errors);
+
             return ServiceResponse.Error("Не вдалося скинути пароль: " + errors);
         }
+
+        logger.LogInformation("Password reset successful. UserId: {UserId}, Email: {Email}",
+            user.Id, user.Email);
+
         // Якщо все успішно — пароль змінено
         return ServiceResponse.Success("Пароль успішно змінено");
     }

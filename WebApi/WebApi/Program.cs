@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +11,9 @@ using WebApi.BLL;
 using WebApi.BLL.Configuration;
 using WebApi.BLL.Services.Account;
 using WebApi.BLL.Services.Category;
+using Serilog;
 
 using WebApi.BLL.Services.Email;
-using WebApi.BLL.Services.Category;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
 using WebApi.BLL.Services.Role;
@@ -41,14 +40,16 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-builder.Services.AddControllers();
-
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 //Add Jwt
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("JWT Key is not configured");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -66,7 +67,7 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
@@ -103,6 +104,17 @@ builder.Services.AddMvc(options =>
     options.Filters.Add<ValidationFilter>();
 });
 
+// Add serilog
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext();
+});
+
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -112,28 +124,32 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-var dir = builder.Configuration["ImagesDir"];
-string path = Path.Combine(Directory.GetCurrentDirectory(), dir);
-Directory.CreateDirectory(path);
+var webRootPath = builder.Environment.WebRootPath
+    ?? Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 
-string rootPath = builder.Environment.ContentRootPath;
-string wwwroot = Path.Combine(rootPath, "wwwroot");
-string imagesPath = Path.Combine(wwwroot, "images");
+var imagesPath = Path.Combine(webRootPath, "images");
 
-Settings.ImagesPath = imagesPath;
-Settings.RootPath = wwwroot;
+Directory.CreateDirectory(imagesPath);
+
+Settings.Init(webRootPath, imagesPath);
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(path),
-    RequestPath = $"/{dir}"
+    FileProvider = new PhysicalFileProvider(imagesPath),
+    RequestPath = $"/images"
 });
 
-//await app.SeedData();
+await app.SeedData();
 
 app.Run();
