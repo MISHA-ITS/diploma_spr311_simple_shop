@@ -22,7 +22,7 @@ namespace WebApi.DAL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoryEntityProductEntity", b =>
+            modelBuilder.Entity("ProductsCategories", b =>
                 {
                     b.Property<long>("CategoriesId")
                         .HasColumnType("bigint");
@@ -34,7 +34,7 @@ namespace WebApi.DAL.Migrations
 
                     b.HasIndex("ProductsId");
 
-                    b.ToTable("CategoryEntityProductEntity");
+                    b.ToTable("ProductsCategories", (string)null);
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.CategoryEntity", b =>
@@ -307,10 +307,6 @@ namespace WebApi.DAL.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -346,7 +342,7 @@ namespace WebApi.DAL.Migrations
                     b.ToTable("ProductImages");
                 });
 
-            modelBuilder.Entity("CategoryEntityProductEntity", b =>
+            modelBuilder.Entity("ProductsCategories", b =>
                 {
                     b.HasOne("WebApi.DAL.Entities.CategoryEntity", null)
                         .WithMany()

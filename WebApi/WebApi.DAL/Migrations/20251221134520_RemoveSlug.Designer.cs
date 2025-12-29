@@ -12,8 +12,8 @@ using WebApi.DAL;
 namespace WebApi.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251215235815_CategoriesProductsRelation")]
-    partial class CategoriesProductsRelation
+    [Migration("20251221134520_RemoveSlug")]
+    partial class RemoveSlug
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -310,10 +310,6 @@ namespace WebApi.DAL.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -333,12 +329,7 @@ namespace WebApi.DAL.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
                     b.Property<long>("ProductId")

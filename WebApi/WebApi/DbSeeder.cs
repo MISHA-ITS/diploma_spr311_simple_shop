@@ -5,12 +5,16 @@ using System.Text.Json;
 using WebApi.BLL;
 using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.Category;
+using WebApi.BLL.DTOs.Product;
 using WebApi.BLL.DTOs.Seeder;
+using WebApi.BLL.Services;
 using WebApi.BLL.Services.Image;
+using WebApi.BLL.Services.Product;
 using WebApi.DAL;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Repositories.Category;
+using WebApi.DAL.Repositories.Products;
 
 namespace WebApi;
 
@@ -25,6 +29,7 @@ public static class DbSeeder
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
         var categoryRepository = scope.ServiceProvider.GetRequiredService<ICategoryRepository>();
+        var productRopository = scope.ServiceProvider.GetRequiredService<IProductRepository>();
         var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
 
         context.Database.Migrate();
@@ -128,6 +133,65 @@ public static class DbSeeder
             else
             {
                 Console.WriteLine("Not Found File Categories.json");
+            }
+        }
+
+        if (!context.Products.Any())
+        {
+            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Products.json");
+            if (File.Exists(jsonFile))
+            {
+                var jsonData = await File.ReadAllTextAsync(jsonFile);
+                try
+                {
+                    var products = JsonSerializer.Deserialize<List<SeederProductDTO>>(jsonData);
+                    if (products == null) return;
+
+                    IEnumerable<ProductEntity> entities = [];
+
+                    foreach (var product in products)
+                    {
+                        var entity = mapper.Map<ProductEntity>(product);
+
+
+
+                        if (product.Images != null)
+                        {
+
+                            foreach (var imageUrl in product.Images)
+                            {
+                                string? imageName = await imageService.SaveImageFromUrlAsync(imageUrl, Settings.ProductsDir);
+
+                                entity.Images.Add(new ProductImageEntity
+                                {
+                                    ImageUrl = imageName
+                                });
+                            }
+                        }
+                        else
+                        {
+                            entity.Images = [];
+                        }
+
+                        var categories = categoryRepository
+                            .GetAll()
+                            .Where(c => product.Categories.Select(x => x.ToUpper()).Contains(c.Name.ToUpper()))
+                            .ToList();
+
+                        entity.Categories = categories;
+
+                        entities = entities.Append(entity);
+                    }
+                    await productRopository.CreateRangeAsync(entities);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error Json Parse Data {0}", ex.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Not Found File Products.json");
             }
         }
     }

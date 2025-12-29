@@ -134,6 +134,6 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = $"/{dir}"
 });
 
-//await app.SeedData();
+await app.SeedData();
 
 app.Run();
