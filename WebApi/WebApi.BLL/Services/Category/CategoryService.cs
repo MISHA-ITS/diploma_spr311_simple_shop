@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Category;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities;
@@ -8,40 +9,66 @@ using WebApi.DAL.Repositories.Category;
 namespace WebApi.BLL.Services.Category
 {
     public class CategoryService(ICategoryRepository categoryRepository,
-        IMapper mapper, IImageService imageService) : ICategoryService
+        IMapper mapper, IImageService imageService, ILogger<CategoryService> logger) : ICategoryService
     {
         public async Task<ServiceResponse> CreateAsync(CreateCategoryDTO dto)
         {
-            if(string.IsNullOrWhiteSpace(dto.Name))
+
+            logger.LogInformation("Creating category with name: {CategoryName}", dto.Name);
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                logger.LogWarning("Failed to create category: Category name is empty");
                 return ServiceResponse.Error("Category name cannot be empty");
+            }
 
             var entity = mapper.Map<CategoryEntity>(dto);
 
             if(dto.Image != null)
             {
-                string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
+                try
+                {
+                    string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
 
-                if (string.IsNullOrEmpty(imageName))
-                    return ServiceResponse.Error("Failed to save category image");
+                    if (string.IsNullOrEmpty(imageName))
+                    {
+                        logger.LogError("Failed to save category image for {CategoryName}", dto.Name);
+                        return ServiceResponse.Error("Failed to save category image");
+                    }
 
-                entity.ImageUrl = imageName;
+                    entity.ImageUrl = imageName;
+                    logger.LogInformation("Saved image {ImageName} for category {CategoryName}", imageName, dto.Name);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Exception occurred while saving image for category {CategoryName}", dto.Name);
+                    return ServiceResponse.Error("An error occurred while saving the category image");
+                }
+
             }
 
-            return await categoryRepository.CreateAsync(entity)
+            return await categoryRepository.CreateAsync(entity) 
                 ? ServiceResponse.Success("Category created successfully")
                 : ServiceResponse.Error("Failed to create category");
         }
 
         public async Task<ServiceResponse> DeleteAsync(long id)
         {
-            var entity = await categoryRepository.GetByIdAsync(id);
+            logger.LogInformation("Attempting to delete category with Id {CategoryId}", id);
 
+            var entity = await categoryRepository.GetByIdAsync(id);
             if (entity == null)
+            {
+                logger.LogWarning("Category with Id {CategoryId} not found", id);
                 return ServiceResponse.Error($"Category with Id {id} not found");
+            }    
 
             var imageDeleteResult = await TryDeleteImageAsync(entity.ImageUrl);
             if (imageDeleteResult != null)
+            {
+                logger.LogError("Failed to delete image for category {CategoryId}", id);
                 return imageDeleteResult;
+            }
 
             return await categoryRepository.DeleteAsync(entity)
                 ? ServiceResponse.Success("Category deleted successfully")
@@ -50,29 +77,36 @@ namespace WebApi.BLL.Services.Category
 
         public async Task<ServiceResponse> GetAllAsync()
         {
-            var entities = categoryRepository.GetAll();
+            logger.LogDebug("Retrieving all categories");
 
+            var entities = categoryRepository.GetAll();
             var dtos = mapper.Map<List<CategoryDTO>>(await entities.ToListAsync());
+
+            logger.LogInformation("Retrieved {Count} categories", dtos.Count);
 
             return ServiceResponse.Success("Categories retrieved successfully", dtos);
         }
 
         public async Task<ServiceResponse> GetByIdAsync(long id)
         {
-            var entity = await categoryRepository.GetByIdAsync(id);
+            logger.LogInformation("Retrieving category with Id {CategoryId}", id);
 
+            var entity = await categoryRepository.GetByIdAsync(id);
             if (entity == null)
                 return ServiceResponse.Error($"Category with Id {id} not found");
 
             var dto = mapper.Map<CategoryDTO>(entity);
+
+            logger.LogInformation("Category with Id {CategoryId} retrieved successfully", id);
 
             return ServiceResponse.Success("Category retrieved successfully", dto);
         }
 
         public async Task<ServiceResponse> UpdateAsync(UpdateCategoryDTO dto)
         {
-            var entity = await categoryRepository.GetByIdAsync(dto.Id);
+            logger.LogInformation("Updating category with Id {CategoryId}", dto.Id);
 
+            var entity = await categoryRepository.GetByIdAsync(dto.Id);
             if (entity == null)
                 return ServiceResponse.Error($"Category with Id {dto.Id} not found");
 
@@ -80,14 +114,21 @@ namespace WebApi.BLL.Services.Category
             {
                 var imageDeleteResult = await TryDeleteImageAsync(entity.ImageUrl);
                 if (imageDeleteResult != null)
+                {
+                    logger.LogError("Failed to delete old image for category {CategoryId}", dto.Id);
                     return imageDeleteResult;
+                }
 
                 string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
 
                 if (string.IsNullOrEmpty(imageName))
+                {
+                    logger.LogError("Failed to save new image for category {CategoryId}", dto.Id);
                     return ServiceResponse.Error("Failed to save new category image");
+                }
 
                 entity.ImageUrl = imageName;
+                logger.LogInformation("Updated image for category {CategoryId} to {ImageName}", dto.Id, imageName);
             }
 
             mapper.Map(dto, entity);
@@ -105,10 +146,12 @@ namespace WebApi.BLL.Services.Category
             try
             {
                 await imageService.DeleteImageAsync(url, Settings.CategoriesDir);
+                logger.LogInformation("Deleted image {ImageUrl}", url);
                 return null;
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "Error deleting category image {ImageUrl}", url);
                 return ServiceResponse.Error($"Error deleting category image: {ex.Message}");
             }
         }

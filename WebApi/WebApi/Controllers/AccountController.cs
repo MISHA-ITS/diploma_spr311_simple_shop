@@ -66,4 +66,25 @@ public class AccountController(IAccountService accountService) : ControllerBase
             Token = result
         });
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPasswordAsync([FromForm] ForgotPasswordDto dto)
+    {
+        var response = await accountService.ForgotPasswordAsync(dto);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [HttpPost("validate-reset-token")]
+    public async Task<IActionResult> ValidateResetTokenAsync([FromForm] ValidateResetTokenDto dto)
+    {
+        var response = await accountService.ValidateResetTokenAsync(dto);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPasswordAsync([FromForm] ResetPasswordDto dto)
+    {
+        var response = await accountService.ResetPasswordAsync(dto);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
 }

@@ -10,7 +10,7 @@ public class RoleMapperProfile : Profile
     {
         // CreateRoleDto -> AppRole
         CreateMap<CreateRoleDto, AppRole>();
-
+        
         // UpdateRoleDto -> AppRole
         CreateMap<UpdateRoleDto, AppRole>();
 

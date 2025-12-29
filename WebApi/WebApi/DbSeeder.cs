@@ -56,6 +56,8 @@ public static class DbSeeder
                 try
                 {
                     var users = JsonSerializer.Deserialize<List<SeederUserDto>>(jsonData);
+                    if (users == null) return;
+
                     foreach (var user in users)
                     {
                         var entity = mapper.Map<AppUser>(user);

@@ -64,6 +64,11 @@ public class AppDbContext
                 .IsRequired();
         });
 
+        modelBuilder.Entity<ProductEntity>()
+            .HasMany(p => p.Categories)
+            .WithMany(c => c.Products)
+            .UsingEntity(j => j.ToTable("ProductsCategories"));
+
         modelBuilder.Entity<ProductImageEntity>()
             .HasOne(pi => pi.Product)
             .WithMany(p => p.Images)
@@ -74,5 +79,6 @@ public class AppDbContext
             .HasMany(p => p.Categories)
             .WithMany(c => c.Products)
             .UsingEntity(j => j.ToTable("ProductsCategories"));
+
     }
 }
