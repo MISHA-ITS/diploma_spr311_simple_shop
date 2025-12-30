@@ -6,3 +6,27 @@
 2025-12-20 09:16:11 [Information] Content root path: "D:\ITStep\Diplom\diploma_spr311_simple_shop\WebApi\WebApi"
 2025-12-20 09:16:11 [Information] Retrieved 44 categories
 2025-12-20 09:16:11 [Information] HTTP "GET" "/api/Category/list" responded 200 in 20985.3211 ms
+2025-12-20 12:51:48 [Information] Now listening on: "http://localhost:5172"
+2025-12-20 12:51:48 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-20 12:51:48 [Information] Hosting environment: "Development"
+2025-12-20 12:51:48 [Information] Content root path: "D:\ITStep\Diplom\diploma_spr311_simple_shop\WebApi\WebApi"
+2025-12-20 12:51:57 [Debug] Retrieving all products with filter ProductFilterDto { categoryId: null, minPrice: null, maxPrice: null, sortBy: null, order: "asc", pageNumber: 1 }
+2025-12-20 12:51:57 [Debug] Fetching all products with related Images and Categories
+2025-12-20 12:51:57 [Warning] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-12-20 12:51:57 [Warning] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-12-20 12:51:58 [Information] Retrieved 2 products
+2025-12-20 12:51:58 [Information] HTTP "GET" "/api/Product/list" responded 200 in 563.8694 ms
+2025-12-20 12:52:01 [Debug] Retrieving all products with filter ProductFilterDto { categoryId: null, minPrice: null, maxPrice: null, sortBy: null, order: "asc", pageNumber: 2 }
+2025-12-20 12:52:01 [Debug] Fetching all products with related Images and Categories
+2025-12-20 12:52:01 [Warning] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-12-20 12:52:01 [Warning] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-12-20 12:52:01 [Information] Retrieved 0 products
+2025-12-20 12:52:01 [Information] HTTP "GET" "/api/Product/list" responded 200 in 111.5635 ms
+2025-12-20 12:53:47 [Debug] Retrieving all products with filter ProductFilterDto { categoryId: null, minPrice: null, maxPrice: null, sortBy: null, order: "asc", pageNumber: 1 }
+2025-12-20 12:53:47 [Debug] Fetching all products with related Images and Categories
+2025-12-20 12:53:47 [Information] Retrieved 2 products
+2025-12-20 12:53:47 [Information] HTTP "GET" "/api/Product/list" responded 200 in 118.1284 ms
+2025-12-20 12:54:07 [Debug] Retrieving all products with filter ProductFilterDto { categoryId: null, minPrice: null, maxPrice: null, sortBy: null, order: "asc", pageNumber: 2 }
+2025-12-20 12:54:07 [Debug] Fetching all products with related Images and Categories
+2025-12-20 12:54:07 [Information] Retrieved 0 products
+2025-12-20 12:54:07 [Information] HTTP "GET" "/api/Product/list" responded 200 in 40.2523 ms
