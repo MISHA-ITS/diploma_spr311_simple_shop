@@ -206,6 +206,18 @@ namespace WebApi.BLL.Services.Product
                     _ => products
                 };
             }
+            else
+            {
+                products = products.OrderBy(p => p.Id);
+            }
+
+            int pageSize = 4;
+            int pageNumber = filter.pageNumber <= 0 ? 1 : filter.pageNumber;
+
+            int skip = (pageNumber - 1) * pageSize;
+
+            products = products.Skip(skip).Take(pageSize);
+
             return products;
         }
     }
