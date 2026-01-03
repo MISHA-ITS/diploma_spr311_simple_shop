@@ -147,25 +147,28 @@ public static class DbSeeder
                     var products = JsonSerializer.Deserialize<List<SeederProductDTO>>(jsonData);
                     if (products == null) return;
 
-                    IEnumerable<ProductEntity> entities = [];
-
                     foreach (var product in products)
                     {
                         var entity = mapper.Map<ProductEntity>(product);
-
-
-
+                        entity.Description = product.Description;
                         if (product.Images != null)
                         {
-
                             foreach (var imageUrl in product.Images)
                             {
-                                string? imageName = await imageService.SaveImageFromUrlAsync(imageUrl, Settings.ProductsDir);
-
-                                entity.Images.Add(new ProductImageEntity
+                                try
                                 {
-                                    ImageUrl = imageName
-                                });
+                                    string? imageName = await imageService.SaveImageFromUrlAsync(imageUrl, Settings.ProductsDir);
+
+                                    entity.Images.Add(new ProductImageEntity
+                                    {
+                                        ImageUrl = imageName
+                                    });
+                                }
+                                catch (HttpRequestException ex)
+                                {
+                                    Console.WriteLine($"Image not loaded: {imageUrl}");
+                                    Console.WriteLine(ex.Message);
+                                }
                             }
                         }
                         else
@@ -180,9 +183,8 @@ public static class DbSeeder
 
                         entity.Categories = categories;
 
-                        entities = entities.Append(entity);
+                        await productRopository.CreateAsync(entity);
                     }
-                    await productRopository.CreateRangeAsync(entities);
                 }
                 catch (Exception ex)
                 {
