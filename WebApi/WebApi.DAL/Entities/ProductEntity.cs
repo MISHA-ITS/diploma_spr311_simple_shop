@@ -7,7 +7,6 @@ namespace WebApi.DAL.Entities
         [Required]
         [MaxLength(255)]
         public required string Name { get; set; }
-        public string Slug { get; set; } = string.Empty;
         public string? Description { get; set; }
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
