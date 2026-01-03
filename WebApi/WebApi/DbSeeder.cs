@@ -152,7 +152,6 @@ public static class DbSeeder
                     foreach (var product in products)
                     {
                         var entity = mapper.Map<ProductEntity>(product);
-                        entity.Description = product.Description;
                         if (product.Images != null)
                         {
                             foreach (var imageUrl in product.Images)
