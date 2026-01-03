@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -350,7 +351,8 @@ public class AccountService(UserManager<AppUser> userManager,
 
         // Формуємо посилання для листа.
         // Саме за цим URL користувач відкриє форму скидання пароля (фронтенд або твоя сторінка).
-        string url = $"http://localhost:5172/reset-password?email={user.Email}&token={encodedToken}";
+        var appUrl = configuration["ClientAppUrl"];
+        string url = $"{appUrl}/reset-password?email={user.Email}&token={encodedToken}";
 
         // Підставляємо action_url у HTML шаблон
         // У шаблоні має бути текст "action_url", який замінюється на справжній URL.
@@ -361,6 +363,8 @@ public class AccountService(UserManager<AppUser> userManager,
 
         logger.LogInformation("Forgot password email sent successfully. UserId: {UserId}, Email: {Email}",
             user.Id, user.Email);
+        logger.LogInformation("Generated reset token for {Email}: {Token}", user.Email, token);
+        logger.LogInformation("Reset URL: {Url}", url);
 
         // Повертаємо інформацію про успішну відправку.
         return ServiceResponse.Success("Лист для скидання пароля успішно надіслано");
@@ -380,9 +384,11 @@ public class AccountService(UserManager<AppUser> userManager,
 
         // Декодуємо токен з URL-кодування (наприклад: %2B замість +, %2F замість /)
         // Це потрібно, оскільки токен проходить у query string, і браузер його автоматично кодує
-        var token = HttpUtility.UrlDecode(dto.Token);
+
         //byte[] tokenBytes = Convert.FromBase64String(dto.Token);
         //var token = Encoding.UTF8.GetString(tokenBytes);
+        //var token = HttpUtility.UrlDecode(dto.Token);
+        var token = dto.Token;
 
         // Перевіряємо токен скидання пароля
         var isValid = await userManager.VerifyUserTokenAsync(
@@ -425,14 +431,14 @@ public class AccountService(UserManager<AppUser> userManager,
         // Декодуємо токен скидання пароля з URL-кодування
         // Токен у вигляді Base64 потрапляє в URL, де символи типу +, /, = замінюються на (%2B, %2F, %3D)
         // HttpUtility.UrlDecode повертає оригінальний токен, який очікує Identity
-        var token = HttpUtility.UrlDecode(dto.Token);
+        //var decodedToken = HttpUtility.UrlDecode(dto.Token);
 
         // Виконуємо скидання пароля
         var result = await userManager.ResetPasswordAsync(
             // 1. user — користувач, якому скидають пароль
             user,
             // 2. token — токен, який був згенерований GeneratePasswordResetTokenAsync
-            token,
+            dto.Token,
             // 3. dto.NewPassword — новий пароль, який хоче встановити користувач
             dto.NewPassword
             );

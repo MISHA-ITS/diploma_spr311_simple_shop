@@ -5,7 +5,7 @@ namespace WebApi.BLL.DTOs.Account;
 public class GoogleAccountDto
 {
     [JsonPropertyName("id")]
-    public string GogoleId { get; set; } = string.Empty;
+    public string GoogleId { get; set; } = string.Empty;
 
     [JsonPropertyName("email")]
     public string Email { get; set; } = string.Empty;

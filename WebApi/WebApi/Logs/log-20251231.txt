@@ -1,0 +1,12 @@
+2025-12-31 00:01:56 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 311.2756 ms
+2025-12-31 00:01:57 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 436.5958 ms
+2025-12-31 00:02:00 [Information] HTTP "GET" "/api/User/Get" responded 200 in 256.1352 ms
+2025-12-31 00:02:00 [Information] HTTP "GET" "/images/users/200_bm12k2fg.mym.webp" responded 304 in 2.6255 ms
+2025-12-31 00:02:00 [Information] HTTP "GET" "/api/User/Get" responded 200 in 73.9655 ms
+2025-12-31 00:02:03 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 303.0678 ms
+2025-12-31 00:02:03 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 255.8531 ms
+2025-12-31 00:02:33 [Information] Google login attempt started
+2025-12-31 00:02:33 [Information] Google user info received. Email: "mybox018@gmail.com"
+2025-12-31 00:02:33 [Information] Existing user logging in via Google. UserId: 22, Email: "mybox018@gmail.com"
+2025-12-31 00:02:33 [Information] HTTP "POST" "/api/account/googleLogin" responded 200 in 366.9755 ms
+2025-12-31 00:03:11 [Information] Application is shutting down...

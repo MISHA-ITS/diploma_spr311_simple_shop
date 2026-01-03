@@ -1,0 +1,27 @@
+2026-01-02 00:29:41 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 900.2365 ms
+2026-01-02 00:29:41 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 221.1495 ms
+2026-01-02 00:29:44 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 236.5278 ms
+2026-01-02 00:29:44 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 229.4838 ms
+2026-01-02 00:57:36 [Information] Application is shutting down...
+2026-01-02 18:12:36 [Information] Now listening on: "http://localhost:5172"
+2026-01-02 18:12:36 [Information] Application started. Press Ctrl+C to shut down.
+2026-01-02 18:12:36 [Information] Hosting environment: "Development"
+2026-01-02 18:12:36 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2026-01-02 19:16:03 [Information] Login attempt started. Email: "mybox018@gmail.com"
+2026-01-02 19:16:05 [Information] Login successful. UserId: 22, Email: "mybox018@gmail.com"
+2026-01-02 19:16:05 [Information] HTTP "POST" "/api/account/login" responded 200 in 2690.8517 ms
+2026-01-02 20:52:19 [Information] Application is shutting down...
+2026-01-02 21:52:26 [Information] Now listening on: "http://localhost:5172"
+2026-01-02 21:52:26 [Information] Application started. Press Ctrl+C to shut down.
+2026-01-02 21:52:26 [Information] Hosting environment: "Development"
+2026-01-02 21:52:26 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2026-01-02 23:34:04 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1740.3184 ms
+2026-01-02 23:34:04 [Information] HTTP "GET" "/images/users/50_yujgd4eo.mzy.webp" responded 200 in 26.1911 ms
+2026-01-02 23:34:04 [Information] HTTP "GET" "/images/users/50_kjpayaat.tnr.webp" responded 200 in 28.1824 ms
+2026-01-02 23:34:04 [Information] HTTP "GET" "/images/users/50_bm12k2fg.mym.webp" responded 200 in 46.8110 ms
+2026-01-02 23:34:04 [Information] HTTP "GET" "/images/users/50_hfzk3yyr.j4x.webp" responded 200 in 16.6121 ms
+2026-01-02 23:34:04 [Information] HTTP "GET" "/images/users/50_jfjl51jo.yhv.webp" responded 200 in 20.9662 ms
+2026-01-02 23:34:05 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 380.1053 ms
+2026-01-02 23:34:10 [Information] HTTP "GET" "/api/User/Get" responded 200 in 142.9190 ms
+2026-01-02 23:34:10 [Information] HTTP "GET" "/images/users/200_bm12k2fg.mym.webp" responded 200 in 48.0289 ms
+2026-01-02 23:34:10 [Information] HTTP "GET" "/api/User/Get" responded 200 in 74.9196 ms

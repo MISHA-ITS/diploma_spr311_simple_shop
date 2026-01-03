@@ -26,9 +26,4 @@ public class ServiceResponse
             Payload = payLoad
         };
     }
-
-    public static implicit operator string(ServiceResponse v)
-    {
-        throw new NotImplementedException();
-    }
 }

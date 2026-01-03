@@ -115,7 +115,17 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors();
+
 var app = builder.Build();
+
+app.UseCors(opt =>
+{
+    opt.AllowAnyHeader()
+       .AllowAnyMethod()
+       .AllowCredentials()
+       .WithOrigins(builder.Configuration["ClientAppUrl"]!);
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,0 +1,144 @@
+2025-12-30 21:41:43 [Information] Now listening on: "http://localhost:5172"
+2025-12-30 21:41:43 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-30 21:41:43 [Information] Hosting environment: "Development"
+2025-12-30 21:41:43 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-30 21:46:57 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1589.3219 ms
+2025-12-30 21:46:57 [Information] HTTP "GET" "/images/users/50_hfzk3yyr.j4x.webp" responded 200 in 23.6426 ms
+2025-12-30 21:46:57 [Information] HTTP "GET" "/images/users/50_jfjl51jo.yhv.webp" responded 200 in 45.1602 ms
+2025-12-30 21:46:57 [Information] HTTP "GET" "/images/users/50_yujgd4eo.mzy.webp" responded 200 in 46.3422 ms
+2025-12-30 21:46:57 [Information] HTTP "GET" "/images/users/50_kjpayaat.tnr.webp" responded 200 in 47.7377 ms
+2025-12-30 21:46:58 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 399.7608 ms
+2025-12-30 21:47:32 [Information] HTTP "GET" "/api/User/Get" responded 200 in 175.6888 ms
+2025-12-30 21:47:32 [Information] HTTP "GET" "/images/users/200_null" responded 404 in 0.1623 ms
+2025-12-30 21:47:32 [Information] HTTP "GET" "/api/User/Get" responded 200 in 130.1758 ms
+2025-12-30 21:50:51 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 316.1052 ms
+2025-12-30 21:50:51 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 248.2768 ms
+2025-12-30 21:51:51 [Information] HTTP "PUT" "/api/User/Update" responded 200 in 2708.7400 ms
+2025-12-30 21:52:08 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 641.0168 ms
+2025-12-30 21:52:08 [Information] HTTP "GET" "/images/users/50_bm12k2fg.mym.webp" responded 200 in 0.6767 ms
+2025-12-30 21:52:08 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 323.3387 ms
+2025-12-30 21:56:55 [Information] Forgot password request started. Email: "nopep26282@cucadas.com"
+2025-12-30 21:56:58 [Information] Forgot password email sent successfully. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 21:56:58 [Information] Generated reset token for "nopep26282@cucadas.com": "CfDJ8J0SxNx1drBHheNIYhsTCXewYpU0JKeZvcxcKhKJ9tR6RRkqifaAw/+eg8blaIqUeChLHPNCWx7nhEfdLn58iy2oQVBRq9BjMkKmDm3/SjdZqTq8qyf0UHbTR4crLnkzuf80gGZOJNfLkrsW7iEKurfRNfUclK5H+Inup9c47rIKvfsHwX3yvW3LqwwwF1wiWA=="
+2025-12-30 21:56:58 [Information] Reset URL: "http://localhost:5173/reset-password?email=nopep26282@cucadas.com&token=CfDJ8J0SxNx1drBHheNIYhsTCXewYpU0JKeZvcxcKhKJ9tR6RRkqifaAw%2f%2beg8blaIqUeChLHPNCWx7nhEfdLn58iy2oQVBRq9BjMkKmDm3%2fSjdZqTq8qyf0UHbTR4crLnkzuf80gGZOJNfLkrsW7iEKurfRNfUclK5H%2bInup9c47rIKvfsHwX3yvW3LqwwwF1wiWA%3d%3d"
+2025-12-30 21:56:58 [Information] HTTP "POST" "/api/account/forgot-password" responded 200 in 3565.2230 ms
+2025-12-30 21:57:28 [Information] Validate reset token request started. Email: "nopep26282@cucadas.com"
+2025-12-30 21:57:28 [Information] Validate reset token request started. Email: "nopep26282@cucadas.com"
+2025-12-30 21:57:29 [Warning] Invalid or expired reset password token. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 21:57:29 [Warning] Invalid or expired reset password token. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 21:57:29 [Information] HTTP "POST" "/api/account/validate-reset-token" responded 400 in 701.9248 ms
+2025-12-30 21:57:29 [Information] HTTP "POST" "/api/account/validate-reset-token" responded 400 in 709.2522 ms
+2025-12-30 22:13:37 [Information] Application is shutting down...
+2025-12-30 22:16:03 [Information] Now listening on: "http://localhost:5172"
+2025-12-30 22:16:03 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-30 22:16:03 [Information] Hosting environment: "Development"
+2025-12-30 22:16:03 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-30 22:16:11 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 656.3076 ms
+2025-12-30 22:16:11 [Information] HTTP "GET" "/images/users/50_bm12k2fg.mym.webp" responded 304 in 4.8236 ms
+2025-12-30 22:16:12 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 450.8521 ms
+2025-12-30 22:17:14 [Information] Forgot password request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:17:16 [Information] Forgot password email sent successfully. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:17:16 [Information] Generated reset token for "nopep26282@cucadas.com": "CfDJ8J0SxNx1drBHheNIYhsTCXctW4Cofvo/xBn4TVFrcnrCW1Gx+WEWxmmsM4a1ML18nlMZ3J7Bvs7RFV26AoV12ZYiUVJdGYx7PAKall4saI8kSf4UbHH/FginC6ZywctrlUAt7xwmrdS2Qk1NH5sfeFD0qaCfFLRJvCTFszntE/SGjf9oYbhXuHHVUZeEbszFQA=="
+2025-12-30 22:17:16 [Information] Reset URL: "http://localhost:5173/reset-password?email=nopep26282@cucadas.com&token=CfDJ8J0SxNx1drBHheNIYhsTCXctW4Cofvo%2fxBn4TVFrcnrCW1Gx%2bWEWxmmsM4a1ML18nlMZ3J7Bvs7RFV26AoV12ZYiUVJdGYx7PAKall4saI8kSf4UbHH%2fFginC6ZywctrlUAt7xwmrdS2Qk1NH5sfeFD0qaCfFLRJvCTFszntE%2fSGjf9oYbhXuHHVUZeEbszFQA%3d%3d"
+2025-12-30 22:17:16 [Information] HTTP "POST" "/api/account/forgot-password" responded 200 in 2097.3959 ms
+2025-12-30 22:17:42 [Information] Validate reset token request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:17:42 [Information] Validate reset token request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:17:42 [Warning] Invalid or expired reset password token. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:17:42 [Information] HTTP "POST" "/api/account/validate-reset-token" responded 400 in 60.9659 ms
+2025-12-30 22:17:42 [Warning] Invalid or expired reset password token. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:17:42 [Information] HTTP "POST" "/api/account/validate-reset-token" responded 400 in 333.5537 ms
+2025-12-30 22:31:41 [Information] Application is shutting down...
+2025-12-30 22:39:09 [Information] Now listening on: "http://localhost:5172"
+2025-12-30 22:39:09 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-30 22:39:09 [Information] Hosting environment: "Development"
+2025-12-30 22:39:09 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-30 22:39:33 [Information] Forgot password request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:39:35 [Information] Forgot password email sent successfully. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:39:35 [Information] Generated reset token for "nopep26282@cucadas.com": "CfDJ8J0SxNx1drBHheNIYhsTCXeEUaN0Z+39blHwBr0ya+7zy8UF4HJlm8ATsPHoH9lM9m/eTfBrASc4rULQnQs11Y+qvp2v4eDVAgY/GMytqDDrFYhYCWKql+tcDLxonfY0SERPgxpGD7LzPHyJILXel1o3b9wWe57h6Z0+DhfEsVPKQyXtsHjepa3hRdl4BLShKg=="
+2025-12-30 22:39:35 [Information] Reset URL: "http://localhost:5173/reset-password?email=nopep26282@cucadas.com&token=CfDJ8J0SxNx1drBHheNIYhsTCXeEUaN0Z%2b39blHwBr0ya%2b7zy8UF4HJlm8ATsPHoH9lM9m%2feTfBrASc4rULQnQs11Y%2bqvp2v4eDVAgY%2fGMytqDDrFYhYCWKql%2btcDLxonfY0SERPgxpGD7LzPHyJILXel1o3b9wWe57h6Z0%2bDhfEsVPKQyXtsHjepa3hRdl4BLShKg%3d%3d"
+2025-12-30 22:39:35 [Information] HTTP "POST" "/api/account/forgot-password" responded 200 in 1886.1983 ms
+2025-12-30 22:40:15 [Information] Validate reset token request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:40:15 [Information] Validate reset token request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:40:15 [Warning] Invalid or expired reset password token. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:40:15 [Information] HTTP "POST" "/api/account/validate-reset-token" responded 400 in 127.1884 ms
+2025-12-30 22:40:15 [Warning] Invalid or expired reset password token. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:40:15 [Information] HTTP "POST" "/api/account/validate-reset-token" responded 400 in 372.2033 ms
+2025-12-30 22:40:59 [Information] Application is shutting down...
+2025-12-30 22:42:09 [Information] Now listening on: "http://localhost:5172"
+2025-12-30 22:42:10 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-30 22:42:10 [Information] Hosting environment: "Development"
+2025-12-30 22:42:10 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-30 22:42:32 [Information] Forgot password request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:42:34 [Information] Forgot password email sent successfully. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:42:34 [Information] Generated reset token for "nopep26282@cucadas.com": "CfDJ8J0SxNx1drBHheNIYhsTCXfCMY7wFrwrfFf6R7clGUed6YP+4jR5M6/VIEwN/RJ9L65H21oeV9srES7Cb3awCMqNJUIRR2Hr/by7xY4RS7RKOJeL0wRNHLjeUkmn6yyib2CsLsA0ZMj3ntPsTtvM9UOkuy715TvQFZCZvjW+iCwfrlGSW6zjEOkzWnYGa6yvMA=="
+2025-12-30 22:42:34 [Information] Reset URL: "http://localhost:5173/reset-password?email=nopep26282@cucadas.com&token=CfDJ8J0SxNx1drBHheNIYhsTCXfCMY7wFrwrfFf6R7clGUed6YP%2b4jR5M6%2fVIEwN%2fRJ9L65H21oeV9srES7Cb3awCMqNJUIRR2Hr%2fby7xY4RS7RKOJeL0wRNHLjeUkmn6yyib2CsLsA0ZMj3ntPsTtvM9UOkuy715TvQFZCZvjW%2biCwfrlGSW6zjEOkzWnYGa6yvMA%3d%3d"
+2025-12-30 22:42:34 [Information] HTTP "POST" "/api/account/forgot-password" responded 200 in 2119.1493 ms
+2025-12-30 22:49:12 [Information] Application is shutting down...
+2025-12-30 22:55:56 [Information] Now listening on: "http://localhost:5172"
+2025-12-30 22:55:56 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-30 22:55:56 [Information] Hosting environment: "Development"
+2025-12-30 22:55:56 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-30 22:56:22 [Information] Forgot password request started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:56:24 [Information] Forgot password email sent successfully. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 22:56:24 [Information] Generated reset token for "nopep26282@cucadas.com": "CfDJ8J0SxNx1drBHheNIYhsTCXfSz3XHSwgeOPfNi5+TdnaP1La/kX0m8aCBgulquNqo3LsUUlbmY03AmUEBs7q8dApglRNUqS8h76/LatW8DD/w/VQlAvje4FMGmykVH+7ilAVrDLtu8/ptbDHSof/YPzOyAux+sQgp3NDqgie5tBWkScE84XyflOks7rCQEja25w=="
+2025-12-30 22:56:24 [Information] Reset URL: "http://localhost:5173/reset-password?email=nopep26282@cucadas.com&token=CfDJ8J0SxNx1drBHheNIYhsTCXfSz3XHSwgeOPfNi5%2bTdnaP1La%2fkX0m8aCBgulquNqo3LsUUlbmY03AmUEBs7q8dApglRNUqS8h76%2fLatW8DD%2fw%2fVQlAvje4FMGmykVH%2b7ilAVrDLtu8%2fptbDHSof%2fYPzOyAux%2bsQgp3NDqgie5tBWkScE84XyflOks7rCQEja25w%3d%3d"
+2025-12-30 22:56:24 [Information] HTTP "POST" "/api/account/forgot-password" responded 200 in 2092.4680 ms
+2025-12-30 22:58:22 [Information] Reset password attempt started. Email: "nopep26282@cucadas.com"
+2025-12-30 22:58:22 [Warning] Reset password failed. UserId: 43, Email: "nopep26282@cucadas.com", Errors: "Invalid token."
+2025-12-30 22:58:22 [Information] HTTP "POST" "/api/account/reset-password" responded 400 in 190.6255 ms
+2025-12-30 22:59:34 [Information] Application is shutting down...
+2025-12-30 23:00:41 [Information] Now listening on: "http://localhost:5172"
+2025-12-30 23:00:41 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-30 23:00:41 [Information] Hosting environment: "Development"
+2025-12-30 23:00:41 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-30 23:01:05 [Information] Forgot password request started. Email: "nopep26282@cucadas.com"
+2025-12-30 23:01:09 [Information] Forgot password email sent successfully. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 23:01:09 [Information] Generated reset token for "nopep26282@cucadas.com": "CfDJ8J0SxNx1drBHheNIYhsTCXf7k5eypqgGrDUStAbkju/p2H0MeQZDEKNh3yzwAe8WxIdaTHpHPtLfaofufPLq/nli0nyhsy57Sq9yP+9YnBFaZquX9RAFkYs/8+S+koNfDuma+gXNP8DY2SQ8QNo2qD6rbV8/MPikF67j8FXvs8K5gaDWiEhlMgNTxJcRQJKFBg=="
+2025-12-30 23:01:09 [Information] Reset URL: "http://localhost:5173/reset-password?email=nopep26282@cucadas.com&token=CfDJ8J0SxNx1drBHheNIYhsTCXf7k5eypqgGrDUStAbkju%2fp2H0MeQZDEKNh3yzwAe8WxIdaTHpHPtLfaofufPLq%2fnli0nyhsy57Sq9yP%2b9YnBFaZquX9RAFkYs%2f8%2bS%2bkoNfDuma%2bgXNP8DY2SQ8QNo2qD6rbV8%2fMPikF67j8FXvs8K5gaDWiEhlMgNTxJcRQJKFBg%3d%3d"
+2025-12-30 23:01:09 [Information] HTTP "POST" "/api/account/forgot-password" responded 200 in 3612.1068 ms
+2025-12-30 23:01:51 [Information] Reset password attempt started. Email: "nopep26282@cucadas.com"
+2025-12-30 23:01:51 [Warning] Reset password failed. UserId: 43, Email: "nopep26282@cucadas.com", Errors: "Invalid token."
+2025-12-30 23:01:51 [Information] HTTP "POST" "/api/account/reset-password" responded 400 in 118.5410 ms
+2025-12-30 23:07:23 [Information] Application is shutting down...
+2025-12-30 23:22:49 [Information] Now listening on: "http://localhost:5172"
+2025-12-30 23:22:49 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-30 23:22:49 [Information] Hosting environment: "Development"
+2025-12-30 23:22:49 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-30 23:23:06 [Information] Forgot password request started. Email: "nopep26282@cucadas.com"
+2025-12-30 23:23:08 [Information] Forgot password email sent successfully. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 23:23:08 [Information] Generated reset token for "nopep26282@cucadas.com": "CfDJ8J0SxNx1drBHheNIYhsTCXc0fug+Yv5oqT7IpzF9bl0dON0zkYO9TMR1oUjpC7ujBQpuSLP7Je5IGCfDsyT/ZOPBT4ZBp+jDkd3J9d6S+EfkLKQX7ijGoy1Bboyb/kwFAFkufPcbxYe3XoRrZScdhPJf/BQBZXJbMiKzXFZtHABZ04cjzbOed0r6PUaRTPhuow=="
+2025-12-30 23:23:08 [Information] Reset URL: "http://localhost:5173/reset-password?email=nopep26282@cucadas.com&token=CfDJ8J0SxNx1drBHheNIYhsTCXc0fug%2bYv5oqT7IpzF9bl0dON0zkYO9TMR1oUjpC7ujBQpuSLP7Je5IGCfDsyT%2fZOPBT4ZBp%2bjDkd3J9d6S%2bEfkLKQX7ijGoy1Bboyb%2fkwFAFkufPcbxYe3XoRrZScdhPJf%2fBQBZXJbMiKzXFZtHABZ04cjzbOed0r6PUaRTPhuow%3d%3d"
+2025-12-30 23:23:08 [Information] HTTP "POST" "/api/account/forgot-password" responded 200 in 2495.9178 ms
+2025-12-30 23:24:16 [Information] Reset password attempt started. Email: "nopep26282@cucadas.com"
+2025-12-30 23:24:17 [Information] Password reset successful. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 23:24:17 [Information] HTTP "POST" "/api/account/reset-password" responded 200 in 735.3152 ms
+2025-12-30 23:24:42 [Information] Login attempt started. Email: "nopep26282@cucadas.com"
+2025-12-30 23:24:43 [Information] Login successful. UserId: 43, Email: "nopep26282@cucadas.com"
+2025-12-30 23:24:43 [Information] HTTP "POST" "/api/account/login" responded 200 in 1261.8997 ms
+2025-12-30 23:26:42 [Information] Google login attempt started
+2025-12-30 23:26:43 [Information] Google user info received. Email: "mybox018@gmail.com"
+2025-12-30 23:26:43 [Information] Existing user logging in via Google. UserId: 22, Email: "mybox018@gmail.com"
+2025-12-30 23:26:43 [Information] HTTP "POST" "/api/account/googleLogin" responded 200 in 1106.9807 ms
+2025-12-30 23:28:43 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 564.2338 ms
+2025-12-30 23:28:43 [Information] HTTP "GET" "/images/users/50_bm12k2fg.mym.webp" responded 304 in 2.3933 ms
+2025-12-30 23:28:44 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 243.7937 ms
+2025-12-30 23:28:51 [Information] HTTP "GET" "/api/User/Get" responded 200 in 109.0025 ms
+2025-12-30 23:28:51 [Information] HTTP "GET" "/images/users/200_bm12k2fg.mym.webp" responded 200 in 35.6281 ms
+2025-12-30 23:28:51 [Information] HTTP "GET" "/api/User/Get" responded 200 in 77.6237 ms
+2025-12-30 23:31:28 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 273.7829 ms
+2025-12-30 23:31:28 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 235.7691 ms
+2025-12-30 23:33:53 [Information] HTTP "GET" "/api/User/Get" responded 200 in 786.4889 ms
+2025-12-30 23:33:54 [Information] HTTP "GET" "/api/User/Get" responded 200 in 395.3532 ms
+2025-12-30 23:42:37 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 875.0624 ms
+2025-12-30 23:42:37 [Information] HTTP "GET" "/images/users/50_bm12k2fg.mym.webp" responded 304 in 0.2733 ms
+2025-12-30 23:42:38 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 231.4129 ms
+2025-12-30 23:53:11 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 978.1537 ms
+2025-12-30 23:53:11 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 239.7335 ms
+2025-12-30 23:53:33 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 243.9331 ms
+2025-12-30 23:53:34 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 310.1664 ms
+2025-12-30 23:59:21 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1017.2255 ms
+2025-12-30 23:59:21 [Information] HTTP "GET" "/images/users/50_bm12k2fg.mym.webp" responded 304 in 0.2729 ms
+2025-12-30 23:59:21 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 233.2335 ms
+2025-12-30 23:59:28 [Information] HTTP "DELETE" "/api/users" responded 404 in 0.2881 ms
+2025-12-30 23:59:34 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 912.8189 ms
+2025-12-30 23:59:34 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 239.5962 ms

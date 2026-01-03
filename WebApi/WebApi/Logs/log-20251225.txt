@@ -1,0 +1,226 @@
+2025-12-25 14:46:13 [Information] Now listening on: "http://localhost:5172"
+2025-12-25 14:46:13 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-25 14:46:13 [Information] Hosting environment: "Development"
+2025-12-25 14:46:13 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-25 14:50:18 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 4901.7708 ms
+2025-12-25 14:50:18 [Information] HTTP "GET" "/images/users/200_bjhda1sf.jvr.webp" responded 200 in 157.0962 ms
+2025-12-25 14:50:18 [Information] HTTP "GET" "/images/users/200_jryhocca.tc3.webp" responded 200 in 161.3452 ms
+2025-12-25 14:50:18 [Information] HTTP "GET" "/images/users/200_m5ekf50j.c4c.webp" responded 200 in 127.9204 ms
+2025-12-25 14:50:18 [Information] HTTP "GET" "/images/users/200_yujgd4eo.mzy.webp" responded 200 in 199.1532 ms
+2025-12-25 14:50:18 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 234.5978 ms
+2025-12-25 15:18:39 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 863.5190 ms
+2025-12-25 15:18:39 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 163.5468 ms
+2025-12-25 15:18:52 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 169.0659 ms
+2025-12-25 15:18:52 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 164.1523 ms
+2025-12-25 15:19:13 [Information] Application is shutting down...
+2025-12-25 18:29:58 [Information] Now listening on: "http://localhost:5172"
+2025-12-25 18:29:58 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-25 18:29:58 [Information] Hosting environment: "Development"
+2025-12-25 18:29:58 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-25 18:47:08 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1752.7727 ms
+2025-12-25 18:47:08 [Information] HTTP "GET" "/images/users/200_bjhda1sf.jvr.webp" responded 200 in 27.6322 ms
+2025-12-25 18:47:08 [Information] HTTP "GET" "/images/users/200_jryhocca.tc3.webp" responded 200 in 36.4107 ms
+2025-12-25 18:47:08 [Information] HTTP "GET" "/images/users/200_m5ekf50j.c4c.webp" responded 200 in 33.6863 ms
+2025-12-25 18:47:08 [Information] HTTP "GET" "/images/users/200_yujgd4eo.mzy.webp" responded 200 in 50.6009 ms
+2025-12-25 18:47:08 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 287.2904 ms
+2025-12-25 19:04:17 [Information] HTTP "POST" "/api/User/Create" responded 200 in 1817.3192 ms
+2025-12-25 19:04:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 206.1682 ms
+2025-12-25 19:04:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 199.1619 ms
+2025-12-25 19:09:08 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 350.1211 ms
+2025-12-25 19:09:08 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 223.2803 ms
+2025-12-25 19:29:36 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 931.5179 ms
+2025-12-25 19:29:36 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 230.7659 ms
+2025-12-25 19:41:14 [Error] An error occurred using the connection to database '"neondb"' on server '"tcp://ep-round-king-agwe98hc-pooler.c-2.eu-central-1.aws.neon.tech:5432"'.
+2025-12-25 19:41:14 [Error] An exception occurred while iterating over the results of a query for context type '"WebApi.DAL.AppDbContext"'."
+""System.InvalidOperationException: An exception has been raised that is likely due to a transient failure.
+ ---> Npgsql.NpgsqlException (0x80004005): Exception while reading from stream
+ ---> System.TimeoutException: Timeout during reading attempt
+   at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|55_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|214_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()"
+System.InvalidOperationException: An exception has been raised that is likely due to a transient failure.
+ ---> Npgsql.NpgsqlException (0x80004005): Exception while reading from stream
+ ---> System.TimeoutException: Timeout during reading attempt
+   at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|55_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|214_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+2025-12-25 19:41:14 [Error] HTTP "GET" "/api/User/GetAll/List" responded 500 in 15139.9790 ms
+System.InvalidOperationException: An exception has been raised that is likely due to a transient failure.
+ ---> Npgsql.NpgsqlException (0x80004005): Exception while reading from stream
+ ---> System.TimeoutException: Timeout during reading attempt
+   at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|55_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|214_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at WebApi.BLL.Services.User.UserService.GetAllAsync() in D:\_IT STEP_\_DIPLOMA\WebApi\WebApi.BLL\Services\User\UserService.cs:line 80
+   at WebApi.Controllers.UserController.GetAllAsync() in D:\_IT STEP_\_DIPLOMA\WebApi\WebApi\Controllers\UserController.cs:line 52
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2025-12-25 19:41:14 [Error] An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: An exception has been raised that is likely due to a transient failure.
+ ---> Npgsql.NpgsqlException (0x80004005): Exception while reading from stream
+ ---> System.TimeoutException: Timeout during reading attempt
+   at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|55_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|214_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at WebApi.BLL.Services.User.UserService.GetAllAsync() in D:\_IT STEP_\_DIPLOMA\WebApi\WebApi.BLL\Services\User\UserService.cs:line 80
+   at WebApi.Controllers.UserController.GetAllAsync() in D:\_IT STEP_\_DIPLOMA\WebApi\WebApi\Controllers\UserController.cs:line 52
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2025-12-25 19:41:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 6631.6988 ms
+2025-12-25 19:41:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 258.0385 ms
+2025-12-25 19:41:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 292.7084 ms
+2025-12-25 19:41:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 271.5711 ms
+2025-12-25 19:54:57 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1073.9484 ms
+2025-12-25 19:54:57 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 255.3651 ms
+2025-12-25 19:55:05 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 629.9981 ms
+2025-12-25 19:55:05 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 288.2011 ms
+2025-12-25 19:55:31 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 213.2511 ms
+2025-12-25 19:55:31 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 232.3984 ms
+2025-12-25 20:04:23 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1089.6505 ms
+2025-12-25 20:04:23 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 207.0017 ms
+2025-12-25 20:04:53 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 328.0571 ms
+2025-12-25 20:04:53 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 251.1797 ms
+2025-12-25 20:07:11 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 201.6150 ms
+2025-12-25 20:07:11 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 200.9751 ms
+2025-12-25 20:25:26 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1032.2330 ms
+2025-12-25 20:25:26 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 189.0096 ms
+2025-12-25 20:26:26 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 233.5404 ms
+2025-12-25 20:26:26 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 199.7819 ms
+2025-12-25 20:28:14 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 206.4206 ms
+2025-12-25 20:28:14 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 227.0606 ms
+2025-12-25 20:41:25 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 989.7175 ms
+2025-12-25 20:41:25 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 257.2149 ms
+2025-12-25 20:44:38 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 378.0766 ms
+2025-12-25 20:44:38 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 202.3592 ms
+2025-12-25 20:45:49 [Information] HTTP "GET" "/images/users/50_ jryhocca.tc3.webp" responded 404 in 0.6658 ms
+2025-12-25 20:45:49 [Information] HTTP "GET" "/images/users/50_ bjhda1sf.jvr.webp" responded 404 in 0.1726 ms
+2025-12-25 20:45:49 [Information] HTTP "GET" "/images/users/50_ yujgd4eo.mzy.webp" responded 404 in 0.1126 ms
+2025-12-25 20:45:49 [Information] HTTP "GET" "/images/users/50_ m5ekf50j.c4c.webp" responded 404 in 0.1094 ms
+2025-12-25 20:45:52 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 445.8450 ms
+2025-12-25 20:45:52 [Information] HTTP "GET" "/images/users/50_ jryhocca.tc3.webp" responded 404 in 0.1266 ms
+2025-12-25 20:45:52 [Information] HTTP "GET" "/images/users/50_ bjhda1sf.jvr.webp" responded 404 in 0.1025 ms
+2025-12-25 20:45:52 [Information] HTTP "GET" "/images/users/50_ m5ekf50j.c4c.webp" responded 404 in 0.1101 ms
+2025-12-25 20:45:52 [Information] HTTP "GET" "/images/users/50_ yujgd4eo.mzy.webp" responded 404 in 0.2283 ms
+2025-12-25 20:45:53 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 376.7683 ms
+2025-12-25 20:46:11 [Information] HTTP "GET" "/images/users/50_jryhocca.tc3.webp" responded 200 in 29.4337 ms
+2025-12-25 20:46:11 [Information] HTTP "GET" "/images/users/50_bjhda1sf.jvr.webp" responded 200 in 23.6519 ms
+2025-12-25 20:46:11 [Information] HTTP "GET" "/images/users/50_m5ekf50j.c4c.webp" responded 200 in 45.9574 ms
+2025-12-25 20:46:11 [Information] HTTP "GET" "/images/users/50_yujgd4eo.mzy.webp" responded 200 in 47.1519 ms
+2025-12-25 20:46:13 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 273.4272 ms
+2025-12-25 20:46:13 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 232.0034 ms
+2025-12-25 20:48:43 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 760.3197 ms
+2025-12-25 20:48:44 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 207.5959 ms
+2025-12-25 20:59:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 950.4327 ms
+2025-12-25 21:01:03 [Information] HTTP "PUT" "/api/User/Update" responded 200 in 2666.7713 ms
+2025-12-25 21:01:38 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 248.2964 ms
+2025-12-25 21:01:38 [Information] HTTP "GET" "/images/users/50_hfzk3yyr.j4x.webp" responded 200 in 0.8592 ms
+2025-12-25 21:01:38 [Information] HTTP "GET" "/images/users/200_hfzk3yyr.j4x.webp" responded 200 in 0.6601 ms
+2025-12-25 21:01:38 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 198.7669 ms
+2025-12-25 21:04:05 [Information] HTTP "PUT" "/api/User/Update" responded 200 in 1451.2889 ms
+2025-12-25 21:04:11 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 347.3937 ms
+2025-12-25 21:04:11 [Information] HTTP "GET" "/images/users/50_hfzk3yyr.j4x.webp" responded 304 in 3.3230 ms
+2025-12-25 21:04:11 [Information] HTTP "GET" "/images/users/200_hfzk3yyr.j4x.webp" responded 304 in 3.1348 ms
+2025-12-25 21:04:11 [Information] HTTP "GET" "/images/users/50_kjpayaat.tnr.webp" responded 200 in 0.9531 ms
+2025-12-25 21:04:11 [Information] HTTP "GET" "/images/users/200_kjpayaat.tnr.webp" responded 200 in 1.3069 ms
+2025-12-25 21:04:11 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 220.6190 ms
+2025-12-25 21:06:23 [Information] HTTP "PUT" "/api/User/Update" responded 200 in 1378.6749 ms
+2025-12-25 21:06:34 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 466.4454 ms
+2025-12-25 21:06:35 [Information] HTTP "GET" "/images/users/50_hfzk3yyr.j4x.webp" responded 304 in 0.1684 ms
+2025-12-25 21:06:35 [Information] HTTP "GET" "/images/users/50_kjpayaat.tnr.webp" responded 304 in 0.0876 ms
+2025-12-25 21:06:35 [Information] HTTP "GET" "/images/users/200_hfzk3yyr.j4x.webp" responded 304 in 0.0586 ms
+2025-12-25 21:06:35 [Information] HTTP "GET" "/images/users/200_kjpayaat.tnr.webp" responded 304 in 0.1596 ms
+2025-12-25 21:06:35 [Information] HTTP "GET" "/images/users/50_jfjl51jo.yhv.webp" responded 200 in 0.5766 ms
+2025-12-25 21:06:35 [Information] HTTP "GET" "/images/users/200_jfjl51jo.yhv.webp" responded 200 in 0.5205 ms
+2025-12-25 21:06:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 204.0393 ms
+2025-12-25 21:21:48 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 3923.8915 ms
+2025-12-25 21:21:48 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 283.4269 ms
+2025-12-25 21:24:04 [Information] Application is shutting down...
