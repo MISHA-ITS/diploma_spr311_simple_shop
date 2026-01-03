@@ -8,6 +8,6 @@ namespace WebApi.BLL.Services.Product
         Task<ServiceResponse> UpdateAsync(UpdateProductDTO dto);
         Task<ServiceResponse> DeleteAsync(long id);
         Task<ServiceResponse> GetByIdAsync(long id);
-        Task<ServiceResponse> GetAllAsync();
+        Task<ServiceResponse> GetAllAsync(ProductFilterDto filter);
     }
 }
