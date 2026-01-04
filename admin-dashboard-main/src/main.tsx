@@ -8,15 +8,19 @@ import { AppWrapper } from "./components/common/PageMeta.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 import {GoogleOAuthProvider} from "@react-oauth/google";
 import EnvConfig from "./config/env.ts";
+import {Provider} from "react-redux";
+import {store} from "./store";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider>
-        <GoogleOAuthProvider clientId={EnvConfig.GOOGLE_CLIENT_ID}>
-            <AppWrapper>
-                <App />
-            </AppWrapper>
-        </GoogleOAuthProvider>,
-    </ThemeProvider>
+      <Provider store={store}>
+          <ThemeProvider>
+              <GoogleOAuthProvider clientId={EnvConfig.GOOGLE_CLIENT_ID}>
+                  <AppWrapper>
+                      <App />
+                  </AppWrapper>
+              </GoogleOAuthProvider>,
+          </ThemeProvider>
+      </Provider>
   </StrictMode>,
 );

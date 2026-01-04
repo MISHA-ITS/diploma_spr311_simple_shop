@@ -1,15 +1,18 @@
 import {useEffect, useState} from "react";
-import { Link } from "react-router";
+import {Link} from "react-router";
+import { useNavigate } from "react-router-dom";
 import {ChevronLeftIcon, EnvelopeIcon, EyeCloseIcon, EyeIcon} from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import PhoneInput from "../form/group-input/PhoneInput.tsx";
-import {IUserCreate} from "../../models/account";
-import {pickImage} from "../../utils/pickImage.tsx";
+import {IUserCreate} from "../../types/IUserCreate.ts";
 import noimage from "../../assets/images/noimage.jpeg";
 import {useGoogleLogin} from "@react-oauth/google";
-import {loginByGoogleApi} from "../../services/auth.ts";
+import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
+import {IRegisterRequest} from "../../types/Account/IRegisterRequest.ts";
+import {useRegisterMutation} from "../../services/apiAccount.ts";
+import {IImageFile} from "../../types/IImageFile.ts";
 
 const userInitState: IUserCreate = {
   email: "",
@@ -27,100 +30,93 @@ const countries = [
   { code: "AU", label: "+61" },
 ];
 
-export default function SignUpForm() {
+const SignUpForm: React.FC = () => {
 
+    const [register, {isLoading, error: registerError}] = useRegisterMutation();
+    console.log("registerError", isLoading, registerError);
     const [user, setUser] = useState<IUserCreate>(userInitState);
-    const [errors, setErrors] = useState<string[]>([])
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
-    const validationChange = (isValid: boolean, fieldKey: string) => {
-        if (isValid && errors.includes(fieldKey)) {
-            setErrors(errors.filter(x => x !== fieldKey))
-        } else if (!isValid && !errors.includes(fieldKey)) {
-            setErrors(state => [...state, fieldKey])
+    const validationChange = (
+        isValid: boolean,
+        fieldKey: string,
+        message?: string
+    ) => {
+      setErrors(prev => {
+        const copy = { ...prev };
+
+        if (isValid) {
+          delete copy[fieldKey];
+        } else if (message) {
+          copy[fieldKey] = message;
         }
+
+        return copy;
+      });
     };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    // 1. Перевірка чекбокса
-    if (!isChecked) {
-      setError("Ви повинні погодитись з умовами");
-      return;
-    }
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    // 2. Перевірка валідації
-    if (errors.length > 0) {
-      setError("Заповніть всі поля коректно");
-      alert("Потрібно погодитися з умовами");
-      return;
-    }
-
-    // 3. Перевірка паролів
-    if (user.password !== confirmPassword) {
-      setError("Паролі не співпадають");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-
-      formData.append("FirstName", user.firstName);
-      formData.append("LastName", user.lastName);
-      formData.append("UserName", user.email);
-      formData.append("Email", user.email);
-      formData.append("Password", user.password);
-
-      if (user.imageFile instanceof File) {
-        formData.append("Image", user.imageFile);
-      }
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/account/register`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        setError(text || "Помилка реєстрації");
+      // 1. Перевірка чекбокса
+      if (!isChecked) {
+        setError("Ви повинні погодитись з умовами");
         return;
       }
 
-      alert("Користувача успішно зареєстровано");
-      window.location.href = "/admin";
+      // 2. Перевірка паролів
+      if (user.password !== confirmPassword) {
+        setError("Паролі не співпадають");
+        return;
+      }
 
-    } catch (err) {
-      console.error(err);
-      setError("Помилка під час реєстрації");
-    }
-  };
+      try {
+        const model: IRegisterRequest = {
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          userName: user.firstName,
+          password: user.password,
+          imageFile: user.imageFile?.file ?? null
+        };
+
+        await register(model);
+
+        alert("Користувача успішно зареєстровано");
+        navigate("/");
+      } catch (err) {
+        console.error(err);
+        setError("Помилка під час реєстрації");
+      }
+    };
 
   const handlePickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setPreview(URL.createObjectURL(file));
+    const imageFile: IImageFile = {
+      file,
+      preview: URL.createObjectURL(file),
+    };
+
+    setPreview(imageFile.preview);
+
     setUser(prev => ({
       ...prev,
-      imageFile: file
+      imageFile,
     }));
   };
 
-  const handlePhoneNumberChange = (phoneNumber: string) => {
-      console.log("Updated phone number:", phoneNumber);
-    };
-
-    const handlePick = async () => {
-      const file = await pickImage();
-      if (!file) return;
-
-      setPreview(URL.createObjectURL(file));
-    };
+    const handlePhoneNumberChange = (phoneNumber: string) => {
+        console.log("Updated phone number:", phoneNumber);
+      };
 
     // --- Google login ---
     const loginByGoogle = useGoogleLogin({
@@ -131,7 +127,7 @@ export default function SignUpForm() {
 
           console.log("Backend response (Google):", result);
           localStorage.setItem("token", result.payload);
-          window.location.href = "/admin";
+          navigate("/");
         } catch (err) {
           console.error("Google login error", err);
           setError("Помилка входу через Google");
@@ -281,6 +277,11 @@ export default function SignUpForm() {
                           }
                         ]}
                       />
+                      {errors.firstName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.firstName}
+                          </p>
+                      )}
                     </div>
                     {/* <!-- Last Name --> */}
                     <div className="sm:col-span-1">
@@ -468,17 +469,18 @@ export default function SignUpForm() {
                         Політикою конфіденційності
                       </span>
                     </p>
+
+                    {Object.keys(errors).length > 0 && (
+                        <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+                          <p className="font-medium mb-1">Форма містить помилки:</p>
+                          <ul className="list-disc list-inside">
+                            {Object.values(errors).map((err: string, index) => (
+                                <li key={index}>{err}</li>
+                            ))}
+                          </ul>
+                        </div>
+                    )}
                   </div>
-                  {errors.length > 0 && (
-                      <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="font-medium mb-1">Форма містить помилки:</p>
-                        <ul className="list-disc list-inside">
-                          {errors.map(err => (
-                              <li key={err}>{err}</li>
-                          ))}
-                        </ul>
-                      </div>
-                  )}
 
                   {/* <!-- Button --> */}
                   <div>
@@ -506,3 +508,5 @@ export default function SignUpForm() {
       </div>
     );
 }
+
+export default SignUpForm;

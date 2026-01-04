@@ -1,23 +1,52 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import {Link} from "react-router";
+import { useNavigate } from "react-router-dom";
 import {ChevronLeftIcon, EnvelopeIcon, EyeCloseIcon, EyeIcon} from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useGoogleLogin } from "@react-oauth/google";
-import { loginByGoogleApi } from "../../services/auth.ts";
-import EnvConfig from "../../config/env.ts";
+import { loginByGoogleApi } from "../../services/apiLoginByGoogle.ts";
+import {ILoginRequest} from "../../types/Account/ILoginRequest.ts";
+import {useLoginMutation} from "../../services/apiAccount.ts";
+
+const initState: ILoginRequest = {
+  email: "",
+  password: "",
+}
 
 const SignInForm: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  const [login, {isLoading, error: loginError}] = useLoginMutation();
+  console.log("loginError", isLoading, loginError);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState<ILoginRequest>(initState);
   const [error, setError] = useState("");
   const [errors, setErrors] = useState<string[]>([])
+  const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+  const [loading, ] = useState(false);
+
+  // --- Email/Password login ---
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const result = await login(form);
+      if (result.error) {
+        console.log("Error:", result.error);
+      }
+      console.log("Backend response:", result);
+      //localStorage.setItem("token", result.payload);
+      alert("Успішний вхід в систему");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      setError("Помилка входу");
+    }
+  };
 
   // --- Google login ---
   const loginByGoogle = useGoogleLogin({
@@ -28,7 +57,7 @@ const SignInForm: React.FC = () => {
 
         console.log("Backend response (Google):", result);
         localStorage.setItem("token", result.payload);
-        window.location.href = "/admin";
+        navigate("/");
       } catch (err) {
         console.error("Google login error", err);
         setError("Помилка входу через Google");
@@ -42,39 +71,6 @@ const SignInForm: React.FC = () => {
       setErrors(errors.filter(x => x !== fieldKey))
     } else if (!isValid && !errors.includes(fieldKey)) {
       setErrors(state => [...state, fieldKey])
-    }
-  };
-
-  // --- Email/Password login ---
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch(`${EnvConfig.API_URL}/api/account/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Помилка входу");
-        setLoading(false);
-        return;
-      }
-
-      console.log("JWT Token:", data.payload);
-      localStorage.setItem("token", data.payload);
-      setLoading(false);
-
-      window.location.href = "/admin"; // редірект
-    } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError("Помилка сервера");
-      setLoading(false);
     }
   };
 
@@ -150,7 +146,7 @@ const SignInForm: React.FC = () => {
 
             {error && <p className="mb-2 text-sm text-red-500 dark:text-red-400">{error}</p>}
 
-            <form onSubmit={handleLogin}>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-6">
                 <div>
                   <Label>
@@ -159,8 +155,8 @@ const SignInForm: React.FC = () => {
                   <div className="relative">
                     <Input
                         placeholder="info@gmail.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={form.email}
+                        onChange={(e) => setForm({...form, email: e.target.value})}
                         className="pl-[62px]"
                         rules={[
                           {
@@ -189,8 +185,8 @@ const SignInForm: React.FC = () => {
                     <Input
                         type={showPassword ? "text" : "password"}
                         placeholder="Введіть свій пароль"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={form.password}
+                        onChange={(e) => setForm({...form, password: e.target.value})}
                         onValidationChange={validationChange}
                         rules={[
                           {
