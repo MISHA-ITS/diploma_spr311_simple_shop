@@ -1,3 +1,5 @@
 export interface ILoginResponse {
-    token: string;
+    isSuccess: boolean;
+    message: string;
+    payload: string;
 }
