@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import { Link } from "react-router";
 import {ChevronLeftIcon, EnvelopeIcon, EyeCloseIcon, EyeIcon} from "../../icons";
 import Label from "../form/Label";
@@ -7,17 +7,31 @@ import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useGoogleLogin } from "@react-oauth/google";
 import { loginByGoogleApi } from "../../services/auth.ts";
-import EnvConfig from "../../config/env.ts";
+import { useNavigate } from "react-router-dom";
+import {useLoginMutation} from "../../services/apiAccount.ts";
+import {ILoginRequest} from "../../models/account";
+import { loginSuccess } from "../../store/authSlice.ts";
+import {useDispatch} from "react-redux";
+import {useAppSelector} from "../../store";
+
+const initState: ILoginRequest = {
+    email: "",
+    password: "",
+}
 
 const SignInForm: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loginRequest, { isLoading }] = useLoginMutation();
+
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [errors, setErrors] = useState<string[]>([])
+
+  const {user} = useAppSelector(globalState => globalState.auth);
+
+  const [form, setForm] = useState<ILoginRequest>(initState);
 
   // --- Google login ---
   const loginByGoogle = useGoogleLogin({
@@ -26,11 +40,9 @@ const SignInForm: React.FC = () => {
         const googleToken = tokenResponse.access_token;
         const result = await loginByGoogleApi(googleToken);
 
-        console.log("Backend response (Google):", result);
-        localStorage.setItem("token", result.payload);
-        window.location.href = "/admin";
-      } catch (err) {
-        console.error("Google login error", err);
+        dispatch(loginSuccess(result.payload));
+        navigate("/admin");
+      } catch {
         setError("Помилка входу через Google");
       }
     },
@@ -48,47 +60,35 @@ const SignInForm: React.FC = () => {
   // --- Email/Password login ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
-
     try {
-      const res = await fetch(`${EnvConfig.API_URL}/api/account/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+        const res = await loginRequest(form).unwrap();
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Помилка входу");
-        setLoading(false);
-        return;
-      }
-
-      console.log("JWT Token:", data.payload);
-      localStorage.setItem("token", data.payload);
-      setLoading(false);
-
-      window.location.href = "/admin"; // редірект
-    } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError("Помилка сервера");
-      setLoading(false);
+        if (res.isSuccess) {
+            dispatch(loginSuccess(res.payload));
+            navigate("/admin");
+        } else {
+            setError(res.message);
+        }
+    } catch {
+        setError("Помилка входу");
     }
   };
 
   return (
       <div className="flex flex-col flex-1">
-        <div className="w-full max-w-md pt-10 mx-auto">
-          <Link
-              to="/admin"
-              className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          >
-            <ChevronLeftIcon className="size-5" />
-            Назад до панелі адміністратора
-          </Link>
-        </div>
+          {user?.roles.includes("Admin") && (
+              <div className="w-full max-w-md pt-10 mx-auto">
+                  <Link
+                      to="/admin"
+                      className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  >
+                      <ChevronLeftIcon className="size-5" />
+                      До панелі адміністратора
+                  </Link>
+              </div>
+          )}
+
 
         <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
           <div>
@@ -142,12 +142,6 @@ const SignInForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative py-3 sm:py-5">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Введіть свою електронну адресу та пароль для входу!
-              </p>
-            </div>
-
             {error && <p className="mb-2 text-sm text-red-500 dark:text-red-400">{error}</p>}
 
             <form onSubmit={handleLogin}>
@@ -159,8 +153,8 @@ const SignInForm: React.FC = () => {
                   <div className="relative">
                     <Input
                         placeholder="info@gmail.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={form.email}
+                        onChange={(e) => setForm({...form, email: e.target.value})}
                         className="pl-[62px]"
                         rules={[
                           {
@@ -189,8 +183,8 @@ const SignInForm: React.FC = () => {
                     <Input
                         type={showPassword ? "text" : "password"}
                         placeholder="Введіть свій пароль"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={form.password}
+                        onChange={(e) => setForm({...form, password: e.target.value})}
                         onValidationChange={validationChange}
                         rules={[
                           {
@@ -249,7 +243,7 @@ const SignInForm: React.FC = () => {
 
                 <div>
                   <Button className="w-full" size="sm">
-                    {loading ? "Завантаження..." : "Увійти"}
+                    {isLoading ? "Завантаження..." : "Увійти"}
                   </Button>
                 </div>
               </div>
