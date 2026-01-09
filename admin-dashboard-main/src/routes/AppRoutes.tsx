@@ -23,6 +23,7 @@ import MainPage from "../pages/MainPage.tsx";
 import MainLayout from "../layout/MainLayout.tsx";
 import ForgotPassword from "../pages/OtherPage/ForgotPassword.tsx";
 import ResetPassword from "../pages/OtherPage/ResetPassword.tsx";
+import CategoriesList from "../pages/Categories/components/CategoriesList.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -43,6 +44,7 @@ const AppRoutes : React.FC = () => {
                         <Route path=":id" element={<UserProfiles />} />
                     </Route>
                     <Route path="users-list" element={<UsersList />} />
+                    <Route path="categories-list" element={<CategoriesList />} />
                     <Route path="calendar" element={<Calendar />} />
                     <Route path="blank" element={<Blank />} />
 
