@@ -79,8 +79,10 @@ namespace WebApi.BLL.Services.Category
         {
             logger.LogDebug("Retrieving all categories");
 
-            var entities = categoryRepository.GetAll();
-            var dtos = mapper.Map<List<CategoryDTO>>(await entities.ToListAsync());
+            //var entities = categoryRepository.GetAll();
+            //var dtos = mapper.Map<List<CategoryDTO>>(await entities.ToListAsync());
+
+            var dtos = await mapper.ProjectTo<CategoryDTO>(categoryRepository.GetAll()).ToListAsync();
 
             logger.LogInformation("Retrieved {Count} categories", dtos.Count);
 

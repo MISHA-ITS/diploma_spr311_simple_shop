@@ -1,4 +1,5 @@
-﻿using WebApi.DAL.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApi.DAL.Entities;
 
 namespace WebApi.DAL.Repositories;
 
@@ -10,5 +11,5 @@ public interface IGenericRepository<TEntity, TId>
     Task<bool> UpdateAsync(TEntity entity);
     Task<bool> DeleteAsync(TEntity entity);
     Task<TEntity?> GetByIdAsync(TId id);
-    IQueryable<TEntity> GetAll();
+    IQueryable<TEntity> GetAll(QueryTrackingBehavior tracking = QueryTrackingBehavior.NoTracking);
 }

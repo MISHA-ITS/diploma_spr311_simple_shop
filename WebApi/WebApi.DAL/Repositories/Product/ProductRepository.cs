@@ -46,10 +46,11 @@ public class ProductRepository(AppDbContext context, ILogger<GenericRepository<P
         }
     }
 
-    public override IQueryable<ProductEntity> GetAll()
+    public override IQueryable<ProductEntity> GetAll(QueryTrackingBehavior tracking = QueryTrackingBehavior.NoTracking)
     {
         _logger.LogDebug("Fetching all products with related Images and Categories");
         return _context.Set<ProductEntity>()
+            .AsTracking(tracking)
             .Include(p => p.Images)
             .Include(p => p.Categories)
             .AsSplitQuery();
