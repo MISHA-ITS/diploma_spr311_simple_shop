@@ -10,8 +10,8 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { loginByGoogleApi } from "../../services/apiLoginByGoogle.ts";
 import {ILoginRequest} from "../../types/Account/ILoginRequest.ts";
 import {useLoginMutation} from "../../services/apiAccount.ts";
-import {getUserFromToken} from "../../store/authSlice.ts";
-import {useAppSelector} from "../../store";
+import {login} from "../../store/authSlice.ts";
+import {useAppDispatch, useAppSelector} from "../../store";
 
 const initState: ILoginRequest = {
   email: "",
@@ -19,33 +19,14 @@ const initState: ILoginRequest = {
 }
 
 const SignInForm: React.FC = () => {
-  const [login, {isLoading, error: loginError}] = useLoginMutation();
+  const [loginPOST, {isLoading, error: loginError}] = useLoginMutation();
 
   console.log("loginError", isLoading, loginError);
 
-  // useEffect(() => {
-  //   if (loginError) {
-  //     console.log("loginError", loginError);
-  //   }
-  //   loadToken();
-  // })
-  //
-  // const loadToken = async () => (
-  //     localStorage.getItem("token")
-  // );
-
-  //const token = localStorage.getItem("token");
-  //console.log("token auth (login page)", token);
+  const dispatch = useAppDispatch();
 
   const {user} = useAppSelector(globalState => globalState.auth);
-
   console.log("user auth (login page)", user);
-
-  if (localStorage.getItem("token"))
-  {
-    const user = getUserFromToken(localStorage.getItem("token") || "");
-    console.log("user auth (login page)", user);
-  }
 
   const [form, setForm] = useState<ILoginRequest>(initState);
   const [error, setError] = useState("");
@@ -59,15 +40,16 @@ const SignInForm: React.FC = () => {
   // --- Email/Password login ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const result = await login(form);
+      const result = await loginPOST(form);
+
       if (result.error) {
         console.log("Login error:", result.error);
       } else {
         console.log("Backend response:", result.data.payload);
         const token = result.data.payload;
-        localStorage.setItem("token", token);
+        dispatch(login(token));
+
         alert("Успішний вхід в систему");
         navigate("/")}
     } catch (err) {

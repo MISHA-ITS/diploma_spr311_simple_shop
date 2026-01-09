@@ -3,17 +3,27 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import {useNavigate} from "react-router";
 import Button from "../ui/button/Button.tsx";
-import {useAppSelector} from "../../store";
+import {useAppDispatch, useAppSelector} from "../../store";
+import {logout} from "../../store/authSlice.ts";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
+  const dispatch = useAppDispatch();
+
   const {user} = useAppSelector(globalState => globalState.auth);
 
+  const urlUserImage = `${import.meta.env.VITE_API_URL}/images/users`;
+
   const handleLogout = () => {
-    localStorage.removeItem("token"); // або localStorage.clear()
-    navigate("/signin");
+    try {
+      localStorage.removeItem("token"); // або localStorage.clear()
+      dispatch(logout());
+      navigate("/signin");
+    } catch (error) {
+      console.log("Logout error", error);
+    }
   };
 
   function toggleDropdown() {
@@ -29,9 +39,25 @@ export default function UserDropdown() {
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="/images/user/owner.jpg" alt="User" />
-        </span>
+        {user && (
+            <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
+            <img
+                className="h-full w-full object-cover rounded-full"
+                src={
+                  user.image
+                      ? user.image.startsWith("http")
+                          ? user.image
+                          : `${urlUserImage}/50_${user.image}`
+                      : "/images/user/noimage.jpeg"
+                }
+                alt={user.name}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src =
+                      "/images/user/noimage.jpeg";
+                }}
+            />
+          </span>
+        )}
 
         <span className="block mr-1 font-medium text-theme-sm">{user?.name}</span>
         <svg
