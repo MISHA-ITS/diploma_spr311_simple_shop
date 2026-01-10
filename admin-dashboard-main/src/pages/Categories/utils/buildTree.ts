@@ -1,4 +1,4 @@
-import type { ICategoryItem, CategoryNode} from "../types.ts";
+import type { ICategoryItem, CategoryNode} from "../../../types/Category/types.ts";
 
 export function buildCategoryTree(flat: ICategoryItem[]): CategoryNode[] {
     const byId = new Map<number, CategoryNode>();

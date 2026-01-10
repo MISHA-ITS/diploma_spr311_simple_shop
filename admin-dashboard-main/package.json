@@ -28,6 +28,8 @@
     "cors": "^2.8.5",
     "expo-image-picker": "^17.0.10",
     "flatpickr": "^4.6.13",
+    "flowbite": "^4.0.1",
+    "flowbite-react": "^0.12.16",
     "jwt-decode": "^4.0.0",
     "object-to-formdata": "^4.5.1",
     "react": "^19.2.3",
@@ -40,6 +42,7 @@
     "react-redux": "^9.2.0",
     "react-router": "^7.1.5",
     "react-router-dom": "^7.11.0",
+    "react-toastify": "^11.0.5",
     "swiper": "^11.2.3",
     "tailwind-merge": "^3.0.1"
   },

@@ -1,10 +1,33 @@
-import {ICategoryRowProps} from "../types.ts";
+import {ICategoryRowProps} from "../../../types/Category/types.ts";
 import * as React from "react";
 import EnvConfig from "../../../config/env.ts";
+import { BiEdit } from "react-icons/bi";
+import { MdDeleteOutline } from "react-icons/md";
+import 'flowbite';
 
-const urlCategoryImage = `${EnvConfig.API_URL}/images/categories`;
+const urlCategoryImage = `${EnvConfig.API_URL}/images/`;
 
-const CategoryRow: React.FC<ICategoryRowProps> = ({ category, onDeleteCategory }) => {
+const CategoryRow: React.FC<ICategoryRowProps> = ({ category, onDeleteCategory, onEditCategory }) => {
+
+    // const [drawerData, setDrawerData] = useState<DrawerDataModel>({
+    //     isDrawerOpen: false,
+    //     selectedCategory: undefined
+    // })
+    //
+    // const onDrawerClose = () => {
+    //     setDrawerData({
+    //         selectedCategory: undefined,
+    //         isDrawerOpen: false
+    //     })
+    // }
+    //
+    // const editCategory = (category: ICategory) => {
+    //     setDrawerData({
+    //         selectedCategory: category,
+    //         isDrawerOpen: true
+    //     })
+    // }
+
     return (
         <tr>
             <td className="px-5 py-4 text-sm text-neutral-600 dark:text-neutral-300 whitespace-nowrap">{category.id}</td>
@@ -13,46 +36,74 @@ const CategoryRow: React.FC<ICategoryRowProps> = ({ category, onDeleteCategory }
                     <div
                         className="h-10 w-10  bg-neutral-200 dark:bg-neutral-700 overflow-hidden grid place-items-center text-sm font-medium">
                         {category.imageUrl ? (
-// If you store only file names, swap to your CDN/base path below
                             <img
                                 className="h-full w-full object-cover"
                                 src={category.imageUrl.startsWith("http") ? category.imageUrl : `${urlCategoryImage}/50_${category.imageUrl}`}
-                                alt={`${category.name}`}
-                                onError={(e) => {
-// graceful fallback to initials if image fails
-                                    const target = e.currentTarget as HTMLImageElement;
-                                    target.style.display = "none";
-                                }}
                             />
                         ) : (
-                            <span>{`${category.name}`}</span>
+                            <img
+                                className="h-full w-full object-cover"
+                                src={`${EnvConfig.API_URL}/images/noimage.jpeg`}
+                            />
                         )}
                     </div>
                     <div>
                         <div className="font-medium leading-tight">{`${category.name}`}</div>
-                        <div className="text-xs text-neutral-500">#{String(category.id).padStart(4, "0")}</div>
+                        {/*<div className="text-xs text-neutral-500">#{String(category.id).padStart(3, "0")}</div>*/}
                     </div>
                 </div>
             </td>
             <td className="px-4 py-2">
-                <button
-                    className="
-                              px-3 py-1.5 rounded-xl text-xs font-medium
-                              bg-red-800 text-white
-                              hover:bg-red-600
-                              dark:bg-red-600 dark:hover:bg-red-600
+                <div className="font-medium leading-tight">{category.parentName ? category.parentName : '--------'}</div>
+            </td>
+            <td className="px-4 py-2">
+                <div className=" text-xs text-gray-500">
+                    {category.childs && category.childs.length > 0 ? category.childs.map(x => x.name).join(' | ') : '--------'}
+                </div>
+            </td>
+            <td className="px-4 py-2">
+                <div className="flex items-center justify-center gap-3">
+                    <button
+                        onClick={() => onEditCategory(category)}
+                        type="button" data-drawer-target="drawer-form" data-drawer-show="drawer-form" aria-controls="drawer-form"
+                        className="
+                            inline-flex items-center justify-center
+                            px-3 py-1.5 rounded-xl text-xs font-medium
+                            bg-blue-800 text-white
+                            hover:bg-blue-600
+                            dark:bg-blue-600 dark:hover:bg-blue-600
 
-                              transition-all duration-200
-                              hover:scale-105
-                              active:scale-85
+                            transition-all duration-300
+                            hover:scale-125
+                            active:scale-85
 
-                              hover:ring-2 hover:ring-red-900
-                              ring-offset-0 dark:ring-offset-neutral-900
-                          "
-                    onClick={() => onDeleteCategory(category.id)}
-                >
-                    Видалити
-                </button>
+                            hover:shadow-xl
+                            hover:ring-2 hover:ring-blue-400
+                            ring-offset-0 dark:ring-offset-neutral-900">
+
+                        <BiEdit size={20} />
+                    </button>
+
+                    <button
+                        className="
+                            inline-flex items-center justify-center
+                            px-3 py-1.5 rounded-xl text-xs font-medium
+                            bg-red-800 text-white
+                            hover:bg-red-600
+                            dark:bg-red-600 dark:hover:bg-red-600
+
+                            transition-all duration-300
+                            hover:scale-125
+                            active:scale-85
+
+                            hover:shadow-xl
+                            hover:ring-2 hover:ring-red-400
+                            ring-offset-0 dark:ring-offset-neutral-900"
+                        onClick={() => onDeleteCategory(category.id)}>
+
+                        <MdDeleteOutline size={20} />
+                    </button>
+                </div>
             </td>
         </tr>
     );
