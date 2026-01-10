@@ -22,7 +22,7 @@ namespace WebApi.DAL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ProductsCategories", b =>
+            modelBuilder.Entity("CategoryEntityProductEntity", b =>
                 {
                     b.Property<long>("CategoriesId")
                         .HasColumnType("bigint");
@@ -342,7 +342,7 @@ namespace WebApi.DAL.Migrations
                     b.ToTable("ProductImages");
                 });
 
-            modelBuilder.Entity("ProductsCategories", b =>
+            modelBuilder.Entity("CategoryEntityProductEntity", b =>
                 {
                     b.HasOne("WebApi.DAL.Entities.CategoryEntity", null)
                         .WithMany()
