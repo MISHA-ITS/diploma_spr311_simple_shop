@@ -1,0 +1,70 @@
+2025-12-22 21:19:53 [Information] Now listening on: "http://localhost:5172"
+2025-12-22 21:19:54 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-22 21:19:54 [Information] Hosting environment: "Development"
+2025-12-22 21:19:54 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-22 21:34:28 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1900.8823 ms
+2025-12-22 21:34:28 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 5.3352 ms
+2025-12-22 21:34:28 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.1048 ms
+2025-12-22 21:34:28 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.0542 ms
+2025-12-22 21:34:28 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0854 ms
+2025-12-22 21:34:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 868.4093 ms
+2025-12-22 21:34:40 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 175.0670 ms
+2025-12-22 21:34:40 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0717 ms
+2025-12-22 21:34:40 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.0732 ms
+2025-12-22 21:34:40 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.0403 ms
+2025-12-22 21:34:40 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0338 ms
+2025-12-22 21:34:40 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 164.1954 ms
+2025-12-22 21:35:39 [Information] Application is shutting down...
+2025-12-22 23:08:30 [Information] Now listening on: "http://localhost:5172"
+2025-12-22 23:08:30 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-22 23:08:30 [Information] Hosting environment: "Development"
+2025-12-22 23:08:30 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-22 23:10:02 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 960.2204 ms
+2025-12-22 23:10:02 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 9.9016 ms
+2025-12-22 23:10:02 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 9.8219 ms
+2025-12-22 23:10:02 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.1967 ms
+2025-12-22 23:10:02 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0937 ms
+2025-12-22 23:10:03 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 774.7216 ms
+2025-12-22 23:13:18 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 456.2086 ms
+2025-12-22 23:13:18 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.0782 ms
+2025-12-22 23:13:18 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0755 ms
+2025-12-22 23:13:18 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.0540 ms
+2025-12-22 23:13:18 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0632 ms
+2025-12-22 23:13:18 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 429.8280 ms
+2025-12-22 23:23:41 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1403.0590 ms
+2025-12-22 23:23:41 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.2134 ms
+2025-12-22 23:23:41 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0998 ms
+2025-12-22 23:23:41 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0773 ms
+2025-12-22 23:23:41 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.1257 ms
+2025-12-22 23:23:42 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 326.5734 ms
+2025-12-22 23:24:06 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 361.2838 ms
+2025-12-22 23:24:06 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0787 ms
+2025-12-22 23:24:06 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.0940 ms
+2025-12-22 23:24:06 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0899 ms
+2025-12-22 23:24:06 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.3324 ms
+2025-12-22 23:24:06 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 348.8740 ms
+2025-12-22 23:25:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 363.6068 ms
+2025-12-22 23:25:19 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.0846 ms
+2025-12-22 23:25:19 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0254 ms
+2025-12-22 23:25:19 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.0468 ms
+2025-12-22 23:25:19 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0806 ms
+2025-12-22 23:25:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 395.3619 ms
+2025-12-22 23:49:50 [Information] HTTP "GET" "//images/users/200_jryhocca.tc3.webp" responded 404 in 0.1907 ms
+2025-12-22 23:49:50 [Information] HTTP "GET" "//images/users/200_bjhda1sf.jvr.webp" responded 404 in 0.0664 ms
+2025-12-22 23:49:50 [Information] HTTP "GET" "//images/users/200_yujgd4eo.mzy.webp" responded 404 in 0.1035 ms
+2025-12-22 23:49:51 [Information] HTTP "GET" "//images/users/200_m5ekf50j.c4c.webp" responded 404 in 1.5963 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1120.8785 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0450 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.0487 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0416 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/users/200_jryhocca.tc3.webp" responded 404 in 0.2781 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.0444 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/users/200_bjhda1sf.jvr.webp" responded 404 in 0.0734 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/users/200_yujgd4eo.mzy.webp" responded 404 in 0.0509 ms
+2025-12-22 23:49:59 [Information] HTTP "GET" "//images/users/200_m5ekf50j.c4c.webp" responded 404 in 0.0770 ms
+2025-12-22 23:50:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 203.7662 ms
+2025-12-22 23:51:39 [Information] HTTP "GET" "/" responded 404 in 0.1332 ms
+2025-12-22 23:52:07 [Information] HTTP "GET" "/images/users/200_" responded 404 in 0.0856 ms
+2025-12-22 23:53:00 [Information] HTTP "GET" "/images/users/200_/images/users/200_m5ekf50j.c4c.webp" responded 404 in 0.6939 ms
+2025-12-22 23:53:15 [Information] HTTP "GET" "/images/users/200_m5ekf50j.c4c.webp" responded 200 in 9.7985 ms
+2025-12-22 23:53:15 [Information] HTTP "GET" "/favicon.ico" responded 404 in 0.0883 ms

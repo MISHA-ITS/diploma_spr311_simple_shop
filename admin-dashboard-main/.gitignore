@@ -1,0 +1,67 @@
+# ===========================
+# 📦 
+# ===========================
+node_modules/
+dist/
+dist-ssr/
+build/
+temp/
+*.local
+*.tmp
+*.bak
+*.sw?
+
+# ===========================
+# ⚙️ 
+# ===========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+WebApi/WebApi/Logs/
+
+# ===========================
+# 🧠 IDE / OS / Tools
+# ===========================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.user
+
+# ===========================
+# 🔐
+# ===========================
+.env
+.env.*
+admin-dashboard-main/.env*
+!.env.example          # залиш приклад з шаблоном змінних
+
+# ===========================
+# ⚙️ ASP.NET backend
+# ===========================
+**/bin/
+**/obj/
+**/Properties/launchSettings.json
+*.db
+*.sqlite
+*.db-shm
+*.db-wal
+*.pdb
+*.userprefs
+
+# ===========================
+
+# User images (generated)
+WebApi/WebApi/wwwroot/images/users/
+
+# Vite
+.vite/

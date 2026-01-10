@@ -1,0 +1,99 @@
+2026-01-03 00:51:28 [Information] Login attempt started. Email: ""
+2026-01-03 00:51:30 [Warning] Login failed. User not found. Email: ""
+2026-01-03 00:51:30 [Information] HTTP "POST" "/api/account/login" responded 400 in 1620.8218 ms
+2026-01-03 01:00:18 [Information] Login attempt started. Email: ""
+2026-01-03 01:00:18 [Warning] Login failed. User not found. Email: ""
+2026-01-03 01:00:18 [Information] HTTP "POST" "/api/account/login" responded 400 in 715.3300 ms
+2026-01-03 01:54:54 [Information] Login attempt started. Email: "mybox018@gmail.com"
+2026-01-03 01:54:55 [Information] Login successful. UserId: 22, Email: "mybox018@gmail.com"
+2026-01-03 01:54:55 [Information] HTTP "POST" "/api/account/login" responded 200 in 1080.5299 ms
+2026-01-03 01:55:03 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 263.9457 ms
+2026-01-03 01:55:03 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 231.3726 ms
+2026-01-03 01:55:07 [Information] HTTP "GET" "/api/User/Get" responded 200 in 83.2867 ms
+2026-01-03 01:55:07 [Information] HTTP "GET" "/api/User/Get" responded 200 in 70.8949 ms
+2026-01-03 01:55:14 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 232.5529 ms
+2026-01-03 01:55:15 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 222.2653 ms
+2026-01-03 02:00:59 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 968.0813 ms
+2026-01-03 02:01:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 218.5086 ms
+2026-01-03 02:07:06 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 534.8688 ms
+2026-01-03 02:07:06 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 564.4034 ms
+2026-01-03 02:07:13 [Information] HTTP "DELETE" "/api/User/Delete/42" responded 404 in 0.3503 ms
+2026-01-03 02:07:22 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 218.4386 ms
+2026-01-03 02:07:23 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 223.8330 ms
+2026-01-03 02:08:29 [Information] HTTP "DELETE" "/api/User/Delete/42" responded 404 in 0.1007 ms
+2026-01-03 02:11:54 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 310.5817 ms
+2026-01-03 02:11:54 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 246.2871 ms
+2026-01-03 02:12:21 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 559.2008 ms
+2026-01-03 02:12:21 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 244.0510 ms
+2026-01-03 02:12:29 [Information] HTTP "DELETE" "/api/User/Delete/42" responded 404 in 0.2046 ms
+2026-01-03 02:14:00 [Information] HTTP "GET" "/api/User/Delete/42" responded 404 in 0.0876 ms
+2026-01-03 02:14:18 [Information] HTTP "GET" "/api/User/Delete/42" responded 404 in 0.0601 ms
+2026-01-03 02:16:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 246.5067 ms
+2026-01-03 02:16:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 253.5548 ms
+2026-01-03 02:16:39 [Information] HTTP "DELETE" "/api/User/Delete/42" responded 404 in 0.1292 ms
+2026-01-03 02:24:08 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 977.5916 ms
+2026-01-03 02:24:09 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 693.1807 ms
+2026-01-03 02:24:11 [Information] HTTP "DELETE" "/api/User/Delete" responded 200 in 286.9280 ms
+2026-01-03 02:24:16 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 223.7188 ms
+2026-01-03 02:24:16 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 239.8667 ms
+2026-01-03 02:44:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 947.9270 ms
+2026-01-03 02:44:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 183.1686 ms
+2026-01-03 02:52:54 [Information] HTTP "POST" "/api/User/Create" responded 200 in 4306.3742 ms
+2026-01-03 02:53:05 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 254.6300 ms
+2026-01-03 02:53:05 [Information] HTTP "GET" "/images/users/50_somjtluf.54f.webp" responded 200 in 1.3090 ms
+2026-01-03 02:53:05 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 233.7610 ms
+2026-01-03 02:53:21 [Information] HTTP "DELETE" "/api/User/Delete" responded 200 in 86.9056 ms
+2026-01-03 02:53:35 [Information] HTTP "GET" "/api/User/Get" responded 200 in 66.3122 ms
+2026-01-03 02:53:35 [Information] HTTP "GET" "/api/User/Get" responded 200 in 64.1496 ms
+2026-01-03 04:10:52 [Information] Starting user registration. Email: "test@gmail.com", UserName: "test@gmail.com"
+2026-01-03 04:10:53 [Debug] Creating user entity for "test@gmail.com"
+2026-01-03 04:10:53 [Information] User successfully created. UserId: 45, Email: "test@gmail.com"
+2026-01-03 04:10:53 [Information] Starting email confirmation message sending. UserId: 45, Email: "test@gmail.com"
+2026-01-03 04:10:53 [Debug] Email confirmation token generated for UserId: 45
+2026-01-03 04:10:54 [Information] Starting user registration. Email: "test@gmail.com", UserName: "test@gmail.com"
+2026-01-03 04:10:54 [Warning] Registration failed. Email already exists: "test@gmail.com"
+2026-01-03 04:10:54 [Information] HTTP "POST" "/api/account/register" responded 200 in 51.1299 ms
+2026-01-03 04:10:57 [Information] Email confirmation message successfully sent. UserId: 45, Email: "test@gmail.com"
+2026-01-03 04:10:57 [Information] Confirmation email sent. UserId: 45
+2026-01-03 04:10:57 [Information] JWT token generated for UserId: 45
+2026-01-03 04:10:57 [Information] HTTP "POST" "/api/account/register" responded 200 in 4987.8351 ms
+2026-01-03 04:11:12 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 240.8264 ms
+2026-01-03 04:11:12 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 238.6891 ms
+2026-01-03 04:11:41 [Information] HTTP "DELETE" "/api/User/Delete" responded 200 in 75.6907 ms
+2026-01-03 04:12:26 [Information] Starting user registration. Email: "test@gmail.com", UserName: "test@gmail.com"
+2026-01-03 04:12:27 [Debug] Creating user entity for "test@gmail.com"
+2026-01-03 04:12:27 [Information] User successfully created. UserId: 46, Email: "test@gmail.com"
+2026-01-03 04:12:27 [Information] Starting email confirmation message sending. UserId: 46, Email: "test@gmail.com"
+2026-01-03 04:12:27 [Debug] Email confirmation token generated for UserId: 46
+2026-01-03 04:12:29 [Information] Email confirmation message successfully sent. UserId: 46, Email: "test@gmail.com"
+2026-01-03 04:12:29 [Information] Confirmation email sent. UserId: 46
+2026-01-03 04:12:29 [Information] JWT token generated for UserId: 46
+2026-01-03 04:12:29 [Information] HTTP "POST" "/api/account/register" responded 200 in 2964.2212 ms
+2026-01-03 04:16:51 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 505.6585 ms
+2026-01-03 04:16:51 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 240.4080 ms
+2026-01-03 04:16:54 [Information] HTTP "DELETE" "/api/User/Delete" responded 200 in 67.4420 ms
+2026-01-03 04:17:45 [Information] Starting user registration. Email: "test@gmail.com", UserName: "test@gmail.com"
+2026-01-03 04:17:45 [Debug] Creating user entity for "test@gmail.com"
+2026-01-03 04:17:45 [Information] User successfully created. UserId: 47, Email: "test@gmail.com"
+2026-01-03 04:17:45 [Information] Starting email confirmation message sending. UserId: 47, Email: "test@gmail.com"
+2026-01-03 04:17:45 [Debug] Email confirmation token generated for UserId: 47
+2026-01-03 04:17:47 [Information] Email confirmation message successfully sent. UserId: 47, Email: "test@gmail.com"
+2026-01-03 04:17:47 [Information] Confirmation email sent. UserId: 47
+2026-01-03 04:17:47 [Information] JWT token generated for UserId: 47
+2026-01-03 04:17:47 [Information] HTTP "POST" "/api/account/register" responded 200 in 2766.2679 ms
+2026-01-03 04:18:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 303.5808 ms
+2026-01-03 04:18:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 275.1180 ms
+2026-01-03 04:19:22 [Information] HTTP "DELETE" "/api/User/Delete" responded 200 in 68.3112 ms
+2026-01-03 04:19:44 [Information] Starting user registration. Email: "test@gmail.com", UserName: "test@gmail.com"
+2026-01-03 04:19:44 [Debug] Creating user entity for "test@gmail.com"
+2026-01-03 04:19:44 [Information] User successfully created. UserId: 48, Email: "test@gmail.com"
+2026-01-03 04:19:44 [Information] Starting email confirmation message sending. UserId: 48, Email: "test@gmail.com"
+2026-01-03 04:19:44 [Debug] Email confirmation token generated for UserId: 48
+2026-01-03 04:19:47 [Information] Email confirmation message successfully sent. UserId: 48, Email: "test@gmail.com"
+2026-01-03 04:19:47 [Information] Confirmation email sent. UserId: 48
+2026-01-03 04:19:47 [Information] JWT token generated for UserId: 48
+2026-01-03 04:19:47 [Information] HTTP "POST" "/api/account/register" responded 200 in 2815.2402 ms
+2026-01-03 04:19:52 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 245.8462 ms
+2026-01-03 04:19:52 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 259.8020 ms
+2026-01-03 04:20:04 [Information] HTTP "DELETE" "/api/User/Delete" responded 200 in 161.8543 ms
+2026-01-03 04:20:30 [Information] Application is shutting down...

@@ -23,7 +23,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync([FromForm]LoginDto dto)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
     {
         var response = await accountService.LoginAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
@@ -52,37 +52,28 @@ public class AccountController(IAccountService accountService) : ControllerBase
     {
         var result = await accountService.LoginByGoogleAsync(model.Token);
 
-        if (string.IsNullOrEmpty(result))
-        {
-            return BadRequest(new
-            {
-                Status = 400,
-                IsValid = false,
-                Errors = new { Email = "Помилка реєстрації" }
-            });
-        }
-        return Ok(new
-        {
-            Token = result
-        });
+        if (!result.IsSuccess)
+            return BadRequest(result);
+
+        return Ok(result);
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPasswordAsync([FromForm] ForgotPasswordDto dto)
+    public async Task<IActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordDto dto)
     {
         var response = await accountService.ForgotPasswordAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
     [HttpPost("validate-reset-token")]
-    public async Task<IActionResult> ValidateResetTokenAsync([FromForm] ValidateResetTokenDto dto)
+    public async Task<IActionResult> ValidateResetTokenAsync([FromBody] ValidateResetTokenDto dto)
     {
         var response = await accountService.ValidateResetTokenAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPasswordAsync([FromForm] ResetPasswordDto dto)
+    public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordDto dto)
     {
         var response = await accountService.ResetPasswordAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);

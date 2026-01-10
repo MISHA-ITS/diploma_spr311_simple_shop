@@ -1,0 +1,38 @@
+2026-01-01 23:36:41 [Information] Now listening on: "http://localhost:5172"
+2026-01-01 23:36:42 [Information] Application started. Press Ctrl+C to shut down.
+2026-01-01 23:36:42 [Information] Hosting environment: "Development"
+2026-01-01 23:36:42 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2026-01-01 23:39:49 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 861.9819 ms
+2026-01-01 23:39:49 [Information] HTTP "GET" "/images/users/50_kjpayaat.tnr.webp" responded 200 in 62.4164 ms
+2026-01-01 23:39:49 [Information] HTTP "GET" "/images/users/50_yujgd4eo.mzy.webp" responded 200 in 56.2690 ms
+2026-01-01 23:39:49 [Information] HTTP "GET" "/images/users/50_bm12k2fg.mym.webp" responded 200 in 68.0279 ms
+2026-01-01 23:39:49 [Information] HTTP "GET" "/images/users/50_hfzk3yyr.j4x.webp" responded 200 in 11.6560 ms
+2026-01-01 23:39:49 [Information] HTTP "GET" "/images/users/50_jfjl51jo.yhv.webp" responded 200 in 27.8808 ms
+2026-01-01 23:39:49 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 346.1250 ms
+2026-01-01 23:40:29 [Information] Login attempt started. Email: "mybox018@gmail.com"
+2026-01-01 23:40:30 [Information] Login successful. UserId: 22, Email: "mybox018@gmail.com"
+2026-01-01 23:40:30 [Information] HTTP "POST" "/api/account/login" responded 200 in 1060.5064 ms
+2026-01-01 23:41:36 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 238.8668 ms
+2026-01-01 23:41:36 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 227.3698 ms
+2026-01-01 23:41:41 [Information] HTTP "GET" "/api/User/Get" responded 200 in 381.7343 ms
+2026-01-01 23:41:41 [Information] HTTP "GET" "/images/users/200_bm12k2fg.mym.webp" responded 200 in 33.6327 ms
+2026-01-01 23:41:41 [Information] HTTP "GET" "/api/User/Get" responded 200 in 64.9082 ms
+2026-01-01 23:41:57 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 223.0188 ms
+2026-01-01 23:41:57 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 212.3615 ms
+2026-01-01 23:42:01 [Information] HTTP "GET" "/api/User/Get" responded 200 in 61.1148 ms
+2026-01-01 23:42:01 [Information] HTTP "GET" "/images/users/200_hfzk3yyr.j4x.webp" responded 200 in 36.1208 ms
+2026-01-01 23:42:01 [Information] HTTP "GET" "/api/User/Get" responded 200 in 60.3273 ms
+2026-01-01 23:42:21 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 262.4572 ms
+2026-01-01 23:42:22 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 212.4251 ms
+2026-01-01 23:42:26 [Information] HTTP "GET" "/api/User/Get" responded 200 in 66.4544 ms
+2026-01-01 23:42:26 [Information] HTTP "GET" "/api/User/Get" responded 200 in 62.0959 ms
+2026-01-01 23:42:43 [Information] HTTP "GET" "/api/User/Get" responded 200 in 59.9709 ms
+2026-01-01 23:42:43 [Information] HTTP "GET" "/api/User/Get" responded 200 in 76.4186 ms
+2026-01-01 23:43:11 [Information] HTTP "GET" "/api/User/Get" responded 200 in 66.4130 ms
+2026-01-01 23:43:11 [Information] HTTP "GET" "/api/User/Get" responded 200 in 60.5767 ms
+2026-01-01 23:43:14 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 240.3832 ms
+2026-01-01 23:43:15 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 228.0528 ms
+2026-01-01 23:43:38 [Information] HTTP "GET" "/api/User/Get" responded 200 in 59.3527 ms
+2026-01-01 23:43:38 [Information] HTTP "GET" "/api/User/Get" responded 200 in 62.7654 ms
+2026-01-01 23:43:46 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 213.0317 ms
+2026-01-01 23:43:46 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 213.7183 ms

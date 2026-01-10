@@ -1,0 +1,72 @@
+2025-12-21 20:28:48 [Information] Now listening on: "http://localhost:5172"
+2025-12-21 20:28:48 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-21 20:28:48 [Information] Hosting environment: "Development"
+2025-12-21 20:28:48 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-21 20:29:20 [Information] Application is shutting down...
+2025-12-21 20:37:42 [Information] Now listening on: "http://localhost:5172"
+2025-12-21 20:37:42 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-21 20:37:42 [Information] Hosting environment: "Development"
+2025-12-21 20:37:42 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-21 20:40:57 [Information] Application is shutting down...
+2025-12-21 20:54:06 [Information] Now listening on: "http://localhost:5172"
+2025-12-21 20:54:06 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-21 20:54:06 [Information] Hosting environment: "Development"
+2025-12-21 20:54:06 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-21 20:56:54 [Information] HTTP "GET" "//api/User/GetAll/List" responded 404 in 205.6473 ms
+2025-12-21 20:57:00 [Information] HTTP "GET" "//api/User/GetAll/List" responded 404 in 1.2805 ms
+2025-12-21 20:57:28 [Information] HTTP "GET" "//api/User/GetAll/List" responded 404 in 3.7797 ms
+2025-12-21 20:58:10 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 736.2462 ms
+2025-12-21 20:58:10 [Information] HTTP "GET" "/favicon.ico" responded 404 in 0.0916 ms
+2025-12-21 21:11:39 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1052.4346 ms
+2025-12-21 21:11:39 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 214.2662 ms
+2025-12-21 21:16:52 [Information] Application is shutting down...
+2025-12-21 21:18:35 [Information] Now listening on: "http://localhost:5172"
+2025-12-21 21:18:35 [Information] Application started. Press Ctrl+C to shut down.
+2025-12-21 21:18:35 [Information] Hosting environment: "Development"
+2025-12-21 21:18:35 [Information] Content root path: "D:\_IT STEP_\_DIPLOMA\WebApi\WebApi"
+2025-12-21 21:20:52 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 526.4563 ms
+2025-12-21 21:20:52 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 276.6793 ms
+2025-12-21 21:26:18 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 959.3515 ms
+2025-12-21 22:14:32 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 933.8123 ms
+2025-12-21 22:14:32 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 158.1025 ms
+2025-12-21 22:14:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 199.9384 ms
+2025-12-21 22:14:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 180.9924 ms
+2025-12-21 22:18:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 159.5677 ms
+2025-12-21 22:18:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 156.5537 ms
+2025-12-21 22:23:23 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 930.3958 ms
+2025-12-21 22:23:23 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 167.1708 ms
+2025-12-21 22:25:43 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 170.8671 ms
+2025-12-21 22:25:43 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 163.9354 ms
+2025-12-21 22:36:37 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 1092.5817 ms
+2025-12-21 22:36:37 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 171.1087 ms
+2025-12-21 22:36:45 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 155.6251 ms
+2025-12-21 22:36:45 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 163.1064 ms
+2025-12-21 22:37:15 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 380.4974 ms
+2025-12-21 22:37:15 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 158.9455 ms
+2025-12-21 22:37:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 207.4637 ms
+2025-12-21 22:37:35 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 163.7741 ms
+2025-12-21 22:42:38 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 403.0087 ms
+2025-12-21 22:42:38 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 155.9479 ms
+2025-12-21 22:43:12 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 252.7338 ms
+2025-12-21 22:43:12 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 185.9024 ms
+2025-12-21 22:46:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 170.8536 ms
+2025-12-21 22:46:00 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 179.3247 ms
+2025-12-21 22:47:07 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 158.2023 ms
+2025-12-21 22:47:07 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 172.5661 ms
+2025-12-21 22:47:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 238.9206 ms
+2025-12-21 22:47:19 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 212.3857 ms
+2025-12-21 22:47:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 264.3796 ms
+2025-12-21 22:47:30 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 163.6116 ms
+2025-12-21 22:51:14 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 522.5275 ms
+2025-12-21 22:51:14 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.1498 ms
+2025-12-21 22:51:14 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0410 ms
+2025-12-21 22:51:14 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0502 ms
+2025-12-21 22:51:14 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.0404 ms
+2025-12-21 22:51:14 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 172.1059 ms
+2025-12-21 22:51:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 166.2746 ms
+2025-12-21 22:51:29 [Information] HTTP "GET" "//images/jryhocca.tc3.webp" responded 404 in 0.0810 ms
+2025-12-21 22:51:29 [Information] HTTP "GET" "//images/bjhda1sf.jvr.webp" responded 404 in 0.0366 ms
+2025-12-21 22:51:29 [Information] HTTP "GET" "//images/yujgd4eo.mzy.webp" responded 404 in 0.0251 ms
+2025-12-21 22:51:29 [Information] HTTP "GET" "//images/m5ekf50j.c4c.webp" responded 404 in 0.0478 ms
+2025-12-21 22:51:29 [Information] HTTP "GET" "/api/User/GetAll/List" responded 200 in 165.6857 ms
+2025-12-21 22:52:18 [Information] Application is shutting down...
