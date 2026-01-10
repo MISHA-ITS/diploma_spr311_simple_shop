@@ -1,62 +1,37 @@
 import {useState} from "react";
-import {Link} from "react-router";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router";
 import {ChevronLeftIcon, EnvelopeIcon, EyeCloseIcon, EyeIcon} from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useGoogleLogin } from "@react-oauth/google";
-import { loginByGoogleApi } from "../../services/apiLoginByGoogle.ts";
-import {ILoginRequest} from "../../types/Account/ILoginRequest.ts";
+import { useNavigate } from "react-router-dom";
 import {useLoginMutation} from "../../services/apiAccount.ts";
-import {login} from "../../store/authSlice.ts";
-import {useAppDispatch, useAppSelector} from "../../store";
+import { loginSuccess } from "../../store/authSlice.ts";
+import {useDispatch} from "react-redux";
+import {useAppSelector} from "../../store";
+import {ILoginRequest} from "../../types/Account/ILoginRequest.ts";
+import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
 
 const initState: ILoginRequest = {
-  email: "",
-  password: "",
+    email: "",
+    password: "",
 }
 
 const SignInForm: React.FC = () => {
-  const [loginPOST, {isLoading, error: loginError}] = useLoginMutation();
-
-  console.log("loginError", isLoading, loginError);
-
-  const dispatch = useAppDispatch();
-
-  const {user} = useAppSelector(globalState => globalState.auth);
-  console.log("user auth (login page)", user);
-
-  const [form, setForm] = useState<ILoginRequest>(initState);
-  const [error, setError] = useState("");
-  const [errors, setErrors] = useState<string[]>([])
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loginRequest, { isLoading }] = useLoginMutation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const [loading, ] = useState(false);
+  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<string[]>([])
 
-  // --- Email/Password login ---
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const result = await loginPOST(form);
+  const {user} = useAppSelector(globalState => globalState.auth);
 
-      if (result.error) {
-        console.log("Login error:", result.error);
-      } else {
-        console.log("Backend response:", result.data.payload);
-        const token = result.data.payload;
-        dispatch(login(token));
-
-        alert("Успішний вхід в систему");
-        navigate("/")}
-    } catch (err) {
-      console.error(err);
-      setError("Помилка входу");
-    }
-  };
+  const [form, setForm] = useState<ILoginRequest>(initState);
 
   // --- Google login ---
   const loginByGoogle = useGoogleLogin({
@@ -65,11 +40,9 @@ const SignInForm: React.FC = () => {
         const googleToken = tokenResponse.access_token;
         const result = await loginByGoogleApi(googleToken);
 
-        console.log("Backend response (Google):", result);
-        localStorage.setItem("token", result.payload);
-        navigate("/");
-      } catch (err) {
-        console.error("Google login error", err);
+        dispatch(loginSuccess(result.payload));
+        navigate("/admin");
+      } catch {
         setError("Помилка входу через Google");
       }
     },
@@ -84,17 +57,38 @@ const SignInForm: React.FC = () => {
     }
   };
 
+  // --- Email/Password login ---
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    try {
+        const res = await loginRequest(form).unwrap();
+
+        if (res.isSuccess) {
+            dispatch(loginSuccess(res.payload));
+            navigate("/admin");
+        } else {
+            setError(res.message);
+        }
+    } catch {
+        setError("Помилка входу");
+    }
+  };
+
   return (
       <div className="flex flex-col flex-1">
-        <div className="w-full max-w-md pt-10 mx-auto">
-          <Link
-              to="/admin"
-              className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          >
-            <ChevronLeftIcon className="size-5" />
-            Назад до панелі адміністратора
-          </Link>
-        </div>
+          {user?.roles.includes("Admin") && (
+              <div className="w-full max-w-md pt-10 mx-auto">
+                  <Link
+                      to="/admin"
+                      className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  >
+                      <ChevronLeftIcon className="size-5" />
+                      До панелі адміністратора
+                  </Link>
+              </div>
+          )}
+
 
         <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
           <div>
@@ -148,15 +142,9 @@ const SignInForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative py-3 sm:py-5">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Введіть свою електронну адресу та пароль для входу!
-              </p>
-            </div>
-
             {error && <p className="mb-2 text-sm text-red-500 dark:text-red-400">{error}</p>}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleLogin}>
               <div className="space-y-6">
                 <div>
                   <Label>
@@ -255,7 +243,7 @@ const SignInForm: React.FC = () => {
 
                 <div>
                   <Button className="w-full" size="sm">
-                    {loading ? "Завантаження..." : "Увійти"}
+                    {isLoading ? "Завантаження..." : "Увійти"}
                   </Button>
                 </div>
               </div>

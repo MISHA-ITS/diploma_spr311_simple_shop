@@ -16,8 +16,9 @@ public class JwtTokenService(IConfiguration configuration,
 
         var claims = new List<Claim>
         {
+            new Claim("id", user.Id.ToString()),
             new Claim("email", user.Email),
-            new Claim("name", $"{user.LastName ?? ""} {user.FirstName ?? ""}".Trim()),
+            new Claim("fullName", $"{user.LastName ?? ""} {user.FirstName ?? ""}".Trim()),
             new Claim("image", $"{user.Image}")
         };
         foreach (var role in await userManager.GetRolesAsync(user))

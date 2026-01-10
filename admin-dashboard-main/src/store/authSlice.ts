@@ -1,34 +1,35 @@
-import {IUser} from "../types/auth/IUser.ts";
+import { saveLocalStorage, getLocalStorage, deleteLocalStorage } from "../utils/secureStore.ts";
+import {IUser} from "../models/account";
 import {jwtDecode} from "jwt-decode";
-import {IAuthState} from "../types/auth/IAuthState.ts";
+import {IAuthState} from "../models/account";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-
-const token = localStorage.getItem('token');
 
 export const getUserFromToken = (token: string): IUser | null => {
     try {
         const decodedToken = jwtDecode<IUser>(token);
-        let roles: string[] = [];
+        const roles: string[] = [];
 
-        if (typeof decodedToken.roles === "string") {
-            roles = decodedToken.roles;
-        }
-        else if (Array.isArray(decodedToken.roles)){
-            roles = decodedToken.roles;
+        if (typeof decodedToken.roles === 'string') {
+            roles.push(decodedToken.roles);
+        } else if (Array.isArray(decodedToken.roles)) {
+            roles.push(...decodedToken.roles);
         }
 
         return {
+            id: decodedToken.id,
             email: decodedToken.email,
-            name: decodedToken.name,
+            fullName: decodedToken.fullName,
             image: decodedToken.image,
-            roles: roles
-        }
+            roles: roles,
+        } as IUser;
     }
-    catch (e) {
+    catch(e) {
         console.log("Invalid token", e);
         return null;
     }
 }
+
+const token = getLocalStorage("token");
 
 const initUser = token ? getUserFromToken(token) : null;
 
@@ -37,25 +38,26 @@ const initState: IAuthState = {
 }
 
 const authSlice = createSlice({
-    name: "auth",
+    name:  'auth',
     initialState: initState,
     reducers: {
-        login: (state, action: PayloadAction<string>) => {
+        loginSuccess: (state, action: PayloadAction<string>) => {
             const token = action.payload;
             const user = getUserFromToken(token);
             if(user) {
-                localStorage.getItem('token'); //це щоб при перезапуску додатку користувач не вилітав
+                saveLocalStorage("token", token);
                 state.user = user;
             }
         },
         logout: (state) => {
-            localStorage.removeItem("token");
+            deleteLocalStorage("token");
             state.user = null;
         },
     }
 });
 
-export const {login, logout} = authSlice.actions;
+export const {loginSuccess, logout} = authSlice.actions;
+
 export default authSlice.reducer;
 
 //console.log("Auth token", initState);

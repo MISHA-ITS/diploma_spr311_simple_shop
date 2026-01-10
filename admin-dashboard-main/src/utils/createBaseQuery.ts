@@ -1,8 +1,16 @@
 import {fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {BASE_URL} from "../constants/urls.ts";
+import EnvConfig from "../config/env.ts";
+import {getLocalStorage} from "./secureStore.ts";
 
 export const createBaseQuery = (endpoint: string) => {
     return fetchBaseQuery({
-        baseUrl: `${BASE_URL}/api/${endpoint}`
-    })
+        baseUrl: `${EnvConfig.API_URL}/api/${endpoint}`,
+        prepareHeaders: (headers) => {
+            const token = getLocalStorage("token");
+            if(token) {
+                headers.set("Authorization", `Bearer ${token}`);
+            }
+            return headers;
+        }
+    });
 };

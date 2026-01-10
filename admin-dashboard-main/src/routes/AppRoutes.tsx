@@ -23,6 +23,7 @@ import MainPage from "../pages/MainPage.tsx";
 import MainLayout from "../layout/MainLayout.tsx";
 import ForgotPassword from "../pages/OtherPage/ForgotPassword.tsx";
 import ResetPassword from "../pages/OtherPage/ResetPassword.tsx";
+import AdminRoute from "./AdminRoutes.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -35,7 +36,11 @@ const AppRoutes : React.FC = () => {
                 </Route>
 
                 {/* Dashboard Layout */}
-                <Route path="admin" element={<AppLayout />}>
+                <Route path="admin" element={
+                    <AdminRoute>
+                        <AppLayout />
+                    </AdminRoute>
+                }>
                     <Route index element={<Home />} />
 
                     {/* Others Page */}

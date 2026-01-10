@@ -1,18 +1,18 @@
 import {useEffect, useState} from "react";
-import {Link} from "react-router";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router";
 import {ChevronLeftIcon, EnvelopeIcon, EyeCloseIcon, EyeIcon} from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import PhoneInput from "../form/group-input/PhoneInput.tsx";
-import {IUserCreate} from "../../types/IUserCreate.ts";
 import noimage from "../../assets/images/noimage.jpeg";
 import {useGoogleLogin} from "@react-oauth/google";
-import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
-import {IRegisterRequest} from "../../types/Account/IRegisterRequest.ts";
 import {useRegisterMutation} from "../../services/apiAccount.ts";
-import {IImageFile} from "../../types/IImageFile.ts";
+import {loginSuccess} from "../../store/authSlice.ts";
+import {useDispatch} from "react-redux";
+import {useAppSelector} from "../../store";
+import {IUserCreate} from "../../types/IUserCreate.ts";
+import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
 
 const userInitState: IUserCreate = {
   email: "",
@@ -30,85 +30,73 @@ const countries = [
   { code: "AU", label: "+61" },
 ];
 
-const SignUpForm: React.FC = () => {
+export default function SignUpForm() {
 
-    const [register, {isLoading, error: registerError}] = useRegisterMutation();
-    console.log("registerError", isLoading, registerError);
-    const [user, setUser] = useState<IUserCreate>(userInitState);
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [createUser, setCreateUser] = useState<IUserCreate>(userInitState);
+    const [errors, setErrors] = useState<string[]>([])
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
     const [error, setError] = useState("");
+
+    const [register] = useRegisterMutation();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const validationChange = (
-        isValid: boolean,
-        fieldKey: string,
-        message?: string
-    ) => {
-      setErrors(prev => {
-        const copy = { ...prev };
+    const {user} = useAppSelector(globalState => globalState.auth);
 
-        if (isValid) {
-          delete copy[fieldKey];
-        } else if (message) {
-          copy[fieldKey] = message;
+    const validationChange = (isValid: boolean, fieldKey: string) => {
+        if (isValid && errors.includes(fieldKey)) {
+            setErrors(errors.filter(x => x !== fieldKey))
+        } else if (!isValid && !errors.includes(fieldKey)) {
+            setErrors(state => [...state, fieldKey])
         }
-
-        return copy;
-      });
     };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
+    // 1. Перевірка чекбокса
+    if (!isChecked) {
+      setError("Ви повинні погодитись з умовами");
+      return;
+    }
 
-      // 1. Перевірка чекбокса
-      if (!isChecked) {
-        setError("Ви повинні погодитись з умовами");
-        return;
+    // 2. Перевірка валідації
+    if (errors.length > 0) {
+      setError("Заповніть всі поля коректно");
+      alert("Потрібно погодитися з умовами");
+      return;
+    }
+
+    // 3. Перевірка паролів
+    if (createUser.password !== confirmPassword) {
+      setError("Паролі не співпадають");
+      return;
+    }
+
+    try {
+      const res = await register(userInitState).unwrap();
+
+      if (res.isSuccess) {
+          dispatch(loginSuccess(res.payload));
+          navigate("/");
+      } else {
+          setError(res.message);
       }
 
-      // 2. Перевірка паролів
-      if (user.password !== confirmPassword) {
-        setError("Паролі не співпадають");
-        return;
-      }
-
-      try {
-        const model: IRegisterRequest = {
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          userName: user.firstName,
-          password: user.password,
-          imageFile: user.imageFile?.file ?? null
-        };
-
-        await register(model);
-
-        alert("Користувача успішно зареєстровано");
-        navigate("/");
-      } catch (err) {
-        console.error(err);
-        setError("Помилка під час реєстрації");
-      }
-    };
+    } catch {
+          setError("Помилка реєстрації");
+    }
+  };
 
   const handlePickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const imageFile: IImageFile = {
-      file,
-      preview: URL.createObjectURL(file),
-    };
-
-    setPreview(imageFile.preview);
-
-    setUser(prev => ({
+    setPreview(URL.createObjectURL(file));
+    setCreateUser(prev => ({
       ...prev,
       imageFile,
     }));
@@ -125,11 +113,9 @@ const SignUpForm: React.FC = () => {
           const googleToken = tokenResponse.access_token;
           const result = await loginByGoogleApi(googleToken);
 
-          console.log("Backend response (Google):", result);
-          localStorage.setItem("token", result.payload);
-          navigate("/");
-        } catch (err) {
-          console.error("Google login error", err);
+          dispatch(loginSuccess(result.payload));
+          navigate("/admin");
+        } catch {
           setError("Помилка входу через Google");
         }
       },
@@ -144,24 +130,24 @@ const SignUpForm: React.FC = () => {
 
     return (
       <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
-        <div className="w-full max-w-md mx-auto mb-5 sm:pt-10">
-          <Link
-            to="/admin"
-            className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          >
-            <ChevronLeftIcon className="size-5" />
-            Назад до панелі адміністратора
-          </Link>
-        </div>
+        { user?.roles.includes("Admin") && (
+            <div className="w-full max-w-md mx-auto mb-2 sm:pt-6">
+                <Link
+                    to="/admin"
+                    className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                >
+                    <ChevronLeftIcon className="size-5" />
+                    Назад до панелі адміністратора
+                </Link>
+            </div>
+        )}
+
         <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
           <div>
-            <div className="mb-5 sm:mb-8">
+            <div className="mb-3 sm:mb-5">
               <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
                 Реєстрація
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Введіть електронну адресу, пароль та № телефону для реєстрації!
-              </p>
             </div>
             <div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-1 sm:gap-5">
@@ -197,21 +183,21 @@ const SignUpForm: React.FC = () => {
                 </button>
               </div>
 
-              <div className="relative py-3 sm:py-5">
+              <div className="relative py-3 sm:py-4">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
+                  <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-1">
                     Або
                   </span>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-5">
+                <div className="space-y-1">
                   <div className="flex justify-center">
-                    <div className="relative w-[200px] h-[200px] rounded-full overflow-hidden group">
+                    <div className="relative w-[150px] h-[150px] rounded-full overflow-hidden group">
                       {/* IMAGE */}
                       <img
                           src={preview || noimage}
@@ -244,6 +230,7 @@ const SignUpForm: React.FC = () => {
                       </label>
                     </div>
                   </div>
+
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     {/* <!-- First Name --> */}
                     <div className="sm:col-span-1">
@@ -255,9 +242,9 @@ const SignUpForm: React.FC = () => {
                         id="fname"
                         name="fname"
                         placeholder="Вкажіть ваше ім'я"
-                        value={user.firstName}
+                        value={createUser.firstName}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setUser({ ...user, firstName: e.target.value })
+                            setCreateUser({ ...createUser, firstName: e.target.value })
                         }
                         onValidationChange={validationChange}
                         rules={[
@@ -293,9 +280,9 @@ const SignUpForm: React.FC = () => {
                         id="lname"
                         name="Прізвище"
                         placeholder="Вкажіть прізвище"
-                        value={user.lastName}
+                        value={createUser.lastName}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setUser({ ...user, lastName: e.target.value })
+                            setCreateUser({ ...createUser, lastName: e.target.value })
                         }
                         onValidationChange={validationChange}
                         rules={[
@@ -326,9 +313,9 @@ const SignUpForm: React.FC = () => {
                       <Input
                           type="email"
                           placeholder="user@gmail.com"
-                          value={user.email}
+                          value={createUser.email}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              setUser({ ...user, email: e.target.value })
+                              setCreateUser({ ...createUser, email: e.target.value })
                           }
                           className="pl-[62px]"
                           rules={[
@@ -358,9 +345,9 @@ const SignUpForm: React.FC = () => {
                       <Input
                         placeholder="Вкажіть пароль"
                         type={showPassword ? "text" : "password"}
-                        value={user.password}
+                        value={createUser.password}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setUser({ ...user, password: e.target.value })
+                            setCreateUser({ ...createUser, password: e.target.value })
                         }
                         onValidationChange={validationChange}
                         rules={[
@@ -423,7 +410,7 @@ const SignUpForm: React.FC = () => {
                             },
                             {
                               rule: 'equals',
-                              value: user.password,
+                              value: createUser.password,
                               message: 'Паролі не співпадають'
                             },
                           ]}
@@ -452,6 +439,11 @@ const SignUpForm: React.FC = () => {
                         onChange={handlePhoneNumberChange}
                     />
                   </div>{" "}
+                    <div className="flex items-center justify-center mb-2 min-h-[19px]">
+                        {error && (
+                            <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>
+                        )}
+                    </div>
                   {/* <!-- Checkbox --> */}
                   <div className="flex items-center gap-3">
                     <Checkbox
@@ -482,31 +474,29 @@ const SignUpForm: React.FC = () => {
                     )}
                   </div>
 
+                  <div className="mt-3 mb-4 flex items-center justify-center">
+                      <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
+                          Вже є акаунт? {""}
+                          <Link
+                              to="/signin"
+                              className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                          >
+                              Увійти
+                          </Link>
+                      </p>
+                  </div>
+
                   {/* <!-- Button --> */}
                   <div>
-                    <button type="submit" className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
+                    <button type="submit" className="flex items-center justify-center w-full px-4 py-3 text-m font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
                       Зареєструватися
                     </button>
                   </div>
                 </div>
               </form>
-
-              <div className="mt-5">
-                <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                  Вже є акаунт? {""}
-                  <Link
-                    to="/signin"
-                    className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                  >
-                    Увійти
-                  </Link>
-                </p>
-              </div>
             </div>
           </div>
         </div>
       </div>
     );
 }
-
-export default SignUpForm;
