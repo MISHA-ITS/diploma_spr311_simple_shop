@@ -38,12 +38,20 @@ public class AccountService(UserManager<AppUser> userManager,
             return ServiceResponse.Error($"Ім'я {dto.UserName} вже існує");
         }
 
+        string? avatarPath = null;
+
+        if (dto.ImageFile != null)
+        {
+            avatarPath = await imageService.SaveImageAsync(dto.ImageFile, Settings.UsersDir);
+        }
+
         var user = new AppUser
         {
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             UserName = dto.UserName,
-            Email = dto.Email
+            Email = dto.Email,
+            Image = avatarPath
         };
 
         logger.LogDebug("Creating user entity for {UserName}", user.UserName);
@@ -52,6 +60,8 @@ public class AccountService(UserManager<AppUser> userManager,
 
         if (result.Succeeded)
         {
+            await userManager.AddToRoleAsync(user, "User");
+
             logger.LogInformation("User successfully created. UserId: {UserId}, Email: {Email}", 
                 user.Id, user.Email);
 

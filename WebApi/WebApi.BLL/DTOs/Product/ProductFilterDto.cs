@@ -8,4 +8,6 @@ public class ProductFilterDto
 
     public string? sortBy { get; set; }
     public string? order { get; set; } = "asc";
+
+    public int pageNumber { get; set; } = 1;
 }

@@ -1,9 +1,14 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import AppSimpleHeader from "./AppSimpleHeader.tsx";
 
 const MainLayout: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col bg-white">
+
+            {/* Header */}
+            <AppSimpleHeader />
+
             {/* Основний контент */}
             <main className="bg-white flex-1 p-6 rounded-lg shadow">
                 <Outlet />
