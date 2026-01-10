@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
-
+import { BiCategory } from "react-icons/bi";
 // Assume these icons are imported from an icon library
 import {
   BoxCubeIcon,
@@ -43,6 +43,11 @@ const navItems: NavItem[] = [
       { name: "Profile", path: "profile", pro: false },
       { name: "List", path: "users-list", pro: false },
     ],
+  },
+  {
+    icon: <BiCategory />,
+    name: "Categories",
+
   },
   {
     name: "Forms",

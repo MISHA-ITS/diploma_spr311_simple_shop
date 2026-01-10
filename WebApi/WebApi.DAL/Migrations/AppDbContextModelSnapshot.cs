@@ -56,6 +56,9 @@ namespace WebApi.DAL.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("text");
@@ -64,6 +67,8 @@ namespace WebApi.DAL.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Categories");
                 });
@@ -357,6 +362,15 @@ namespace WebApi.DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WebApi.DAL.Entities.CategoryEntity", b =>
+                {
+                    b.HasOne("WebApi.DAL.Entities.CategoryEntity", "Parent")
+                        .WithMany("Childs")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("WebApi.DAL.Entities.Identity.AppRoleClaim", b =>
                 {
                     b.HasOne("WebApi.DAL.Entities.Identity.AppRole", "Role")
@@ -429,6 +443,11 @@ namespace WebApi.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("WebApi.DAL.Entities.CategoryEntity", b =>
+                {
+                    b.Navigation("Childs");
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.Identity.AppRole", b =>

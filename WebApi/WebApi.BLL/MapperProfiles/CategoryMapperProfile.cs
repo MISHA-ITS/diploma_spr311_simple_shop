@@ -17,7 +17,10 @@ public class CategoryMapperProfile : Profile
             .ForMember(dest => dest.ImageUrl, opt => opt.Ignore());
 
         //CategoryEntity -> CategoryDTO
-        CreateMap<CategoryEntity, CategoryDTO>();
+        CreateMap<CategoryEntity, CategoryDTO>()
+            .ForMember(x => x.Childs, opt => opt.MapFrom(x => x.Childs))
+            .ForMember(x => x.ParentName, opt => opt.MapFrom(x => x.Parent != null ? x.Parent.Name : null))
+            .IncludeAllDerived();
 
         CreateMap<SeederCategoryDTO, CategoryEntity>()
             .ForMember(dest => dest.Slug, opt => opt.MapFrom(src => src.urlSlug));

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Text;
 using System.Text.Json;
 using WebApi.BLL;
 using WebApi.BLL.Constatnts;
@@ -8,6 +10,8 @@ using WebApi.BLL.DTOs.Category;
 using WebApi.BLL.DTOs.Product;
 using WebApi.BLL.DTOs.Seeder;
 using WebApi.BLL.Services;
+using WebApi.BLL.Extensions;
+using WebApi.BLL.Models.Seeder;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.Product;
 using WebApi.DAL;
@@ -55,7 +59,7 @@ public static class DbSeeder
                 var jsonData = await File.ReadAllTextAsync(jsonFile);
                 try
                 {
-                    var users = JsonSerializer.Deserialize<List<SeederUserDto>>(jsonData);
+                    var users = JsonConvert.DeserializeObject<List<SeederUserDto>>(jsonData);
                     if (users == null) return;
 
                     foreach (var user in users)
@@ -96,36 +100,41 @@ public static class DbSeeder
 
         if(!context.Categories.Any())
         {
-            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Categories.json");
+            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "test-categories.json");
             if (File.Exists(jsonFile))
             {
-                var jsonData = await File.ReadAllTextAsync(jsonFile);
+                var jsonData = await File.ReadAllTextAsync(jsonFile, Encoding.UTF8);
                 try
                 {
-                    var categories = JsonSerializer.Deserialize<List<SeederCategoryDTO>>(jsonData);
+                    var categories = JsonConvert.DeserializeObject<IEnumerable<SeederCategoryModel>>(jsonData);
                     if (categories == null) return;
 
-                    IEnumerable<CategoryEntity> entities = [];
-
-                    foreach (var category in categories)
+                    if (categories.Any() )
                     {
-                        var entity = mapper.Map<CategoryEntity>(category);
-
-                        if (!string.IsNullOrWhiteSpace(category.image))
-                        {
-                            entity.ImageUrl = await imageService.SaveImageFromUrlAsync(
-                                category.image,
-                                Settings.CategoriesDir
-                            );
-                        }
-                        else
-                        {
-                            entity.ImageUrl = null;
-                        }
-
-                        entities = entities.Append(entity);
+                        await categoryRepository.CreateRangeAsync(await GetCategories(categories, imageService));
                     }
-                    await categoryRepository.CreateRangeAsync(entities);
+
+                    //IEnumerable<CategoryEntity> entities = [];
+
+                    //foreach (var category in categories)
+                    //{
+                    //    var entity = mapper.Map<CategoryEntity>(category);
+
+                    //    if (!string.IsNullOrWhiteSpace(category.image))
+                    //    {
+                    //        entity.ImageUrl = await imageService.SaveImageFromUrlAsync(
+                    //            category.image,
+                    //            Settings.CategoriesDir
+                    //        );
+                    //    }
+                    //    else
+                    //    {
+                    //        entity.ImageUrl = null;
+                    //    }
+
+                    //    entities = entities.Append(entity);
+                    //}
+                    //await categoryRepository.CreateRangeAsync(entities);
                 }
                 catch (Exception ex)
                 {
@@ -136,65 +145,73 @@ public static class DbSeeder
             {
                 Console.WriteLine("Not Found File Categories.json");
             }
-        }
-
-        if (!context.Products.Any())
-        {
-            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Products.json");
-            if (File.Exists(jsonFile))
-            {
-                var jsonData = await File.ReadAllTextAsync(jsonFile);
-                try
-                {
-                    var products = JsonSerializer.Deserialize<List<SeederProductDTO>>(jsonData);
-                    if (products == null) return;
-
-                    IEnumerable<ProductEntity> entities = [];
-
-                    foreach (var product in products)
-                    {
-                        var entity = mapper.Map<ProductEntity>(product);
 
 
+            //var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Categories.json");
+            //if (File.Exists(jsonFile))
+            //{
+            //    var jsonData = await File.ReadAllTextAsync(jsonFile);
+            //    try
+            //    {
+            //        var categories = JsonSerializer.Deserialize<List<SeederCategoryDTO>>(jsonData);
+            //        if (categories == null) return;
 
-                        if (product.Images != null)
-                        {
+            //        IEnumerable<CategoryEntity> entities = [];
 
-                            foreach (var imageUrl in product.Images)
-                            {
-                                string? imageName = await imageService.SaveImageFromUrlAsync(imageUrl, Settings.ProductsDir);
+            //        foreach (var category in categories)
+            //        {
+            //            var entity = mapper.Map<CategoryEntity>(category);
 
-                                entity.Images.Add(new ProductImageEntity
-                                {
-                                    ImageUrl = imageName
-                                });
-                            }
-                        }
-                        else
-                        {
-                            entity.Images = [];
-                        }
+            //            if (!string.IsNullOrWhiteSpace(category.image))
+            //            {
+            //                entity.ImageUrl = await imageService.SaveImageFromUrlAsync(
+            //                    category.image,
+            //                    Settings.CategoriesDir
+            //                );
+            //            }
+            //            else
+            //            {
+            //                entity.ImageUrl = null;
+            //            }
 
-                        var categories = categoryRepository
-                            .GetAll()
-                            .Where(c => product.Categories.Select(x => x.ToUpper()).Contains(c.Name.ToUpper()))
-                            .ToList();
-
-                        entity.Categories = categories;
-
-                        entities = entities.Append(entity);
-                    }
-                    await productRopository.CreateRangeAsync(entities);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error Json Parse Data {0}", ex.Message);
-                }
-            }
-            else
-            {
-                Console.WriteLine("Not Found File Products.json");
-            }
+            //            entities = entities.Append(entity);
+            //        }
+            //        await categoryRepository.CreateRangeAsync(entities);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("Error Json Parse Data {0}", ex.Message);
+            //    }
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Not Found File Categories.json");
+            //}
         }
     }
+
+
+    private async static Task<IEnumerable<CategoryEntity>> GetCategories(
+                IEnumerable<SeederCategoryModel> models,
+                IImageService imageService)
+    {
+        var categoryTasks = models.Select(async (x) =>
+        {
+            
+            var childs = x.Childs?.Any() ?? false ? await GetCategories(x.Childs, imageService) : null;
+            var image = !String.IsNullOrEmpty(x.Image)
+                ? await imageService.SaveImageFromUrlAsync(x.Image, Settings.ImagesPath)
+                : null;
+            return new CategoryEntity()
+            {
+                Name = x.Name,
+                ImageUrl = image,
+                Slug = x.Name.ToSlug(),
+                Childs = childs?.ToArray() ?? []
+            };
+        });
+        var categories = await Task.WhenAll(categoryTasks);
+        return categories;
+    }
+
 }

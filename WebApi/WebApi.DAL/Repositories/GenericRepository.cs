@@ -64,10 +64,10 @@ public class GenericRepository<TEntity, TId>
         }
     }
 
-    public virtual IQueryable<TEntity> GetAll()
+    public virtual IQueryable<TEntity> GetAll(QueryTrackingBehavior tracking = QueryTrackingBehavior.NoTracking)
     {
         _logger.LogDebug("Fetching all entities of type {EntityType}", typeof(TEntity).Name);
-        return _context.Set<TEntity>();
+        return _context.Set<TEntity>().AsTracking(tracking);
     }
 
     public virtual async Task<TEntity?> GetByIdAsync(TId id)
