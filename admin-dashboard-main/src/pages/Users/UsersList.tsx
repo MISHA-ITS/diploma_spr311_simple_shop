@@ -35,22 +35,20 @@ const UsersList : React.FC = () => {
         if (!confirm("Ви впевнені, що хочете видалити користувача?")) return;
 
         try {
-            const res = await fetch(`${EnvConfig.API_URL}/api/User/Delete?id=${userId}`, {
-                method: "DELETE",
-            });
-
-            if (!res.ok) {
-                const text = await res.text();
-                alert("Помилка: " + text);
-                return;
-            }
+            await axios.delete(
+                `${EnvConfig.API_URL}/api/User/Delete`,
+                { params: { id: userId } }
+            );
 
             alert("Користувача успішно видалено");
 
-            setUsers((prev) => prev.filter((u) => u.id !== userId));
-        } catch (err) {
-            console.error(err);
-            alert("Помилка при видаленні користувача");
+            setUsers(prev => prev.filter(u => u.id !== userId));
+        } catch (error: any) {
+            console.error(error);
+            alert(
+                error?.response?.data?.message ??
+                "Помилка при видаленні користувача"
+            );
         }
     };
 

@@ -5,14 +5,14 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import PhoneInput from "../form/group-input/PhoneInput.tsx";
-import {IUserCreate} from "../../models/account";
 import noimage from "../../assets/images/noimage.jpeg";
 import {useGoogleLogin} from "@react-oauth/google";
-import {loginByGoogleApi} from "../../services/auth.ts";
 import {useRegisterMutation} from "../../services/apiAccount.ts";
 import {loginSuccess} from "../../store/authSlice.ts";
 import {useDispatch} from "react-redux";
 import {useAppSelector} from "../../store";
+import {IUserCreate} from "../../types/IUserCreate.ts";
+import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
 
 const userInitState: IUserCreate = {
   email: "",
@@ -98,13 +98,13 @@ export default function SignUpForm() {
     setPreview(URL.createObjectURL(file));
     setCreateUser(prev => ({
       ...prev,
-      imageFile: file
+      imageFile,
     }));
   };
 
-  const handlePhoneNumberChange = (phoneNumber: string) => {
-      console.log("Updated phone number:", phoneNumber);
-    };
+    const handlePhoneNumberChange = (phoneNumber: string) => {
+        console.log("Updated phone number:", phoneNumber);
+      };
 
     // --- Google login ---
     const loginByGoogle = useGoogleLogin({
@@ -264,6 +264,11 @@ export default function SignUpForm() {
                           }
                         ]}
                       />
+                      {errors.firstName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.firstName}
+                          </p>
+                      )}
                     </div>
                     {/* <!-- Last Name --> */}
                     <div className="sm:col-span-1">
@@ -456,17 +461,18 @@ export default function SignUpForm() {
                         Політикою конфіденційності
                       </span>
                     </p>
+
+                    {Object.keys(errors).length > 0 && (
+                        <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+                          <p className="font-medium mb-1">Форма містить помилки:</p>
+                          <ul className="list-disc list-inside">
+                            {Object.values(errors).map((err: string, index) => (
+                                <li key={index}>{err}</li>
+                            ))}
+                          </ul>
+                        </div>
+                    )}
                   </div>
-                  {errors.length > 0 && (
-                      <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="font-medium mb-1">Форма містить помилки:</p>
-                        <ul className="list-disc list-inside">
-                          {errors.map(err => (
-                              <li key={err}>{err}</li>
-                          ))}
-                        </ul>
-                      </div>
-                  )}
 
                   <div className="mt-3 mb-4 flex items-center justify-center">
                       <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">

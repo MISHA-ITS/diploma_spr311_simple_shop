@@ -6,13 +6,13 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useGoogleLogin } from "@react-oauth/google";
-import { loginByGoogleApi } from "../../services/auth.ts";
 import { useNavigate } from "react-router-dom";
 import {useLoginMutation} from "../../services/apiAccount.ts";
-import {ILoginRequest} from "../../models/account";
 import { loginSuccess } from "../../store/authSlice.ts";
 import {useDispatch} from "react-redux";
 import {useAppSelector} from "../../store";
+import {ILoginRequest} from "../../types/Account/ILoginRequest.ts";
+import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
 
 const initState: ILoginRequest = {
     email: "",
