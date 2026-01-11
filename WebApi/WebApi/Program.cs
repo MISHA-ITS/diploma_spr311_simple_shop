@@ -5,25 +5,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 using WebApi;
 using WebApi.BLL;
 using WebApi.BLL.Configuration;
 using WebApi.BLL.Services.Account;
 using WebApi.BLL.Services.Category;
-using Serilog;
-
 using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
+using WebApi.BLL.Services.Product;
 using WebApi.BLL.Services.Role;
 using WebApi.BLL.Services.User;
 using WebApi.DAL;
 using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Repositories.Category;
-using WebApi.Filters;
-using WebApi.BLL.Services.Product;
 using WebApi.DAL.Repositories.Products;
+using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 

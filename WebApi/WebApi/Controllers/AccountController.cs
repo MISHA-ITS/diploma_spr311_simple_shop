@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.BLL.DTOs.Account;
 using WebApi.BLL.Services.Account;
+using WebApi.BLL.Services.User;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/account")]
-public class AccountController(IAccountService accountService) : ControllerBase
+public class AccountController(IAccountService accountService,
+    IUserService userService) : ControllerBase
 {
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync([FromForm]RegisterDto dto)
+    public async Task<IActionResult> RegisterAsync([FromForm] RegisterDto dto)
     {
         var user = await accountService.RegisterAsync(dto);
 
@@ -77,5 +80,15 @@ public class AccountController(IAccountService accountService) : ControllerBase
     {
         var response = await accountService.ResetPasswordAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<IActionResult> Profile()
+    {
+        var userId = await accountService.GetUserIdAsync();
+        var userInfo = await userService.GetByIdAsync(userId.ToString());
+
+        return Ok(userInfo);
     }
 }

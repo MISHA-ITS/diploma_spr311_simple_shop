@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -14,7 +15,7 @@ using WebApi.DAL.Entities.Identity;
 
 namespace WebApi.BLL.Services.Account;
 
-public class AccountService(UserManager<AppUser> userManager, 
+public class AccountService(IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager, 
     IJwtTokenService jwtTokenService, 
     IEmailService emailService, 
     IConfiguration configuration, 
@@ -79,6 +80,16 @@ public class AccountService(UserManager<AppUser> userManager,
             dto.Email, error.Code, error.Description);
 
         return ServiceResponse.Error(error.Description);
+    }
+
+    public async Task<long> GetUserIdAsync()
+    {
+        var email = httpContextAccessor.HttpContext?.User?.Claims.First().Value;
+        if (string.IsNullOrEmpty(email))
+            throw new UnauthorizedAccessException("User is not authenticated");
+        var user = await userManager.FindByEmailAsync(email);
+
+        return user.Id;
     }
 
     private async Task SendEmailConfirmMessageAsync(AppUser user)

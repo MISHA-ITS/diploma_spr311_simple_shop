@@ -49,7 +49,7 @@ const SimpleHeader: React.FC = () => {
                     )}
 
                     {/* ✅ Залогінений USER */}
-                    {user && user?.roles === "User" && (
+                    {user && !user.roles.includes("Admin") && (
                         <button
                             onClick={handleLogout}
                             className="rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
@@ -59,7 +59,7 @@ const SimpleHeader: React.FC = () => {
                     )}
 
                     {/* 👑 Залогінений ADMIN */}
-                    {user && user?.roles === "Admin" && (
+                    {user && user.roles.includes("Admin") && (
                         <Link
                             to="/admin"
                             className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"

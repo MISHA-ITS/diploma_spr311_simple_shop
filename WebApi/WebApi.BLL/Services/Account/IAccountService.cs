@@ -11,4 +11,5 @@ public interface IAccountService
     public Task<ServiceResponse> ForgotPasswordAsync(ForgotPasswordDto dto);
     public Task<ServiceResponse> ValidateResetTokenAsync(ValidateResetTokenDto dto);
     public Task<ServiceResponse> ResetPasswordAsync(ResetPasswordDto dto);
+    Task<long> GetUserIdAsync();
 }
