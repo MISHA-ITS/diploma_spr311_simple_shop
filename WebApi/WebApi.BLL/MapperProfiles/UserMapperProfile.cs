@@ -23,7 +23,10 @@ public class UserMapperProfile : Profile
             .ForMember(dest => dest.Image, opt => opt.Ignore());
 
         //UserEntity -> UserDTO
-        CreateMap<AppUser, UserDTO>();
+        CreateMap<AppUser, UserDTO>()
+            .ForMember(x => x.Roles,
+                opt => opt.MapFrom(u =>
+                    u.UserRoles.Select(ur => ur.Role!.Name)));
 
         //GoogleAccoun -> UserDTO
         CreateMap<GoogleAccountDto, UserDTO>()
