@@ -7,15 +7,23 @@ export interface ICategory {
     childs: ICategory[],
 }
 
-export interface DrawerDataModel {
-    isDrawerOpen: boolean,
-    selectedCategory: ICategory | undefined
+//drawler
+export interface ICategoryCreationModel {
+    id: number,
+    name: string,
+    imageFile?: File
+    parentId?: number
+    currentImage?: string
 }
-export interface CategoryCreateProps {
-    open: boolean,
-    onClose: () => void
-    category?: ICategory
+
+///
+export interface ICategoryTreeNode {
+    title: string;
+    value: number;
+    key: number;
+    children?: ICategoryTreeNode[];
 }
+
 
 export interface ICategoryRowProps {
     category: ICategory;

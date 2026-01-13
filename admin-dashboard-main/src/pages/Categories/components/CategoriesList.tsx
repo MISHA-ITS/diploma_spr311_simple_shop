@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import EnvConfig from "../../../config/env.ts";
-import { ICategory } from "../../../types/Category/types.ts";
+import {ICategory, ICategoryTreeNode} from "../../../types/Category/types.ts";
 import CategoriesCard from "./CategoriesCard.tsx";
 import CategoryRow from "./CategoryRow.tsx";
+import { TreeSelect } from 'antd';
+import {buildTree} from "../utils/funct.ts";
+import { HiMiniXMark } from "react-icons/hi2";
 
 
 const urlCategories = `${EnvConfig.API_URL}/api/Category/list`;
@@ -14,6 +17,18 @@ const CategoriesList: React.FC = () => {
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [parentId, setParentId] = useState<number | null>(null);
+    const [categoryFilterData, setCategoryFilterData] = useState<{
+        categoryTree: ICategoryTreeNode[];
+        excludedFilters: number[];
+    }>({
+        categoryTree: [],
+        excludedFilters: [],
+    });
+
+    const onParentCategoryChange = (value: number | null) => {
+        setParentId(value);
+    };
 
 
     useEffect(() => {
@@ -27,9 +42,42 @@ const CategoriesList: React.FC = () => {
             });
     }, []);
 
+    useEffect(() => {
+        if (!categories.length) return;
+
+        // Передаємо null як другий аргумент для пошуку кореневих елементів
+        const tree = buildTree(
+            categories,
+            null,
+            selectedCategory ? [selectedCategory.id] : []
+        );
+
+        setCategoryFilterData(prev => ({
+            ...prev,
+            categoryTree: tree,
+        }));
+    }, [categories, selectedCategory]);
+
+    useEffect(() => {
+        if (isDrawerOpen) {
+            // Блокуємо скрол
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Повертаємо скрол
+            document.body.style.overflow = 'auto';
+        }
+
+        // Чистимо ефект, якщо компонент видаляється
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [isDrawerOpen]);
+
     const handleEditCategory = (category: ICategory) => {
         setSelectedCategory(category);
+        setParentId(category.parentId);
         setIsOpen(true);
+        document.body.style.overflow = 'hidden';
     };
 
     const handleDeleteCategory = async (categoryId: number) => {
@@ -70,7 +118,7 @@ const CategoriesList: React.FC = () => {
         reader.readAsDataURL(file);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmitEdit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedCategory) return;
 
@@ -78,6 +126,8 @@ const CategoriesList: React.FC = () => {
             const formData = new FormData();
             formData.append("id", String(selectedCategory.id));
             formData.append("name", selectedCategory.name);
+            formData.append("parentId", String(parentId ?? ""));
+
 
             if (selectedFile) {
                 formData.append("image", selectedFile);
@@ -103,8 +153,6 @@ const CategoriesList: React.FC = () => {
             alert("Помилка при оновленні");
         }
     };
-
-
 
     return (
         <div className="w-full">
@@ -138,13 +186,21 @@ const CategoriesList: React.FC = () => {
             {isDrawerOpen && (
                 <div
                     className="fixed inset-1 bg-black/30 z-30 transition-opacity duration-300"
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => {
+                        setIsOpen(false);
+                        setParentId(null);
+                        setSelectedCategory(null);
+                    }}
                 />
             )}
 
             {/* Drawer */}
             <div className={`fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform bg-white w-96 border-l shadow-2xl ${
-                isDrawerOpen ? "translate-x-0" : "translate-x-full"}`}>
+                isDrawerOpen ? "translate-x-0" : "translate-x-full"}
+                top-[64px] 
+                h-[calc(100vh-64px)] 
+                p-4 overflow-y-auto`
+            }>
                 <div className="flex items-center justify-between mb-6 border-b pb-4">
                     <h5 className="text-lg font-semibold text-gray-700">
                         {selectedCategory ? 'Редагувати категорію' : 'Створити категорію'}
@@ -152,10 +208,11 @@ const CategoriesList: React.FC = () => {
                     <button
                         onClick={() => setIsOpen(false)}
                         className="text-gray-400 hover:bg-gray-100 hover:text-gray-900 rounded-lg p-2 transition-colors">
+                        <HiMiniXMark />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmitEdit} className="space-y-5">
                     <div className="flex flex-col items-center mb-6">
                         <span className="w-full text-center mb-2 text-sm font-medium text-gray-700">Зображення</span>
 
@@ -198,7 +255,18 @@ const CategoriesList: React.FC = () => {
                         />
                     </div>
 
-
+                    <label className="block mb-2 text-sm font-medium text-gray-900">Батьківська категорія</label>
+                    <TreeSelect
+                        style={{ width: '100%' }}
+                        value={parentId}
+                        allowClear
+                        showSearch
+                        size="small"
+                        className="flex-1"
+                        treeData={categoryFilterData.categoryTree}
+                        placeholder={selectedCategory?.parentId || 'Відсутня'}
+                        onChange={onParentCategoryChange}
+                    />
 
                     <div className="pt-4">
                         <button className="w-full text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg px-5 py-3 transition-colors shadow-md">
