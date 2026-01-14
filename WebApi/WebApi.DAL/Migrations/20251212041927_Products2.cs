@@ -5,38 +5,38 @@
 namespace WebApi.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Products2 : Migration
+    public partial class advertisements2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_ProductImageEntity_Products_ProductId",
-                table: "ProductImageEntity");
+                name: "FK_advertisementImageEntity_advertisements_advertisementId",
+                table: "advertisementImageEntity");
 
             migrationBuilder.DropPrimaryKey(
-                name: "PK_ProductImageEntity",
-                table: "ProductImageEntity");
+                name: "PK_advertisementImageEntity",
+                table: "advertisementImageEntity");
 
             migrationBuilder.RenameTable(
-                name: "ProductImageEntity",
-                newName: "ProductImages");
+                name: "advertisementImageEntity",
+                newName: "advertisementImages");
 
             migrationBuilder.RenameIndex(
-                name: "IX_ProductImageEntity_ProductId",
-                table: "ProductImages",
-                newName: "IX_ProductImages_ProductId");
+                name: "IX_advertisementImageEntity_advertisementId",
+                table: "advertisementImages",
+                newName: "IX_advertisementImages_advertisementId");
 
             migrationBuilder.AddPrimaryKey(
-                name: "PK_ProductImages",
-                table: "ProductImages",
+                name: "PK_advertisementImages",
+                table: "advertisementImages",
                 column: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ProductImages_Products_ProductId",
-                table: "ProductImages",
-                column: "ProductId",
-                principalTable: "Products",
+                name: "FK_advertisementImages_advertisements_advertisementId",
+                table: "advertisementImages",
+                column: "advertisementId",
+                principalTable: "advertisements",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -45,32 +45,32 @@ namespace WebApi.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_ProductImages_Products_ProductId",
-                table: "ProductImages");
+                name: "FK_advertisementImages_advertisements_advertisementId",
+                table: "advertisementImages");
 
             migrationBuilder.DropPrimaryKey(
-                name: "PK_ProductImages",
-                table: "ProductImages");
+                name: "PK_advertisementImages",
+                table: "advertisementImages");
 
             migrationBuilder.RenameTable(
-                name: "ProductImages",
-                newName: "ProductImageEntity");
+                name: "advertisementImages",
+                newName: "advertisementImageEntity");
 
             migrationBuilder.RenameIndex(
-                name: "IX_ProductImages_ProductId",
-                table: "ProductImageEntity",
-                newName: "IX_ProductImageEntity_ProductId");
+                name: "IX_advertisementImages_advertisementId",
+                table: "advertisementImageEntity",
+                newName: "IX_advertisementImageEntity_advertisementId");
 
             migrationBuilder.AddPrimaryKey(
-                name: "PK_ProductImageEntity",
-                table: "ProductImageEntity",
+                name: "PK_advertisementImageEntity",
+                table: "advertisementImageEntity",
                 column: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ProductImageEntity_Products_ProductId",
-                table: "ProductImageEntity",
-                column: "ProductId",
-                principalTable: "Products",
+                name: "FK_advertisementImageEntity_advertisements_advertisementId",
+                table: "advertisementImageEntity",
+                column: "advertisementId",
+                principalTable: "advertisements",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }

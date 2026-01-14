@@ -7,19 +7,19 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WebApi.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Products : Migration
+    public partial class advertisements : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<long>(
-                name: "ProductEntityId",
+                name: "advertisementEntityId",
                 table: "Categories",
                 type: "bigint",
                 nullable: true);
 
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "advertisements",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -33,47 +33,47 @@ namespace WebApi.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_advertisements", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductImageEntity",
+                name: "advertisementImageEntity",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Path = table.Column<string>(type: "text", nullable: false),
-                    ProductId = table.Column<long>(type: "bigint", nullable: false),
+                    advertisementId = table.Column<long>(type: "bigint", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductImageEntity", x => x.Id);
+                    table.PrimaryKey("PK_advertisementImageEntity", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductImageEntity_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
+                        name: "FK_advertisementImageEntity_advertisements_advertisementId",
+                        column: x => x.advertisementId,
+                        principalTable: "advertisements",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_ProductEntityId",
+                name: "IX_Categories_advertisementEntityId",
                 table: "Categories",
-                column: "ProductEntityId");
+                column: "advertisementEntityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImageEntity_ProductId",
-                table: "ProductImageEntity",
-                column: "ProductId");
+                name: "IX_advertisementImageEntity_advertisementId",
+                table: "advertisementImageEntity",
+                column: "advertisementId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Categories_Products_ProductEntityId",
+                name: "FK_Categories_advertisements_advertisementEntityId",
                 table: "Categories",
-                column: "ProductEntityId",
-                principalTable: "Products",
+                column: "advertisementEntityId",
+                principalTable: "advertisements",
                 principalColumn: "Id");
         }
 
@@ -81,21 +81,21 @@ namespace WebApi.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Categories_Products_ProductEntityId",
+                name: "FK_Categories_advertisements_advertisementEntityId",
                 table: "Categories");
 
             migrationBuilder.DropTable(
-                name: "ProductImageEntity");
+                name: "advertisementImageEntity");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "advertisements");
 
             migrationBuilder.DropIndex(
-                name: "IX_Categories_ProductEntityId",
+                name: "IX_Categories_advertisementEntityId",
                 table: "Categories");
 
             migrationBuilder.DropColumn(
-                name: "ProductEntityId",
+                name: "advertisementEntityId",
                 table: "Categories");
         }
     }

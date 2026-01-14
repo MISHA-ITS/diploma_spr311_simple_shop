@@ -12,32 +12,32 @@ using WebApi.DAL;
 namespace WebApi.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251216162320_RenameCategoryEntityProductEntityToProductsCategories")]
-    partial class RenameCategoryEntityProductEntityToProductsCategories
+    [Migration("20251216162320_RenameCategoryEntityadvertisementEntityToadvertisementsCategories")]
+    partial class RenameCategoryEntityadvertisementEntityToadvertisementsCategories
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("advertisementVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoryEntityProductEntity", b =>
+            modelBuilder.Entity("CategoryEntityadvertisementEntity", b =>
                 {
                     b.Property<long>("CategoriesId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("ProductsId")
+                    b.Property<long>("advertisementsId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("CategoriesId", "ProductsId");
+                    b.HasKey("CategoriesId", "advertisementsId");
 
-                    b.HasIndex("ProductsId");
+                    b.HasIndex("advertisementsId");
 
-                    b.ToTable("ProductsCategories", (string)null);
+                    b.ToTable("advertisementsCategories", (string)null);
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.CategoryEntity", b =>
@@ -288,7 +288,7 @@ namespace WebApi.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("WebApi.DAL.Entities.ProductEntity", b =>
+            modelBuilder.Entity("WebApi.DAL.Entities.advertisementEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -319,10 +319,10 @@ namespace WebApi.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("advertisements");
                 });
 
-            modelBuilder.Entity("WebApi.DAL.Entities.ProductImageEntity", b =>
+            modelBuilder.Entity("WebApi.DAL.Entities.advertisementImageEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -336,7 +336,7 @@ namespace WebApi.DAL.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
-                    b.Property<long>("ProductId")
+                    b.Property<long>("advertisementId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("UpdateDate")
@@ -344,12 +344,12 @@ namespace WebApi.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("advertisementId");
 
-                    b.ToTable("ProductImages");
+                    b.ToTable("advertisementImages");
                 });
 
-            modelBuilder.Entity("CategoryEntityProductEntity", b =>
+            modelBuilder.Entity("CategoryEntityadvertisementEntity", b =>
                 {
                     b.HasOne("WebApi.DAL.Entities.CategoryEntity", null)
                         .WithMany()
@@ -357,9 +357,9 @@ namespace WebApi.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApi.DAL.Entities.ProductEntity", null)
+                    b.HasOne("WebApi.DAL.Entities.advertisementEntity", null)
                         .WithMany()
-                        .HasForeignKey("ProductsId")
+                        .HasForeignKey("advertisementsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -427,15 +427,15 @@ namespace WebApi.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApi.DAL.Entities.ProductImageEntity", b =>
+            modelBuilder.Entity("WebApi.DAL.Entities.advertisementImageEntity", b =>
                 {
-                    b.HasOne("WebApi.DAL.Entities.ProductEntity", "Product")
+                    b.HasOne("WebApi.DAL.Entities.advertisementEntity", "advertisement")
                         .WithMany("Images")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("advertisementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.Navigation("advertisement");
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.Identity.AppRole", b =>
@@ -456,7 +456,7 @@ namespace WebApi.DAL.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("WebApi.DAL.Entities.ProductEntity", b =>
+            modelBuilder.Entity("WebApi.DAL.Entities.advertisementEntity", b =>
                 {
                     b.Navigation("Images");
                 });

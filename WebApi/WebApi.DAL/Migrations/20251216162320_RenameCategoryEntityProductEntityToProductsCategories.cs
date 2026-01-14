@@ -5,50 +5,50 @@
 namespace WebApi.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class RenameCategoryEntityProductEntityToProductsCategories : Migration
+    public partial class RenameCategoryEntityadvertisementEntityToadvertisementsCategories : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_CategoryEntityProductEntity_Categories_CategoriesId",
-                table: "CategoryEntityProductEntity");
+                name: "FK_CategoryEntityadvertisementEntity_Categories_CategoriesId",
+                table: "CategoryEntityadvertisementEntity");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_CategoryEntityProductEntity_Products_ProductsId",
-                table: "CategoryEntityProductEntity");
+                name: "FK_CategoryEntityadvertisementEntity_advertisements_advertisementsId",
+                table: "CategoryEntityadvertisementEntity");
 
             migrationBuilder.DropPrimaryKey(
-                name: "PK_CategoryEntityProductEntity",
-                table: "CategoryEntityProductEntity");
+                name: "PK_CategoryEntityadvertisementEntity",
+                table: "CategoryEntityadvertisementEntity");
 
             migrationBuilder.RenameTable(
-                name: "CategoryEntityProductEntity",
-                newName: "ProductsCategories");
+                name: "CategoryEntityadvertisementEntity",
+                newName: "advertisementsCategories");
 
             migrationBuilder.RenameIndex(
-                name: "IX_CategoryEntityProductEntity_ProductsId",
-                table: "ProductsCategories",
-                newName: "IX_ProductsCategories_ProductsId");
+                name: "IX_CategoryEntityadvertisementEntity_advertisementsId",
+                table: "advertisementsCategories",
+                newName: "IX_advertisementsCategories_advertisementsId");
 
             migrationBuilder.AddPrimaryKey(
-                name: "PK_ProductsCategories",
-                table: "ProductsCategories",
-                columns: new[] { "CategoriesId", "ProductsId" });
+                name: "PK_advertisementsCategories",
+                table: "advertisementsCategories",
+                columns: new[] { "CategoriesId", "advertisementsId" });
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ProductsCategories_Categories_CategoriesId",
-                table: "ProductsCategories",
+                name: "FK_advertisementsCategories_Categories_CategoriesId",
+                table: "advertisementsCategories",
                 column: "CategoriesId",
                 principalTable: "Categories",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ProductsCategories_Products_ProductsId",
-                table: "ProductsCategories",
-                column: "ProductsId",
-                principalTable: "Products",
+                name: "FK_advertisementsCategories_advertisements_advertisementsId",
+                table: "advertisementsCategories",
+                column: "advertisementsId",
+                principalTable: "advertisements",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -57,44 +57,44 @@ namespace WebApi.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_ProductsCategories_Categories_CategoriesId",
-                table: "ProductsCategories");
+                name: "FK_advertisementsCategories_Categories_CategoriesId",
+                table: "advertisementsCategories");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_ProductsCategories_Products_ProductsId",
-                table: "ProductsCategories");
+                name: "FK_advertisementsCategories_advertisements_advertisementsId",
+                table: "advertisementsCategories");
 
             migrationBuilder.DropPrimaryKey(
-                name: "PK_ProductsCategories",
-                table: "ProductsCategories");
+                name: "PK_advertisementsCategories",
+                table: "advertisementsCategories");
 
             migrationBuilder.RenameTable(
-                name: "ProductsCategories",
-                newName: "CategoryEntityProductEntity");
+                name: "advertisementsCategories",
+                newName: "CategoryEntityadvertisementEntity");
 
             migrationBuilder.RenameIndex(
-                name: "IX_ProductsCategories_ProductsId",
-                table: "CategoryEntityProductEntity",
-                newName: "IX_CategoryEntityProductEntity_ProductsId");
+                name: "IX_advertisementsCategories_advertisementsId",
+                table: "CategoryEntityadvertisementEntity",
+                newName: "IX_CategoryEntityadvertisementEntity_advertisementsId");
 
             migrationBuilder.AddPrimaryKey(
-                name: "PK_CategoryEntityProductEntity",
-                table: "CategoryEntityProductEntity",
-                columns: new[] { "CategoriesId", "ProductsId" });
+                name: "PK_CategoryEntityadvertisementEntity",
+                table: "CategoryEntityadvertisementEntity",
+                columns: new[] { "CategoriesId", "advertisementsId" });
 
             migrationBuilder.AddForeignKey(
-                name: "FK_CategoryEntityProductEntity_Categories_CategoriesId",
-                table: "CategoryEntityProductEntity",
+                name: "FK_CategoryEntityadvertisementEntity_Categories_CategoriesId",
+                table: "CategoryEntityadvertisementEntity",
                 column: "CategoriesId",
                 principalTable: "Categories",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_CategoryEntityProductEntity_Products_ProductsId",
-                table: "CategoryEntityProductEntity",
-                column: "ProductsId",
-                principalTable: "Products",
+                name: "FK_CategoryEntityadvertisementEntity_advertisements_advertisementsId",
+                table: "CategoryEntityadvertisementEntity",
+                column: "advertisementsId",
+                principalTable: "advertisements",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }

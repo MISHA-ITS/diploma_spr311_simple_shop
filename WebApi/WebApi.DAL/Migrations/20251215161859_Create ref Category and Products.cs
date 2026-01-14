@@ -5,75 +5,75 @@
 namespace WebApi.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class CreaterefCategoryandProducts : Migration
+    public partial class CreaterefCategoryandadvertisements : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Categories_Products_ProductEntityId",
+                name: "FK_Categories_advertisements_advertisementEntityId",
                 table: "Categories");
 
             migrationBuilder.DropIndex(
-                name: "IX_Categories_ProductEntityId",
+                name: "IX_Categories_advertisementEntityId",
                 table: "Categories");
 
             migrationBuilder.DropColumn(
-                name: "ProductEntityId",
+                name: "advertisementEntityId",
                 table: "Categories");
 
             migrationBuilder.CreateTable(
-                name: "ProductCategories",
+                name: "advertisementCategories",
                 columns: table => new
                 {
                     CategoriesId = table.Column<long>(type: "bigint", nullable: false),
-                    ProductsId = table.Column<long>(type: "bigint", nullable: false)
+                    advertisementsId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductCategories", x => new { x.CategoriesId, x.ProductsId });
+                    table.PrimaryKey("PK_advertisementCategories", x => new { x.CategoriesId, x.advertisementsId });
                     table.ForeignKey(
-                        name: "FK_ProductCategories_Categories_CategoriesId",
+                        name: "FK_advertisementCategories_Categories_CategoriesId",
                         column: x => x.CategoriesId,
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductCategories_Products_ProductsId",
-                        column: x => x.ProductsId,
-                        principalTable: "Products",
+                        name: "FK_advertisementCategories_advertisements_advertisementsId",
+                        column: x => x.advertisementsId,
+                        principalTable: "advertisements",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductCategories_ProductsId",
-                table: "ProductCategories",
-                column: "ProductsId");
+                name: "IX_advertisementCategories_advertisementsId",
+                table: "advertisementCategories",
+                column: "advertisementsId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductCategories");
+                name: "advertisementCategories");
 
             migrationBuilder.AddColumn<long>(
-                name: "ProductEntityId",
+                name: "advertisementEntityId",
                 table: "Categories",
                 type: "bigint",
                 nullable: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_ProductEntityId",
+                name: "IX_Categories_advertisementEntityId",
                 table: "Categories",
-                column: "ProductEntityId");
+                column: "advertisementEntityId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Categories_Products_ProductEntityId",
+                name: "FK_Categories_advertisements_advertisementEntityId",
                 table: "Categories",
-                column: "ProductEntityId",
-                principalTable: "Products",
+                column: "advertisementEntityId",
+                principalTable: "advertisements",
                 principalColumn: "Id");
         }
     }

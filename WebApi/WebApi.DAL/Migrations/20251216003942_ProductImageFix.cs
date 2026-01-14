@@ -5,22 +5,22 @@
 namespace WebApi.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class ProductImageFix : Migration
+    public partial class advertisementImageFix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
                 name: "Name",
-                table: "ProductImages");
+                table: "advertisementImages");
 
             migrationBuilder.DropColumn(
                 name: "Path",
-                table: "ProductImages");
+                table: "advertisementImages");
 
             migrationBuilder.AddColumn<string>(
                 name: "ImageUrl",
-                table: "ProductImages",
+                table: "advertisementImages",
                 type: "text",
                 nullable: true);
         }
@@ -30,18 +30,18 @@ namespace WebApi.DAL.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "ImageUrl",
-                table: "ProductImages");
+                table: "advertisementImages");
 
             migrationBuilder.AddColumn<string>(
                 name: "Name",
-                table: "ProductImages",
+                table: "advertisementImages",
                 type: "text",
                 nullable: false,
                 defaultValue: "");
 
             migrationBuilder.AddColumn<string>(
                 name: "Path",
-                table: "ProductImages",
+                table: "advertisementImages",
                 type: "text",
                 nullable: false,
                 defaultValue: "");

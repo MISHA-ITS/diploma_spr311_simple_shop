@@ -12,7 +12,7 @@ namespace WebApi.DAL.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "Slug",
-                table: "Products");
+                table: "advertisements");
         }
 
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace WebApi.DAL.Migrations
         {
             migrationBuilder.AddColumn<string>(
                 name: "Slug",
-                table: "Products",
+                table: "advertisements",
                 type: "text",
                 nullable: false,
                 defaultValue: "");

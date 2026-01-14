@@ -95,10 +95,15 @@ export default function SignUpForm() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setPreview(URL.createObjectURL(file));
+    const preview = URL.createObjectURL(file);
+    setPreview(preview);
+
     setCreateUser(prev => ({
       ...prev,
-      imageFile,
+      imageFile: {
+        file,
+        preview,
+      },
     }));
   };
 
@@ -239,8 +244,8 @@ export default function SignUpForm() {
                       </Label>
                       <Input
                         type="text"
-                        id="fname"
-                        name="fname"
+                        id="firstname"
+                        name="firstname"
                         placeholder="Вкажіть ваше ім'я"
                         value={createUser.firstName}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
