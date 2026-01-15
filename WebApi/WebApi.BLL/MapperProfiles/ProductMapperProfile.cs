@@ -21,5 +21,9 @@ public class ProductMapperProfile : Profile
         CreateMap<ProductEntity, ProductDTO>()
             .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.Categories.Select(c => c.Name)))
             .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl)));
+
+        CreateMap<SeederProductDTO, ProductEntity>()
+            .ForMember(dest => dest.Images, opt => opt.Ignore())
+            .ForMember(dest => dest.Categories, opt => opt.Ignore());
     }
 }

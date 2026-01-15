@@ -47,7 +47,7 @@ const navItems: NavItem[] = [
   {
     icon: <BiCategory />,
     name: "Categories",
-
+    path: "categories-list",
   },
   {
     name: "Forms",
