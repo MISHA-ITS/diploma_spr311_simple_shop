@@ -12,10 +12,10 @@ export const buildTree = (
 
             // Використовуємо == щоб null, undefined та 0 вважалися однаковими для корня
             if (!parentId) {
-                return !x.parentId || x.parentId === 0;
+                return !x.parentId || x.parentId == 0;
             }
 
-            return x.parentId === parentId;
+            return x.parentId == parentId;
         })
         .map(x => ({
             title: x.name,

@@ -38,7 +38,7 @@ const CategoryRow: React.FC<ICategoryRowProps> = ({ category, onDeleteCategory, 
                         {category.imageUrl ? (
                             <img
                                 className="h-full w-full object-cover"
-                                src={category.imageUrl.startsWith("http") ? category.imageUrl : `${urlCategoryImage}/50_${category.imageUrl}`}
+                                src={category.imageUrl.startsWith("http") ? category.imageUrl : `${urlCategoryImage}50_${category.imageUrl}`}
                             />
                         ) : (
                             <img

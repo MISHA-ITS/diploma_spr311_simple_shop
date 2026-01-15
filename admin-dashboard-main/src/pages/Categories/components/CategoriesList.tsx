@@ -18,6 +18,7 @@ const CategoriesList: React.FC = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [parentId, setParentId] = useState<number | null>(null);
+    const [name, setName] = useState("");
     const [categoryFilterData, setCategoryFilterData] = useState<{
         categoryTree: ICategoryTreeNode[];
         excludedFilters: number[];
@@ -28,6 +29,14 @@ const CategoriesList: React.FC = () => {
 
     const onParentCategoryChange = (value: number | null) => {
         setParentId(value);
+    };
+
+    const closeDrawer = () => {
+        setIsOpen(false);
+        setSelectedCategory(null);
+        setParentId(null);
+        setSelectedFile(null);
+        setPreviewUrl(null);
     };
 
 
@@ -82,24 +91,15 @@ const CategoriesList: React.FC = () => {
 
     const handleDeleteCategory = async (categoryId: number) => {
         if (!confirm("Ви впевнені, що хочете видалити категорію?")) return;
+        const resp = await axios.delete(`${EnvConfig.API_URL}/api/Category/Delete/${categoryId}`, {
+            params: { id: categoryId }
+        });
 
-        try {
-            const res = await fetch(
-                `${EnvConfig.API_URL}/api/Category/Delete?id=${categoryId}`,
-                { method: "DELETE" }
+        if (resp.status === 200 || resp.data.isSuccess) {
+            setCategories(
+                prev => prev.filter(c => c.id !== categoryId)
             );
-
-            if (!res.ok) {
-                alert("Помилка при видаленні");
-                return;
-            }
-
-            setCategories(prev =>
-                prev.filter(c => c.id !== categoryId)
-            );
-
-        } catch (err) {
-            console.error(err);
+            // alert("Категорію видалено");
         }
     };
 
@@ -124,32 +124,36 @@ const CategoriesList: React.FC = () => {
 
         try {
             const formData = new FormData();
-            formData.append("id", String(selectedCategory.id));
-            formData.append("name", selectedCategory.name);
-            formData.append("parentId", String(parentId ?? ""));
+            formData.append("Id", String(selectedCategory.id));
+            formData.append("Name", name);
+            formData.append("ParentId", String(parentId ?? ""));
 
 
             if (selectedFile) {
-                formData.append("image", selectedFile);
+                formData.append("Image", selectedFile);
             }
 
             const { data } = await axios.put(
                 `${EnvConfig.API_URL}/api/Category/update`,
                 formData
             );
+            for (const pair of formData.entries()) {
+                console.log(pair[0], pair[1]);
+            }
 
             setCategories(prev =>
                 prev.map(c =>
                     c.id === data.id ? data : c
                 )
             );
+            closeDrawer()
 
-            //Замініти на react toastify
+            //Змініти на react toastify
             alert("Збережено ");
 
         } catch (error) {
             console.error(error);
-            //Замініти на react toastify
+            //Змініти на react toastify
             alert("Помилка при оновленні");
         }
     };
@@ -185,11 +189,9 @@ const CategoriesList: React.FC = () => {
             {/* Оверлей */}
             {isDrawerOpen && (
                 <div
-                    className="fixed inset-1 bg-black/30 z-30 transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/30 z-30 transition-opacity duration-300"
                     onClick={() => {
-                        setIsOpen(false);
-                        setParentId(null);
-                        setSelectedCategory(null);
+                        closeDrawer()
                     }}
                 />
             )}
@@ -250,6 +252,7 @@ const CategoriesList: React.FC = () => {
                         <input
                             type="text"
                             defaultValue={selectedCategory?.name || ''}
+                            onChange={(e) => setName(e.target.value)}
                             className="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Введіть назву..."
                         />
