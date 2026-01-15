@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Category;
+using WebApi.BLL.Extensions;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Repositories.Category;
@@ -24,11 +25,13 @@ namespace WebApi.BLL.Services.Category
 
             var entity = mapper.Map<CategoryEntity>(dto);
 
+            entity.Slug = entity.Name.ToSlug();
+
             if(dto.Image != null)
             {
                 try
                 {
-                    string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
+                    string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.ImagesPath);
 
                     if (string.IsNullOrEmpty(imageName))
                     {
@@ -112,6 +115,13 @@ namespace WebApi.BLL.Services.Category
             if (entity == null)
                 return ServiceResponse.Error($"Category with Id {dto.Id} not found");
 
+            entity.ParentId = dto.ParentId;
+            if (entity.Name != dto.Name)
+            {
+                entity.Name = dto.Name;
+                entity.Slug = dto.Name.ToSlug();
+            }
+
             if (dto.Image != null)
             {
                 var imageDeleteResult = await TryDeleteImageAsync(entity.ImageUrl);
@@ -121,7 +131,7 @@ namespace WebApi.BLL.Services.Category
                     return imageDeleteResult;
                 }
 
-                string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.CategoriesDir);
+                string? imageName = await imageService.SaveImageAsync(dto.Image, Settings.ImagesPath);
 
                 if (string.IsNullOrEmpty(imageName))
                 {
@@ -134,6 +144,14 @@ namespace WebApi.BLL.Services.Category
             }
 
             mapper.Map(dto, entity);
+
+            logger.LogInformation(
+    "DTO: Id={Id}, Name={Name}, ParentId={ParentId}, HasImage={HasImage}",
+    dto.Id,
+    dto.Name,
+    dto.ParentId,
+    dto.Image != null
+);
 
             return await categoryRepository.UpdateAsync(entity)
                 ?  ServiceResponse.Success("Category updated successfully")
