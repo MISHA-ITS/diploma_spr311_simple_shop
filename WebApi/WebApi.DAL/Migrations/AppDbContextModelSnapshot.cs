@@ -34,7 +34,7 @@ namespace WebApi.DAL.Migrations
 
                     b.HasIndex("CategoriesId");
 
-                    b.ToTable("AdvertisementCategories", (string)null);
+                    b.ToTable("AdvertisementEntityCategoryEntity");
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.AdvertisementEntity", b =>
@@ -274,6 +274,8 @@ namespace WebApi.DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("SettlementRef")
+                        .HasMaxLength(36)
+                        .IsUnicode(false)
                         .HasColumnType("character varying(36)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -483,7 +485,7 @@ namespace WebApi.DAL.Migrations
                     b.HasOne("WebApi.DAL.Entities.NewPostEntities.Settlement", "Settlement")
                         .WithMany("Adverts")
                         .HasForeignKey("SettlementRef")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("WebApi.DAL.Entities.Identity.AppUser", "User")
                         .WithMany()
@@ -529,9 +531,12 @@ namespace WebApi.DAL.Migrations
 
             modelBuilder.Entity("WebApi.DAL.Entities.Identity.AppUser", b =>
                 {
-                    b.HasOne("WebApi.DAL.Entities.NewPostEntities.Settlement", null)
+                    b.HasOne("WebApi.DAL.Entities.NewPostEntities.Settlement", "Settlement")
                         .WithMany("Users")
-                        .HasForeignKey("SettlementRef");
+                        .HasForeignKey("SettlementRef")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Settlement");
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.Identity.AppUserClaim", b =>

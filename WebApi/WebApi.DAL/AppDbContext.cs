@@ -53,6 +53,12 @@ public class AppDbContext
                 .WithOne(e => e.User)
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
+
+            b.HasOne(e => e.Settlement)
+                .WithMany(s => s.Users)
+                .HasForeignKey(e => e.SettlementRef)
+                .HasPrincipalKey(s => s.Ref)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<AppRole>(b =>
@@ -71,15 +77,16 @@ public class AppDbContext
         });
 
         modelBuilder.Entity<AdvertisementEntity>()
-            .HasMany(a => a.Categories)
-            .WithMany(c => c.Advertisements)
-            .UsingEntity(j => j.ToTable("AdvertisementCategories"));
+            .HasOne(a => a.Settlement)
+                .WithMany(s => s.Adverts)
+                .HasForeignKey(a => a.SettlementRef)
+                .HasPrincipalKey(s => s.Ref)
+                .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<AdvertisementImageEntity>()
             .HasOne(ai => ai.Advertisement)
             .WithMany(a => a.Images)
             .HasForeignKey(ai => ai.AdvertisementId)
             .OnDelete(DeleteBehavior.Cascade);
-
     }
 }

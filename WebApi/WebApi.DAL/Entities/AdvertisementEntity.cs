@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Entities.NewPostEntities;
 
@@ -21,7 +22,7 @@ namespace WebApi.DAL.Entities
         public long UserId { get; set; }
         public AppUser? User { get; set; }
 
-
+        [NotMapped]
         [StringLength(36)]
         [Unicode(false)]
         public string? SettlementRef { get; set; }

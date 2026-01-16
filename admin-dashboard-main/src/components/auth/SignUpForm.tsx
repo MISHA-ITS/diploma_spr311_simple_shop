@@ -66,13 +66,14 @@ export default function SignUpForm() {
     // 2. Перевірка валідації
     if (errors.length > 0) {
       setError("Заповніть всі поля коректно");
-      alert("Потрібно погодитися з умовами");
+      alert("Заповніть всі поля коректно");
       return;
     }
 
     // 3. Перевірка паролів
     if (createUser.password !== confirmPassword) {
       setError("Паролі не співпадають");
+      alert("Паролі не співпадають");
       return;
     }
 

@@ -11,6 +11,11 @@ public class Settlement : NewPostBaseEntity
     [StringLength(100)]
     public string SettlementTypeDescription { get; set; } = string.Empty;
 
+    [Key]
+    [StringLength(36)]
+    [Unicode(false)]
+    public string Ref { get; set; } = null!;
+
     [StringLength(36)]
     [Unicode(false)]
     public string? Region { get; set; }
