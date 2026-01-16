@@ -26,6 +26,11 @@ public class AccountService(UserManager<AppUser> userManager,
         logger.LogInformation("Starting user registration. Email: {Email}, UserName: {UserName}", 
             dto.Email, dto.UserName);
 
+        if (string.IsNullOrWhiteSpace(dto.Email))
+        {
+            return ServiceResponse.Error("Email є обовʼязковим");
+        }
+
         if (!await IsUniqueEmailAsync(dto.Email))
         {
             logger.LogWarning("Registration failed. Email already exists: {Email}", dto.Email);
@@ -184,6 +189,9 @@ public class AccountService(UserManager<AppUser> userManager,
 
     private async Task<bool> IsUniqueEmailAsync(string email)
     {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email is null or empty", nameof(email));
+
         var user = await userManager.FindByEmailAsync(email);
         return user == null;
     }

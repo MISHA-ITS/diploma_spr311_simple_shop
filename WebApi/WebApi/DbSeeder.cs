@@ -7,18 +7,18 @@ using System.Text.Json;
 using WebApi.BLL;
 using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.Category;
-using WebApi.BLL.DTOs.Product;
+using WebApi.BLL.DTOs.advertisement;
 using WebApi.BLL.DTOs.Seeder;
 using WebApi.BLL.Services;
 using WebApi.BLL.Extensions;
 using WebApi.BLL.Models.Seeder;
 using WebApi.BLL.Services.Image;
-using WebApi.BLL.Services.Product;
+using WebApi.BLL.Services.advertisement;
 using WebApi.DAL;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Repositories.Category;
-using WebApi.DAL.Repositories.Products;
+using WebApi.DAL.Repositories.advertisements;
 
 namespace WebApi;
 
@@ -33,7 +33,7 @@ public static class DbSeeder
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
         var categoryRepository = scope.ServiceProvider.GetRequiredService<ICategoryRepository>();
-        var productRopository = scope.ServiceProvider.GetRequiredService<IProductRepository>();
+        var advertisementRopository = scope.ServiceProvider.GetRequiredService<IAdvertisementRepository>();
         var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
 
         context.Database.Migrate();

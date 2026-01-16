@@ -1,4 +1,4 @@
-import {Props} from "../types.ts";
+import {Props} from "../../../types/Category/types.ts";
 
 const UsersCard: React.FC<Props> = ({ count, children }) => (
     <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm ring-1 ring-black/5 overflow-hidden">
