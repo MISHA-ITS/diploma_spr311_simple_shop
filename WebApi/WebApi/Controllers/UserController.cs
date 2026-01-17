@@ -16,13 +16,8 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAsync(string? id)
+    public async Task<IActionResult> GetAsync(long id)
     {
-        if (string.IsNullOrEmpty(id))
-        {
-            return BadRequest("id is required!");
-        }
-
         var response = await userService.GetByIdAsync(id);
         return response?.IsSuccess == true ? Ok(response) : BadRequest(response);
     }
@@ -35,13 +30,8 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteAsync(string? id)
+    public async Task<IActionResult> DeleteAsync(long id)
     {
-        if (string.IsNullOrEmpty(id))
-        {
-            return BadRequest("id is required!");
-        }
-
         var response = await userService.DeleteAsync(id);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }

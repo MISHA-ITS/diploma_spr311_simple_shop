@@ -66,13 +66,14 @@ export default function SignUpForm() {
     // 2. Перевірка валідації
     if (errors.length > 0) {
       setError("Заповніть всі поля коректно");
-      alert("Потрібно погодитися з умовами");
+      alert("Заповніть всі поля коректно");
       return;
     }
 
     // 3. Перевірка паролів
     if (createUser.password !== confirmPassword) {
       setError("Паролі не співпадають");
+      alert("Паролі не співпадають");
       return;
     }
 
@@ -95,10 +96,15 @@ export default function SignUpForm() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setPreview(URL.createObjectURL(file));
+    const preview = URL.createObjectURL(file);
+    setPreview(preview);
+
     setCreateUser(prev => ({
       ...prev,
-      imageFile,
+      imageFile: {
+        file,
+        preview,
+      },
     }));
   };
 
@@ -239,8 +245,8 @@ export default function SignUpForm() {
                       </Label>
                       <Input
                         type="text"
-                        id="fname"
-                        name="fname"
+                        id="firstname"
+                        name="firstname"
                         placeholder="Вкажіть ваше ім'я"
                         value={createUser.firstName}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

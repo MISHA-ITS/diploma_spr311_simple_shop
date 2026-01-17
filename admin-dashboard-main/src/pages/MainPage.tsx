@@ -11,7 +11,7 @@ const MainPage : React.FC = () => {
                 className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
             >
                 <ChevronLeftIcon className="size-5" />
-                Âõ³ä
+                Ð£Ð²Ñ–Ð¹Ñ‚Ð¸
             </Link>
         </div>
             <div>

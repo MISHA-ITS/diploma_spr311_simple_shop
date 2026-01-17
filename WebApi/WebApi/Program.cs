@@ -5,25 +5,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 using WebApi;
 using WebApi.BLL;
 using WebApi.BLL.Configuration;
 using WebApi.BLL.Services.Account;
+using WebApi.BLL.Services.advertisement;
 using WebApi.BLL.Services.Category;
-using Serilog;
-
 using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
+using WebApi.BLL.Services.NewPost;
 using WebApi.BLL.Services.Role;
 using WebApi.BLL.Services.User;
 using WebApi.DAL;
 using WebApi.DAL.Entities.Identity;
+using WebApi.DAL.Entities.NewPostEntities;
+using WebApi.DAL.Repositories.advertisements;
 using WebApi.DAL.Repositories.Category;
+using WebApi.DAL.Repositories.NewPost;
 using WebApi.Filters;
-using WebApi.BLL.Services.Product;
-using WebApi.DAL.Repositories.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,10 +37,14 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
+builder.Services.AddScoped<INewPostService, NewPostService>();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IAdvertisementRepository, AdvertisementRepository>();
+builder.Services.AddScoped<INewPostRepository<Area>, NewPostRepository<Area>>();
+builder.Services.AddScoped<INewPostRepository<Region>, NewPostRepository<Region>>();
+builder.Services.AddScoped<INewPostRepository<Settlement>, NewPostRepository<Settlement>>();
 
 builder.Services.AddSwaggerGen();
 

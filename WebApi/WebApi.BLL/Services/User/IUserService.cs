@@ -6,7 +6,7 @@ public interface IUserService
 {
     Task<ServiceResponse> CreateAsync(CreateUserDto dto);
     Task<ServiceResponse> UpdateAsync(UpdateUserDto dto);
-    Task<ServiceResponse> DeleteAsync(string id);
-    Task<ServiceResponse?> GetByIdAsync(string id);
+    Task<ServiceResponse> DeleteAsync(long id);
+    Task<ServiceResponse?> GetByIdAsync(long id);
     Task<ServiceResponse> GetAllAsync();
 }
