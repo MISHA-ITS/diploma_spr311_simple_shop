@@ -7,15 +7,6 @@ export interface ICategory {
     childs: ICategory[],
 }
 
-//drawler
-export interface ICategoryCreationModel {
-    id: number,
-    name: string,
-    imageFile?: File
-    parentId?: number
-    currentImage?: string
-}
-
 ///
 export interface ICategoryTreeNode {
     title: string;
@@ -34,8 +25,12 @@ export interface ICategoryRowProps {
 export interface Props {
     count: number;
     children: React.ReactNode;
+    onCreate?: () => void;
+    onRefresh?: () => void;
 }
 
 export type CategoryNode = ICategory & {
     children: CategoryNode[];
 };
+
+

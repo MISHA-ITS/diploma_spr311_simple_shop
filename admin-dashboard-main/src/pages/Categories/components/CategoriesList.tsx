@@ -34,11 +34,18 @@ const CategoriesList: React.FC = () => {
     const closeDrawer = () => {
         setIsOpen(false);
         setSelectedCategory(null);
-        setParentId(null);
         setSelectedFile(null);
         setPreviewUrl(null);
     };
 
+    const refreshCategories = async () => {
+        try {
+            const resp = await axios.get(urlCategories);
+            setCategories(resp.data.payload);
+        } catch (err) {
+            console.error("Помилка при оновленні списку:", err);
+        }
+    };
 
     useEffect(() => {
         axios.get(urlCategories)
@@ -54,7 +61,6 @@ const CategoriesList: React.FC = () => {
     useEffect(() => {
         if (!categories.length) return;
 
-        // Передаємо null як другий аргумент для пошуку кореневих елементів
         const tree = buildTree(
             categories,
             null,
@@ -67,16 +73,14 @@ const CategoriesList: React.FC = () => {
         }));
     }, [categories, selectedCategory]);
 
+    //скрол
     useEffect(() => {
         if (isDrawerOpen) {
-            // Блокуємо скрол
             document.body.style.overflow = 'hidden';
         } else {
-            // Повертаємо скрол
             document.body.style.overflow = 'auto';
         }
 
-        // Чистимо ефект, якщо компонент видаляється
         return () => {
             document.body.style.overflow = 'auto';
         };
@@ -85,8 +89,18 @@ const CategoriesList: React.FC = () => {
     const handleEditCategory = (category: ICategory) => {
         setSelectedCategory(category);
         setParentId(category.parentId);
+        setName(category.name);
         setIsOpen(true);
         document.body.style.overflow = 'hidden';
+    };
+
+    const handleCreateCategory = () => {
+        setSelectedCategory(null);
+        setName("");
+        setParentId(null);
+        setPreviewUrl(null);
+        setSelectedFile(null);
+        setIsOpen(true);
     };
 
     const handleDeleteCategory = async (categoryId: number) => {
@@ -103,14 +117,13 @@ const CategoriesList: React.FC = () => {
         }
     };
 
-    //Не дороблено
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         setSelectedFile(file);
 
-        // робимо preview
+        //preview
         const reader = new FileReader();
         reader.onload = () => {
             setPreviewUrl(reader.result as string);
@@ -120,11 +133,9 @@ const CategoriesList: React.FC = () => {
 
     const handleSubmitEdit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedCategory) return;
 
         try {
             const formData = new FormData();
-            formData.append("Id", String(selectedCategory.id));
             formData.append("Name", name);
             formData.append("ParentId", String(parentId ?? ""));
 
@@ -133,35 +144,29 @@ const CategoriesList: React.FC = () => {
                 formData.append("Image", selectedFile);
             }
 
-            const { data } = await axios.put(
-                `${EnvConfig.API_URL}/api/Category/update`,
-                formData
-            );
-            for (const pair of formData.entries()) {
-                console.log(pair[0], pair[1]);
+            if (selectedCategory) {
+                formData.append("Id", String(selectedCategory.id));
+                await axios.put(`${EnvConfig.API_URL}/api/Category/update`, formData);
+            } else {
+                await axios.post(`${EnvConfig.API_URL}/api/Category/create`, formData);
             }
 
-            setCategories(prev =>
-                prev.map(c =>
-                    c.id === data.id ? data : c
-                )
-            );
+            refreshCategories()
             closeDrawer()
-
             //Змініти на react toastify
-            alert("Збережено ");
+            alert(selectedCategory ? "Оновлено" : "Створено");
 
         } catch (error) {
             console.error(error);
             //Змініти на react toastify
-            alert("Помилка при оновленні");
+            alert(selectedCategory ? "Помилка при оновлені" : "Помилка при створені");
         }
     };
 
     return (
         <div className="w-full">
 
-            <CategoriesCard count={categories.length}>
+            <CategoriesCard count={categories.length} onCreate={handleCreateCategory} onRefresh={refreshCategories}>
                 <table className="min-w-full text-left">
                     <thead className="bg-neutral-50 text-xs uppercase">
                     <tr>
@@ -186,7 +191,7 @@ const CategoriesList: React.FC = () => {
                 </table>
             </CategoriesCard>
 
-            {/* Оверлей */}
+            {/* Overlay  */}
             {isDrawerOpen && (
                 <div
                     className="fixed inset-0 bg-black/30 z-30 transition-opacity duration-300"
@@ -196,7 +201,7 @@ const CategoriesList: React.FC = () => {
                 />
             )}
 
-            {/* Drawer */}
+            {/* Drawer edit category*/}
             <div className={`fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform bg-white w-96 border-l shadow-2xl ${
                 isDrawerOpen ? "translate-x-0" : "translate-x-full"}
                 top-[64px] 
@@ -208,7 +213,7 @@ const CategoriesList: React.FC = () => {
                         {selectedCategory ? 'Редагувати категорію' : 'Створити категорію'}
                     </h5>
                     <button
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => closeDrawer()}
                         className="text-gray-400 hover:bg-gray-100 hover:text-gray-900 rounded-lg p-2 transition-colors">
                         <HiMiniXMark />
                     </button>
@@ -251,8 +256,9 @@ const CategoriesList: React.FC = () => {
                         <label className="block mb-2 text-sm font-medium text-gray-900">Назва</label>
                         <input
                             type="text"
-                            defaultValue={selectedCategory?.name || ''}
-                            onChange={(e) => setName(e.target.value)}
+                            value={name}
+                            onChange={(e) =>{
+                                setName(e.target.value);}}
                             className="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Введіть назву..."
                         />
@@ -273,7 +279,7 @@ const CategoriesList: React.FC = () => {
 
                     <div className="pt-4">
                         <button className="w-full text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg px-5 py-3 transition-colors shadow-md">
-                            Зберегти зміни
+                            {selectedCategory ? 'Зберегти зміни' : 'Створити'}
                         </button>
                     </div>
                 </form>
