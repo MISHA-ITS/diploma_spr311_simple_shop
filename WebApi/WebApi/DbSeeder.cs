@@ -97,7 +97,8 @@ public static class DbSeeder
                 Console.WriteLine("Not Found File Users.json");
             }
         }
-
+        
+        
         if(!context.Categories.Any())
         {
             var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "test-categories.json");
@@ -188,6 +189,7 @@ public static class DbSeeder
             //    Console.WriteLine("Not Found File Categories.json");
             //}
         }
+        
     }
 
 
