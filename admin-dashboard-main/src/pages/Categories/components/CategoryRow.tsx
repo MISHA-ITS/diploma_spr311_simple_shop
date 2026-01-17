@@ -3,31 +3,10 @@ import * as React from "react";
 import EnvConfig from "../../../config/env.ts";
 import { BiEdit } from "react-icons/bi";
 import { MdDeleteOutline } from "react-icons/md";
-import 'flowbite';
 
 const urlCategoryImage = `${EnvConfig.API_URL}/images/`;
 
 const CategoryRow: React.FC<ICategoryRowProps> = ({ category, onDeleteCategory, onEditCategory }) => {
-
-    // const [drawerData, setDrawerData] = useState<DrawerDataModel>({
-    //     isDrawerOpen: false,
-    //     selectedCategory: undefined
-    // })
-    //
-    // const onDrawerClose = () => {
-    //     setDrawerData({
-    //         selectedCategory: undefined,
-    //         isDrawerOpen: false
-    //     })
-    // }
-    //
-    // const editCategory = (category: ICategory) => {
-    //     setDrawerData({
-    //         selectedCategory: category,
-    //         isDrawerOpen: true
-    //     })
-    // }
-
     return (
         <tr>
             <td className="px-5 py-4 text-sm text-neutral-600 dark:text-neutral-300 whitespace-nowrap">{category.id}</td>
@@ -38,7 +17,7 @@ const CategoryRow: React.FC<ICategoryRowProps> = ({ category, onDeleteCategory, 
                         {category.imageUrl ? (
                             <img
                                 className="h-full w-full object-cover"
-                                src={category.imageUrl.startsWith("http") ? category.imageUrl : `${urlCategoryImage}/50_${category.imageUrl}`}
+                                src={category.imageUrl.startsWith("http") ? category.imageUrl : `${urlCategoryImage}50_${category.imageUrl}`}
                             />
                         ) : (
                             <img

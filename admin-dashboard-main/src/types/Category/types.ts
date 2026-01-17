@@ -7,15 +7,14 @@ export interface ICategory {
     childs: ICategory[],
 }
 
-export interface DrawerDataModel {
-    isDrawerOpen: boolean,
-    selectedCategory: ICategory | undefined
+///
+export interface ICategoryTreeNode {
+    title: string;
+    value: number;
+    key: number;
+    children?: ICategoryTreeNode[];
 }
-export interface CategoryCreateProps {
-    open: boolean,
-    onClose: () => void
-    category?: ICategory
-}
+
 
 export interface ICategoryRowProps {
     category: ICategory;
@@ -26,8 +25,12 @@ export interface ICategoryRowProps {
 export interface Props {
     count: number;
     children: React.ReactNode;
+    onCreate?: () => void;
+    onRefresh?: () => void;
 }
 
 export type CategoryNode = ICategory & {
     children: CategoryNode[];
 };
+
+
