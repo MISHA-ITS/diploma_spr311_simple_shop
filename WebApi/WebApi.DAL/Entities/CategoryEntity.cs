@@ -15,5 +15,5 @@ public class CategoryEntity : BaseEntity<long>
     public CategoryEntity? Parent { get; set; }
     public ICollection<CategoryEntity> Childs { get; set; } = new HashSet<CategoryEntity>();
 
-    public ICollection<ProductEntity> Products { get; set; } = [];
+    public ICollection<AdvertisementEntity> Advertisements { get; set; } = [];
 }

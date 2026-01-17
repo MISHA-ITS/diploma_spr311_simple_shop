@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.User;
 using WebApi.BLL.Services.Image;
+using WebApi.DAL;
 using WebApi.DAL.Entities.Identity;
+
 
 namespace WebApi.BLL.Services.User;
 
-public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImageService imageService) : IUserService
+public class UserService(AppDbContext dbContext, UserManager<AppUser> userManager, IMapper mapper, IImageService imageService) : IUserService
 {
     public async Task<ServiceResponse> CreateAsync(CreateUserDto dto)
     {
@@ -17,7 +20,7 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
 
         var user = mapper.Map<AppUser>(dto);
 
-        user.UserName = dto.Email.Split('@')[0];
+        user.UserName = dto.Email;
 
         if (dto.Image != null)
         {
@@ -39,9 +42,9 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
         return ServiceResponse.Success($"Користувача {user.UserName} успішно доданота призначено роль User", dto);
     }
 
-    public async Task<ServiceResponse> DeleteAsync(string id)
+    public async Task<ServiceResponse> DeleteAsync(long id)
     {
-        var user = await userManager.FindByIdAsync(id);
+        var user = await userManager.FindByIdAsync(id.ToString());
 
         if (user == null)
             return ServiceResponse.Error($"Користувача з Id {id} не знайдено");
@@ -77,36 +80,24 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
 
     public async Task<ServiceResponse> GetAllAsync()
     {
-        var users = await userManager.Users.ToListAsync();
+        var users = await dbContext.Users
+            .ProjectTo<UserDTO>(mapper.ConfigurationProvider)
+            .ToListAsync();
 
-        var dtos = new List<UserDTO>();
-
-        foreach (var user in users)
-        {
-            var dto = mapper.Map<UserDTO>(user);
-
-            var roles = await userManager.GetRolesAsync(user);
-            dto.Roles = roles.ToArray();
-
-            dtos.Add(dto);
-        }
-
-        return ServiceResponse.Success("Користувачів отримано", dtos);
+        return ServiceResponse.Success("Користувачів отримано", users);
     }
 
-    public async Task<ServiceResponse?> GetByIdAsync(string id)
+    public async Task<ServiceResponse?> GetByIdAsync(long id)
     {
-        var user = await userManager.FindByIdAsync(id);
+        var user = await dbContext.Users
+            .Where(u => u.Id == id)
+            .ProjectTo<UserDTO>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
 
-        if (user != null)
-        {
-            var dto = mapper.Map<UserDTO>(user);
-            var roles = await userManager.GetRolesAsync(user);
-            dto.Roles = roles.ToArray();
-            return ServiceResponse.Success($"Користувача з Id {id} отримано", dto);
-        }
+        if (user == null)
+            return ServiceResponse.Error($"Користувача з Id {id} не знайдено");
 
-        return ServiceResponse.Error($"Користувача з Id {id} не знайдено");
+        return ServiceResponse.Success($"Користувача з Id {id} отримано", user);
     }
 
     public async Task<ServiceResponse> UpdateAsync(UpdateUserDto dto)
@@ -121,18 +112,14 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
         if (existingUser != null && existingUser.Id != dto.Id)
             return ServiceResponse.Error($"Користувач з електронною адресою {dto.Email} вже існує");
 
+        string? oldImage = user.Image;
+
         // Оновлюємо User за допомогою AutoMapper
         mapper.Map(dto, user);
 
         // Якщо прийшло нове фото
         if (dto.Image != null)
         {
-            // Видаляємо старий аватар, якщо є
-            if (!string.IsNullOrEmpty(user.Image))
-            {
-                await imageService.DeleteImageAsync(user.Image, Settings.UsersDir);
-            }
-
             // Завантажуємо нове фото
             string newImageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
 
@@ -143,10 +130,15 @@ public class UserService(UserManager<AppUser> userManager, IMapper mapper, IImag
         // Оновлюємо користувача
         var result = await userManager.UpdateAsync(user);
 
-        if (result.Succeeded)
-            return ServiceResponse.Success($"Користувача {user.UserName} успішно оновлено", dto);
+        if (!result.Succeeded)
+            return ServiceResponse.Error($"Не вдалося оновити користувача", dto);
 
-        return ServiceResponse.Error($"Не вдалося оновити користувача", dto);
+        // Видаляємо старий аватар, якщо є
+        if (!string.IsNullOrEmpty(user.Image))
+        {
+            await imageService.DeleteImageAsync(user.Image, Settings.UsersDir);
+        }
+
+        return ServiceResponse.Success($"Користувача {user.UserName} успішно оновлено", dto);
     }
-
 }
