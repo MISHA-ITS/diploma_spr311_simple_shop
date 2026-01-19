@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.User;
+using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL;
 using WebApi.DAL.Entities.Identity;
@@ -91,7 +92,7 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
     {
         var user = await dbContext.Users
             .Where(u => u.Id == id)
-            .ProjectTo<UserDTO>(mapper.ConfigurationProvider)
+            .ProjectTo<UserProfileModel>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
 
         if (user == null)
@@ -102,43 +103,56 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
 
     public async Task<ServiceResponse> UpdateAsync(UpdateUserDto dto)
     {
+        // 1. Знаходимо користувача
         var user = await userManager.FindByIdAsync(dto.Id.ToString());
 
         if (user == null)
             return ServiceResponse.Error($"Користувача з Id {dto.Id} не знайдено");
 
+        // 2. Перевірка email на унікальність
         var existingUser = await userManager.FindByEmailAsync(dto.Email);
 
         if (existingUser != null && existingUser.Id != dto.Id)
             return ServiceResponse.Error($"Користувач з електронною адресою {dto.Email} вже існує");
 
+        // 3. ЗБЕРІГАЄМО СТАРЕ ЗОБРАЖЕННЯ
         string? oldImage = user.Image;
 
-        // Оновлюємо User за допомогою AutoMapper
+        // 4. ОНОВЛЮЄМО ВСІ ПОЛЯ, КРІМ Image
+        // ❗ AutoMapper повинен мати .ForMember(x => x.Image, opt => opt.Ignore())
         mapper.Map(dto, user);
 
-        // Якщо прийшло нове фото
+        // 5. Якщо передали нове фото — зберігаємо його
         if (dto.Image != null)
         {
-            // Завантажуємо нове фото
+            // 5.1 Зберігаємо нове фото
             string newImageName = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
 
-            // Присвоюємо нове ім’я файла
+            // 5.2 Присвоюємо нове ім’я
             user.Image = newImageName;
+
+            // 5.3 (опціонально) Видаляємо старі файли
+            if (!string.IsNullOrEmpty(oldImage))
+            {
+                imageService.DeleteImageAsync(oldImage, Settings.UsersDir);
+            }
+        }
+        else
+        {
+            // 6. Якщо нове фото НЕ передавали — залишаємо старе
+            user.Image = oldImage;
         }
 
-        // Оновлюємо користувача
+        // 7. ОНОВЛЮЄМО КОРИСТУВАЧА В БАЗІ
         var result = await userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
-            return ServiceResponse.Error($"Не вдалося оновити користувача", dto);
-
-        // Видаляємо старий аватар, якщо є
-        if (!string.IsNullOrEmpty(user.Image))
         {
-            await imageService.DeleteImageAsync(user.Image, Settings.UsersDir);
+            var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+            return ServiceResponse.Error($"Не вдалося оновити користувача: {errors}");
         }
 
-        return ServiceResponse.Success($"Користувача {user.UserName} успішно оновлено", dto);
+        return ServiceResponse.Success("Користувача успішно оновлено");
     }
+
 }

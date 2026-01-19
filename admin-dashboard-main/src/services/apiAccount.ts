@@ -1,6 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {createBaseQuery} from "../utils/createBaseQuery.ts";
-import {ILoginRequest, IResponse, IUserCreate} from "../models/account";
+import {IResponse} from "../types/Account/IRegisterRequest.ts";
+import {ILoginRequest} from "../types/Account/ILoginRequest.ts";
+import {IUserCreate} from "../types/IUserCreate.ts";
+import {IUserProfile} from "../types/Account/IUserProfile.ts";
+//import {ILoginRequest, IResponse, IUserCreate} from "../models/account";
 
 export const apiAccount = createApi({
     reducerPath: "apiAccount",
@@ -37,7 +41,14 @@ export const apiAccount = createApi({
                 };
             },
         }),
+        profile: builder.query<IUserProfile, void>({
+            query: () => ({
+                url: "profile",
+                method: "GET"
+            }),
+            providesTags: ["Account"]
+        }),
     }),
 });
 
-export const {useLoginMutation, useRegisterMutation } = apiAccount;
+export const {useLoginMutation, useRegisterMutation, useProfileQuery } = apiAccount;

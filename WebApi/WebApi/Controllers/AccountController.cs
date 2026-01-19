@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.BLL.DTOs.Account;
+using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Account;
+using WebApi.BLL.Services.User;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/account")]
-public class AccountController(IAccountService accountService) : ControllerBase
+public class AccountController(IAccountService accountService, IUserService userService) : ControllerBase
 {
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync([FromForm]RegisterDto dto)
+    public async Task<IActionResult> RegisterAsync([FromForm]RegisterModel dto)
     {
         var user = await accountService.RegisterAsync(dto);
 
@@ -23,7 +26,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginModel dto)
     {
         var response = await accountService.LoginAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
@@ -76,6 +79,15 @@ public class AccountController(IAccountService accountService) : ControllerBase
     public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordDto dto)
     {
         var response = await accountService.ResetPasswordAsync(dto);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<IActionResult> GetProfile()
+    {         
+        var userId = await accountService.GetUserIdAsync();
+        var response = await userService.GetByIdAsync(userId);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 }

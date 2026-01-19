@@ -1,8 +1,10 @@
 import { saveLocalStorage, getLocalStorage, deleteLocalStorage } from "../utils/secureStore.ts";
-import {IUser} from "../models/account";
 import {jwtDecode} from "jwt-decode";
-import {IAuthState} from "../models/account";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {IUser} from "../types/auth/IUser.ts";
+//import {IUser} from "../models/account";
+import {IAuthState} from "../types/auth/IAuthState.ts";
+//import {IAuthState} from "../models/account";
 
 export const getUserFromToken = (token: string): IUser | null => {
     try {
