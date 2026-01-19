@@ -3,13 +3,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
 using WebApi;
 using WebApi.BLL;
 using WebApi.BLL.Configuration;
+using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Account;
 using WebApi.BLL.Services.advertisement;
 using WebApi.BLL.Services.Category;
@@ -76,6 +79,42 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(jwtKey))
     };
 });
+
+var assemblyName = typeof(LoginModel).Assembly.GetName().Name;
+
+builder.Services.AddSwaggerGen(opt =>
+{
+    var fileDoc = $"{assemblyName}.xml";
+    var filePath = Path.Combine(AppContext.BaseDirectory, fileDoc);
+    opt.IncludeXmlComments(filePath);
+
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+
+});
+
+builder.Services.AddHttpClient();
 
 //Email settings
 var EmailSection = builder.Configuration.GetSection("EmailSettings");
@@ -166,6 +205,6 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = $"/images"
 });
 
-await app.SeedData();
+//await app.SeedData();
 
 app.Run();

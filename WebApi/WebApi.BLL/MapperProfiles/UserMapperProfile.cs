@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using System.Globalization;
 using WebApi.BLL.DTOs.Account;
 using WebApi.BLL.DTOs.Seeder;
 using WebApi.BLL.DTOs.User;
+using WebApi.BLL.Models.Account;
 using WebApi.DAL.Entities.Identity;
 
 namespace WebApi.BLL.MapperProfiles;
@@ -27,6 +29,16 @@ public class UserMapperProfile : Profile
             .ForMember(x => x.Roles,
                 opt => opt.MapFrom(u =>
                     u.UserRoles.Select(ur => ur.Role!.Name)));
+
+        //UserEntity -> UserProfileModel
+        CreateMap<AppUser, UserProfileModel>()
+            .ForMember(opt => opt.FullName, opt =>
+                opt.MapFrom(x => x.LastName + " " + x.FirstName))
+            .ForMember(opt => opt.CreatedAt, opt =>
+                opt.MapFrom(x => x.CreatedAt.ToString("dd.MM.yyyy HH:mm:ss",
+                    new CultureInfo("uk"))))
+            .ForMember(opt => opt.Roles, opt =>
+                opt.MapFrom(x => x.UserRoles!.Select(ur => ur.Role.Name).ToArray()));
 
         //GoogleAccoun -> UserDTO
         CreateMap<GoogleAccountDto, UserDTO>()
