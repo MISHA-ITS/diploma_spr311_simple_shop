@@ -32,6 +32,9 @@ using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddControllers();
+
 // Add services to the container.
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -54,6 +57,20 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+// Add identity
+builder.Services
+    .AddIdentity<AppUser, AppRole>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+        // password settings
+        options.Password.RequiredUniqueChars = 0;
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 //Add Jwt
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -120,19 +137,7 @@ builder.Services.AddHttpClient();
 var EmailSection = builder.Configuration.GetSection("EmailSettings");
 builder.Services.Configure<EmailSettings>(EmailSection);
 
-// Add identity
-builder.Services
-    .AddIdentity<AppUser, AppRole>(options =>
-    {
-        options.User.RequireUniqueEmail = true;
-        // password settings
-        options.Password.RequiredUniqueChars = 0;
-        options.Password.RequireDigit = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireNonAlphanumeric = false;
-    })
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+
 
 //Add automapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -158,7 +163,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .Enrich.FromLogContext();
 });
 
-builder.Services.AddControllers();
+
 
 builder.Services.AddCors();
 
