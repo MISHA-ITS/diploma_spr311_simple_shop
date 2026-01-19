@@ -210,6 +210,6 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = $"/images"
 });
 
-await app.SeedData();
+//await app.SeedData();
 
 app.Run();
