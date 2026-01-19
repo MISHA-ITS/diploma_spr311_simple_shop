@@ -25,6 +25,7 @@ import ForgotPassword from "../pages/OtherPage/ForgotPassword.tsx";
 import ResetPassword from "../pages/OtherPage/ResetPassword.tsx";
 import CategoriesList from "../pages/Categories/components/CategoriesList.tsx";
 import AdminRoute from "./AdminRoutes.tsx";
+import Profile from "../pages/Profile.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -75,6 +76,7 @@ const AppRoutes : React.FC = () => {
                 {/* Auth Layout */}
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
                 <Route path="reset-password" element={<ResetPassword />} />
 

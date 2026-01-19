@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Web;
 using WebApi.BLL.DTOs.Account;
+using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
@@ -19,9 +22,10 @@ public class AccountService(UserManager<AppUser> userManager,
     IEmailService emailService, 
     IConfiguration configuration, 
     IImageService imageService,
+    IHttpContextAccessor httpContextAccessor,
     ILogger<AccountService> logger) : IAccountService
 {
-    public async Task<ServiceResponse?> RegisterAsync(RegisterDto dto)
+    public async Task<ServiceResponse?> RegisterAsync(RegisterModel dto)
     {
         logger.LogInformation("Starting user registration. Email: {Email}, UserName: {UserName}", 
             dto.Email, dto.UserName);
@@ -160,7 +164,7 @@ public class AccountService(UserManager<AppUser> userManager,
         return ServiceResponse.Success("Електронна пошта успішно підтверджена.");
     }
 
-    public async Task<ServiceResponse> LoginAsync(LoginDto dto)
+    public async Task<ServiceResponse> LoginAsync(LoginModel dto)
     {
         logger.LogInformation("Login attempt started. Email: {Email}", dto.Email);
 
@@ -477,6 +481,16 @@ public class AccountService(UserManager<AppUser> userManager,
 
         // Якщо все успішно — пароль змінено
         return ServiceResponse.Success("Пароль успішно змінено");
+    }
+
+    public async Task<long> GetUserIdAsync()
+    {
+        var email = httpContextAccessor.HttpContext?.User?.Claims.First().Value;
+        if (string.IsNullOrEmpty(email))
+            throw new UnauthorizedAccessException("User is not authenticated");
+        var user = await userManager.FindByEmailAsync(email);
+
+        return user.Id;
     }
 
     public sealed class GoogleAccountDto

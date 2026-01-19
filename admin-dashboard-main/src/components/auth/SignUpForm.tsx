@@ -57,28 +57,23 @@ export default function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Перевірка чекбокса
     if (!isChecked) {
       setError("Ви повинні погодитись з умовами");
       return;
     }
 
-    // 2. Перевірка валідації
     if (errors.length > 0) {
       setError("Заповніть всі поля коректно");
-      alert("Заповніть всі поля коректно");
       return;
     }
 
-    // 3. Перевірка паролів
     if (createUser.password !== confirmPassword) {
       setError("Паролі не співпадають");
-      alert("Паролі не співпадають");
       return;
     }
 
     try {
-      const res = await register(userInitState).unwrap();
+      const res = await register(createUser).unwrap();
 
       if (res.isSuccess) {
           dispatch(loginSuccess(res.payload));
@@ -252,7 +247,7 @@ export default function SignUpForm() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setCreateUser({ ...createUser, firstName: e.target.value })
                         }
-                        onValidationChange={validationChange}
+                        onValidationChange={(isValid) => validationChange(isValid, "email")}
                         rules={[
                           {
                             rule: 'required',
@@ -290,7 +285,7 @@ export default function SignUpForm() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setCreateUser({ ...createUser, lastName: e.target.value })
                         }
-                        onValidationChange={validationChange}
+                        onValidationChange={(isValid) => validationChange(isValid, "email")}
                         rules={[
                           {
                             rule: 'required',
@@ -335,7 +330,7 @@ export default function SignUpForm() {
                               message: "Пошта є некоректна",
                             },
                           ]}
-                          onValidationChange={validationChange}
+                          onValidationChange={(isValid) => validationChange(isValid, "email")}
                       />
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 border-r border-gray-200 px-3.5 py-3 text-gray-500 dark:border-gray-800 dark:text-gray-400">
                       <EnvelopeIcon className="size-6" />
@@ -355,7 +350,7 @@ export default function SignUpForm() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             setCreateUser({ ...createUser, password: e.target.value })
                         }
-                        onValidationChange={validationChange}
+                        onValidationChange={(isValid) => validationChange(isValid, "email")}
                         rules={[
                           {
                             rule: 'required',
@@ -408,7 +403,7 @@ export default function SignUpForm() {
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                               setConfirmPassword(e.target.value)
                           }
-                          onValidationChange={validationChange}
+                          onValidationChange={(isValid) => validationChange(isValid, "email")}
                           rules={[
                             {
                               rule: 'required',

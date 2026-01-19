@@ -1,6 +1,6 @@
-﻿namespace WebApi.BLL.DTOs.Account;
+﻿namespace WebApi.BLL.Models.Account;
 
-public class LoginDto
+public class LoginModel
 {
     /// <summary>
     /// Електронна пошта користувача

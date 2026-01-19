@@ -54,6 +54,7 @@ public class ImageService(IConfiguration configuration) : IImageService
     private async Task<string> SaveImageAsync(byte[] bytes, string folder)
     {
         string imageName = $"{Path.GetRandomFileName()}.webp";
+
         var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>()
             ?? throw new InvalidOperationException("ImageSizes configuration is missing or invalid");
 
@@ -105,5 +106,6 @@ public class ImageService(IConfiguration configuration) : IImageService
             });
         });
         await image.SaveAsync(path, new WebpEncoder());
+        Console.WriteLine($"Saving image to: {path}");
     }
 }
