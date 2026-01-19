@@ -2,13 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
-using WebApi.BLL.DTOs.advertisement;
+using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Repositories.Category;
-using WebApi.DAL.Repositories.advertisements;
-    
-namespace WebApi.BLL.Services.advertisement
+using WebApi.DAL.Repositories.Advertisements;
+
+namespace WebApi.BLL.Services.Advertisement
 {
     public class AdvertisementService(
         IAdvertisementRepository advertisementRepository, ICategoryRepository categoryRepository,
@@ -30,7 +30,7 @@ namespace WebApi.BLL.Services.advertisement
             {
                 foreach (var image in dto.Images)
                 {
-                    string? imageName = await imageService.SaveImageAsync(image, Settings.advertisementsDir);
+                    string? imageName = await imageService.SaveImageAsync(image, Settings.AdvertisementsDir);
                     if (string.IsNullOrEmpty(imageName))
                     {
                         logger.LogError("Failed to save one of the images for advertisement {advertisementName}", dto.Name);
@@ -80,14 +80,14 @@ namespace WebApi.BLL.Services.advertisement
                 : ServiceResponse.Error("Failed to delete advertisement");
         }
 
-        public async Task<ServiceResponse> GetAllAsync(advertisementFilterDto filter)
+        public async Task<ServiceResponse> GetAllAsync(AdvertisementFilterDto filter)
         {
             logger.LogDebug("Retrieving all advertisements with filter {@Filter}", filter);
 
             var entities = advertisementRepository.GetAll();
             entities = Filteradvertisements(entities, filter);
 
-            var dtos = mapper.Map<List<advertisementDTO>>(await entities.ToListAsync());
+            var dtos = mapper.Map<List<AdvertisementFilterDto>>(await entities.ToListAsync());
 
             logger.LogInformation("Retrieved {Count} advertisements", dtos.Count);
 
@@ -103,7 +103,7 @@ namespace WebApi.BLL.Services.advertisement
             if (entity == null)
                 return ServiceResponse.Error($"advertisement with Id {id} not found");
 
-            var dto = mapper.Map<advertisementDTO>(entity);
+            var dto = mapper.Map<AdvertisementDTO>(entity);
 
             logger.LogInformation("advertisement with Id {advertisementId} retrieved successfully", id);
 
@@ -134,7 +134,7 @@ namespace WebApi.BLL.Services.advertisement
 
                 foreach (var image in dto.Images)
                 {
-                    string? imageName = await imageService.SaveImageAsync(image, Settings.advertisementsDir);
+                    string? imageName = await imageService.SaveImageAsync(image, Settings.AdvertisementsDir);
 
                     if (string.IsNullOrEmpty(imageName))
                     {
@@ -164,7 +164,7 @@ namespace WebApi.BLL.Services.advertisement
 
             try
             {
-                await imageService.DeleteImageAsync(url, Settings.advertisementsDir);
+                await imageService.DeleteImageAsync(url, Settings.AdvertisementsDir);
                 logger.LogInformation("Deleted advertisement image {ImageUrl}", url);
                 return null;
             }
@@ -175,7 +175,7 @@ namespace WebApi.BLL.Services.advertisement
             }
         }
 
-        private IQueryable<AdvertisementEntity> Filteradvertisements(IQueryable<AdvertisementEntity> advertisements, advertisementFilterDto filter)
+        private IQueryable<AdvertisementEntity> Filteradvertisements(IQueryable<AdvertisementEntity> advertisements, AdvertisementFilterDto filter)
         {
             if (filter.categoryId.HasValue)
             {

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using WebApi.DAL.Entities;
 
-namespace WebApi.DAL.Repositories.advertisements;
+namespace WebApi.DAL.Repositories.Advertisements;
 
 public class AdvertisementRepository(AppDbContext context, ILogger<GenericRepository<AdvertisementEntity, long>> logger) :
     GenericRepository<AdvertisementEntity, long>(context, logger), IAdvertisementRepository

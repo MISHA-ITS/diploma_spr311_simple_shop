@@ -7,7 +7,7 @@ public static class Settings
 
     public const string CategoriesDir = "categories";
     public const string UsersDir = "users";
-    public const string advertisementsDir = "advertisements";
+    public const string AdvertisementsDir = "advertisements";
 
     public static void Init(string rootPath, string imagePath)
     {
