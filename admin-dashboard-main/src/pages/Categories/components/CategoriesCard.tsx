@@ -1,74 +1,64 @@
+import React from "react";
 import {Props} from "../../../types/Category/types.ts";
 import { FaPlusCircle } from "react-icons/fa";
 import { IoReloadCircleSharp } from "react-icons/io5";
 
-const UsersCard: React.FC<Props> = ({ count, children, onCreate, onRefresh }) => {
+const CategoriesCard: React.FC<Props> = ({ count, children, onCreate, onRefresh }) => {
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+    const handleRefreshClick = () => {
+        if (isRefreshing) return;
+
+        setIsRefreshing(true);
+        if (onRefresh) {
+            onRefresh();
+        }
+
+        setTimeout(() => setIsRefreshing(false), 500);
+    };
+
     return (
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm ring-1 ring-black/5 overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-black/10 dark:border-white/10">
-            <div className="items-center justify-between">
-                <h2 className="text-lg font-semibold">Категорії</h2>
-                <div className="text-sm text-neutral-500">{count} запис(ів) </div>
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl shadow-blue-500/5 overflow-hidden border border-blue-100 dark:border-blue-900/30">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-blue-50 dark:border-blue-900/20 bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/10">
+                <div>
+                    <h2 className="text-2xl font-black text-neutral-800 dark:text-white tracking-tight">
+                        Категорії
+                    </h2>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                            {count} активних записів
+                        </span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={handleRefreshClick}
+                        className="group p-2 rounded-2xl text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all"
+                    >
+                        <IoReloadCircleSharp
+                            size={32}
+                            className={isRefreshing ? "animate-spin-once" : ""}
+                        />
+                    </button>
+
+                    <div className="w-px h-8 bg-blue-100 dark:bg-blue-800"></div>
+
+                    <button
+                        onClick={onCreate}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all active:scale-95 font-bold text-sm"
+                    >
+                        <FaPlusCircle size={18} />
+                        <span>Створити</span>
+                    </button>
+                </div>
             </div>
-            <div className="flex items-center justify-between gap-3 px-5 py-4">
-                <button
-                    onClick={onCreate}
-                    type="button"
-                    data-drawer-target="drawer-form"
-                    data-drawer-show="drawer-form"
-                    aria-controls="drawer-form"
-                    className="
-                        inline-flex items-center justify-center
-                        w-9 h-9 rounded-full
-                        bg-emerald-600 text-white
-                        hover:bg-emerald-500
-                        dark:bg-emerald-500 dark:hover:bg-emerald-400
 
-                        transition-all duration-300
-                        hover:scale-110
-                        active:scale-90
-
-                        hover:shadow-xl
-                        hover:ring-2 hover:ring-emerald-300
-                        ring-offset-0 dark:ring-offset-neutral-900
-
-                        leading-none
-                    "
-                >
-                    <FaPlusCircle size={26} className="block" />
-                </button>
-                <div className="h-6 w-[1px] bg-neutral-300 dark:bg-neutral-700 mx-1"></div>
-                <button
-                    onClick={onRefresh}
-                    type="button"
-                    data-drawer-target="drawer-form"
-                    data-drawer-show="drawer-form"
-                    aria-controls="drawer-form"
-                    className="
-                        inline-flex items-center justify-center
-                        w-9 h-9 rounded-full
-                        bg-blue-700 text-white
-                        hover:bg-blue-600
-                        dark:bg-blue-600 dark:hover:bg-blue-500
-
-                        transition-all duration-300
-                        hover:scale-110
-                        active:scale-90
-
-                        hover:shadow-xl
-                        hover:ring-2 hover:ring-blue-400
-                        ring-offset-0 dark:ring-offset-neutral-900
-
-                        leading-none
-                    "
-                >
-                    <IoReloadCircleSharp size={30} />
-                </button>
+            <div className="overflow-x-auto">
+                {children}
             </div>
         </div>
-        {children}
-    </div>
     )
 }
 
-export default UsersCard;
+export default CategoriesCard;

@@ -1,24 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import axios from "axios";
 import EnvConfig from "../../../config/env.ts";
 import {ICategory, ICategoryTreeNode} from "../../../types/Category/types.ts";
 import CategoriesCard from "./CategoriesCard.tsx";
 import CategoryRow from "./CategoryRow.tsx";
-import { TreeSelect } from 'antd';
-import {buildTree} from "../utils/funct.ts";
+import {Pagination, TreeSelect} from 'antd';
+import {buildTree} from "../utils/functions.ts";
 import { HiMiniXMark } from "react-icons/hi2";
 
 
-const urlCategories = `${EnvConfig.API_URL}/api/Category/list`;
+
 
 const CategoriesList: React.FC = () => {
     const [isDrawerOpen, setIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
     const [categories, setCategories] = useState<ICategory[]>([]);
+    const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [parentId, setParentId] = useState<number | null>(null);
     const [name, setName] = useState("");
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
     const [categoryFilterData, setCategoryFilterData] = useState<{
         categoryTree: ICategoryTreeNode[];
         excludedFilters: number[];
@@ -38,31 +42,47 @@ const CategoriesList: React.FC = () => {
         setPreviewUrl(null);
     };
 
+    const loadAllCategories = async () => {
+        try {
+            const resp = await axios.get(
+                `${EnvConfig.API_URL}/api/Category/list`
+            );
+
+            setAllCategories(resp.data.payload ?? []);
+        } catch (err) {
+            console.error("Помилка завантаження всіх категорій:", err);
+        }
+    };
+
     const refreshCategories = async () => {
         try {
-            const resp = await axios.get(urlCategories);
-            setCategories(resp.data.payload);
+            const resp = await axios.get(`${EnvConfig.API_URL}/api/Category/page`,
+                {
+                    params:{
+                        page,
+                        size:pageSize
+                    }
+                });
+            setCategories(resp.data.payload.items ?? []);
+            setTotal(resp.data.payload.total ?? 0);
         } catch (err) {
-            console.error("Помилка при оновленні списку:", err);
+            console.error("Помилка при оновленні списку виникла помилка:", err);
         }
     };
 
     useEffect(() => {
-        axios.get(urlCategories)
-            .then(resp => {
-                console.log("Categories API:", resp.data);
-                setCategories(resp.data.payload);
-            })
-            .catch(err => {
-                console.error("Categories error", err);
-            });
+        refreshCategories();
+    }, [page, pageSize]);
+
+    useEffect(() => {
+        loadAllCategories();
     }, []);
 
     useEffect(() => {
         if (!categories.length) return;
 
         const tree = buildTree(
-            categories,
+            allCategories,
             null,
             selectedCategory ? [selectedCategory.id] : []
         );
@@ -71,7 +91,7 @@ const CategoriesList: React.FC = () => {
             ...prev,
             categoryTree: tree,
         }));
-    }, [categories, selectedCategory]);
+    }, [allCategories, selectedCategory]);
 
     //скрол
     useEffect(() => {
@@ -151,7 +171,8 @@ const CategoriesList: React.FC = () => {
                 await axios.post(`${EnvConfig.API_URL}/api/Category/create`, formData);
             }
 
-            refreshCategories()
+            await refreshCategories()
+            await loadAllCategories();
             closeDrawer()
             //Змініти на react toastify
             alert(selectedCategory ? "Оновлено" : "Створено");
@@ -164,9 +185,9 @@ const CategoriesList: React.FC = () => {
     };
 
     return (
-        <div className="w-full">
+        <div className="relative w-full pb-24">
 
-            <CategoriesCard count={categories.length} onCreate={handleCreateCategory} onRefresh={refreshCategories}>
+            <CategoriesCard count={total} onCreate={handleCreateCategory} onRefresh={refreshCategories}>
                 <table className="min-w-full text-left">
                     <thead className="bg-neutral-50 text-xs uppercase">
                     <tr>
@@ -190,6 +211,21 @@ const CategoriesList: React.FC = () => {
                     </tbody>
                 </table>
             </CategoriesCard>
+
+            {/*Pagination*/}
+            <div className="bg-white dark:bg-neutral-800 px-6 py-2 rounded-2xl shadow-sm border border-blue-50 dark:border-blue-700/30">
+                <Pagination
+                    align="center"
+                    current={page}
+                    pageSize={pageSize}
+                    total={total}
+                    showSizeChanger
+                    onChange={(newPage, newSize) => {
+                        setPage(newPage);
+                        setPageSize(newSize);
+                    }}
+                />
+            </div>
 
             {/* Overlay  */}
             {isDrawerOpen && (
