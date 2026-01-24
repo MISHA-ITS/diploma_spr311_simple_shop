@@ -17,6 +17,16 @@ export interface IUsersResponse {
     isSuccess: boolean;
 }
 
+export interface IUserUpdate {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string | null;
+    roles: string;
+    imageFile: File | null,
+}
+
 export interface IUserRowProps {
     user: IUserItem;
     initials: (name: string) => string;

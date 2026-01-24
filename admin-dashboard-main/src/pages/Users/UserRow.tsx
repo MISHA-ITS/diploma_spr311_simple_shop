@@ -69,7 +69,6 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser}) => {
                               hover:ring-2 hover:ring-blue-900
                               ring-offset-0 dark:ring-offset-neutral-900
                           "
-                          onClick={() => alert(`Edit user ${user.id} - ${user.email}`)}
                     >
                         Редагувати
                     </Link>

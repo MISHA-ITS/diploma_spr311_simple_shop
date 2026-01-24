@@ -3,7 +3,7 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
-import {IUserItem} from "../../pages/Users/types.ts";
+import {IUserItem, IUserUpdate} from "../../pages/Users/types.ts";
 import {useEffect, useState} from "react";
 import noimage from "../../assets/images/noimage.jpeg";
 import EnvConfig from "../../config/env.ts";
@@ -20,7 +20,8 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
   const { isOpen, openModal, closeModal } = useModal();
   const [preview, setPreview] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IUserUpdate>({
+      id: user.id,
     firstName: "",
     lastName: "",
     email: "",
@@ -33,12 +34,13 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phoneNumber: user.phoneNumber ? user.phoneNumber : "",
-        roles: user.roles.join(", "),
-        imageFile: null,
+          ...formData,
+          id: user?.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          roles: user.roles,
       });
 
       setPreview(
@@ -61,23 +63,25 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleSave = async () => {
-    console.log("🔥 handleSave called");
-    const payload = new FormData();
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-    payload.append("Id", user.id.toString());
-    payload.append("FirstName", formData.firstName);
-    payload.append("LastName", formData.lastName);
-    payload.append("Email", formData.email);
-    payload.append("Phone", formData.phoneNumber);
-    payload.append("Roles", formData.roles);
-
-    if (formData.imageFile) {
-      payload.append("Image", formData.imageFile);
-    }
+      console.log("🔥 handleSave called");
+    // const payload = new FormData();
+    //
+    // payload.append("Id", user.id.toString());
+    // payload.append("FirstName", formData.firstName);
+    // payload.append("LastName", formData.lastName);
+    // payload.append("Email", formData.email);
+    // payload.append("Phone", formData.phoneNumber);
+    // payload.append("Roles", formData.roles);
+    //
+    // if (formData.imageFile) {
+    //   payload.append("Image", formData.imageFile);
+    // }
 
     try {
-      const updated = await updateUser(payload).unwrap();
+      const updated = await updateUser(formData).unwrap();
       console.log("UPDATED USER:", updated);
       closeModal();
     } catch (error) {
