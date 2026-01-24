@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApi.BLL.DTOs.advertisement;
-using WebApi.BLL.Services.advertisement;
+using WebApi.BLL.DTOs.Advertisement;
+using WebApi.BLL.Services.Advertisement;
 
 namespace WebApi.Controllers;
 
@@ -23,7 +23,7 @@ public class AdvertismentController(IAdvertisementService advertisementService) 
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetAll([FromQuery] advertisementFilterDto filter)
+    public async Task<IActionResult> GetAll([FromQuery] AdvertisementFilterDto filter)
     {
         var responce = await advertisementService.GetAllAsync(filter);
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);

@@ -7,18 +7,17 @@ using System.Text.Json;
 using WebApi.BLL;
 using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs.Category;
-using WebApi.BLL.DTOs.advertisement;
 using WebApi.BLL.DTOs.Seeder;
 using WebApi.BLL.Services;
 using WebApi.BLL.Extensions;
 using WebApi.BLL.Models.Seeder;
 using WebApi.BLL.Services.Image;
-using WebApi.BLL.Services.advertisement;
 using WebApi.DAL;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Repositories.Category;
-using WebApi.DAL.Repositories.advertisements;
+using WebApi.BLL.DTOs.Advertisement;
+using WebApi.DAL.Repositories.Advertisements;
 
 namespace WebApi;
 
@@ -189,7 +188,59 @@ public static class DbSeeder
             //    Console.WriteLine("Not Found File Categories.json");
             //}
         }
-        
+
+        if (!context.Advertisements.Any())
+        {
+            var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "advertisement.json");
+
+            if (!File.Exists(jsonFile)) return;
+
+            var jsonData = await File.ReadAllTextAsync(jsonFile, Encoding.UTF8);
+
+            var dtoList = JsonConvert.DeserializeObject<List<SeederAdvertisementDTO>>(jsonData);
+            if (dtoList == null || dtoList.Count == 0) return;
+
+            var categories = await context.Categories.GroupBy(c => c.Name).Select(g => g.First()).ToDictionaryAsync(c => c.Name);
+
+            var advertisements = new List<AdvertisementEntity>();
+
+            foreach (var dto in dtoList)
+            {
+                var ad = mapper.Map<AdvertisementEntity>(dto);
+
+                ad.Categories = dto.Categories.Where(c => categories.ContainsKey(c)).Select(c => categories[c]).ToList();
+
+                if (dto.Images != null && dto.Images.Count > 0)
+                {
+                    ad.Images ??= new List<AdvertisementImageEntity>();
+
+                    var imageTasks = dto.Images.Select(async imageUrl =>
+                    {
+                        var path = await imageService.SaveImageFromUrlAsync(imageUrl, Settings.AdvertisementsDir);
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            return new AdvertisementImageEntity { ImageUrl = path };
+                        }
+                        return null;
+                    });
+
+                    var images = await Task.WhenAll(imageTasks);
+
+                    foreach (var image in images.Where(x => x != null))
+                    {
+                        ad.Images.Add(image!);
+                    }
+                }
+
+                Console.WriteLine($"Prepared Ad: {ad.Name} with {ad.Images.Count} images.");
+                advertisements.Add(ad);
+            }
+            if (advertisements.Any())
+            {
+                await advertisementRopository.CreateRangeAsync(advertisements);
+            }
+        }
+
     }
 
 

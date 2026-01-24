@@ -1,6 +1,6 @@
-﻿namespace WebApi.BLL.DTOs.advertisement;
+﻿namespace WebApi.BLL.DTOs.Advertisement;
 
-public class advertisementFilterDto
+public class AdvertisementFilterDto
 {
     public long? categoryId { get; set; }
     public decimal? minPrice { get; set; }

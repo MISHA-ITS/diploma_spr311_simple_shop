@@ -1,6 +1,6 @@
-﻿namespace WebApi.BLL.DTOs.advertisement
+﻿namespace WebApi.BLL.DTOs.Advertisement
 {
-    public class advertisementDTO
+    public class AdvertisementDTO
     {
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
