@@ -8,6 +8,7 @@ namespace WebApi.BLL.Models.Account;
 
 public class UserProfileModel
 {
+    public long Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;

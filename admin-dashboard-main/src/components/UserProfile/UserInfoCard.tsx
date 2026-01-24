@@ -20,6 +20,8 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
   const { isOpen, openModal, closeModal } = useModal();
   const [preview, setPreview] = useState<string | null>(null);
 
+  console.log("USER:", user);
+
   const [formData, setFormData] = useState<IUserUpdate>({
       id: user.id,
     firstName: "",
@@ -66,7 +68,7 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      console.log("🔥 handleSave called");
+      console.log("handleSave called");
     // const payload = new FormData();
     //
     // payload.append("Id", user.id.toString());

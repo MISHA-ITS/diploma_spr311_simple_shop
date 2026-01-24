@@ -14,6 +14,7 @@ const urlUser = `${EnvConfig.API_URL}/api/User/Get?id`;
 const UserProfiles: React.FC = () => {
 
     const { id } = useParams<{id:string}>();
+    console.log("id", id);
     const [user, setUser] = useState<IUserItem | null>(null);
     const [loading, setLoading] = useState(true);
 

@@ -26,10 +26,11 @@ export const apiUser = createApi({
         updateUser: builder.mutation<IUserProfile, IUserUpdate>({
             query: (updateUser) => {
                 try {
+                    console.log("User info", updateUser);
                     const formData = serialize(updateUser);
                     return {
-                        url: 'UpdateAsync',
-                        method: 'POST',
+                        url: 'update',
+                        method: 'PUT',
                         body: formData
                     }
                 }
