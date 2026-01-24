@@ -23,7 +23,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync(UpdateUserDto dto)
+    public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDto dto)
     {
         var response = await userService.UpdateAsync(dto);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
