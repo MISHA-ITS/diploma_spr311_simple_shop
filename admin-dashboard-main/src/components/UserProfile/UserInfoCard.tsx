@@ -4,18 +4,87 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import {IUserItem} from "../../pages/Users/types.ts";
+import {useEffect, useState} from "react";
+import noimage from "../../assets/images/noimage.jpeg";
+import EnvConfig from "../../config/env.ts";
+import {useUpdateUserMutation} from "../../services/apiUser.ts";
+
+const urlUserImage = `${EnvConfig.API_URL}/images/users`;
 
 type Props = {
   user: IUserItem;
 };
 
 const UserInfoCard: React.FC<Props> = ({ user }) => {
+  const [updateUser] = useUpdateUserMutation();
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    roles: "",
+    imageFile: null as File | null,
+  });
+
+  // 🟢 Ініціалізація форми
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber ? user.phoneNumber : "",
+        roles: user.roles.join(", "),
+        imageFile: null,
+      });
+
+      setPreview(
+          user.image
+              ? `${urlUserImage}/200_${user.image}`
+              : null
+      );
+    }
+  }, [isOpen, user]);
+
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const handlePickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFormData(prev => ({ ...prev, imageFile: file }));
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleSave = async () => {
+    console.log("🔥 handleSave called");
+    const payload = new FormData();
+
+    payload.append("Id", user.id.toString());
+    payload.append("FirstName", formData.firstName);
+    payload.append("LastName", formData.lastName);
+    payload.append("Email", formData.email);
+    payload.append("Phone", formData.phoneNumber);
+    payload.append("Roles", formData.roles);
+
+    if (formData.imageFile) {
+      payload.append("Image", formData.imageFile);
+    }
+
+    try {
+      const updated = await updateUser(payload).unwrap();
+      console.log("UPDATED USER:", updated);
+      closeModal();
+    } catch (error) {
+      console.error("Update failed", error);
+    }
+  };
+
   return (
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -57,7 +126,7 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                   Номер телефону
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  - - -
+                  {user.phoneNumber}
                 </p>
               </div>
 
@@ -99,86 +168,107 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
           <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
             <div className="px-2 pr-14">
               <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                Edit Personal Information
+                Редагувати особисту інформацію
               </h4>
               <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-                Update your details to keep your profile up-to-date.
+                Оновіть свої дані, щоб ваш профіль залишався актуальним.
               </p>
             </div>
             <form className="flex flex-col">
               <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-                <div>
-                  <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                    Social Links
-                  </h5>
 
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                    <div>
-                      <Label>Facebook</Label>
-                      <Input
-                          type="text"
-                          value="https://www.facebook.com/PimjoHQ"
-                      />
-                    </div>
+                <div className="flex justify-center">
+                  <div className="relative w-[150px] h-[150px] rounded-full overflow-hidden group">
+                    {/* IMAGE */}
+                    <img
+                        src={preview || noimage}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                    />
 
-                    <div>
-                      <Label>X.com</Label>
-                      <Input type="text" value="https://x.com/PimjoHQ" />
-                    </div>
+                    img src={`${urlUserImage}/200_${user.image}`} alt="user" /
 
-                    <div>
-                      <Label>Linkedin</Label>
-                      <Input
-                          type="text"
-                          value="https://www.linkedin.com/company/pimjo"
-                      />
-                    </div>
+                    {/* HIDDEN FILE INPUT */}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePickImage}
+                        className="hidden"
+                        id="avatarUpload"
+                    />
 
-                    <div>
-                      <Label>Instagram</Label>
-                      <Input type="text" value="https://instagram.com/PimjoHQ" />
-                    </div>
+                    {/* OVERLAY BUTTON */}
+                    <label
+                        htmlFor="avatarUpload"
+                        className="
+                            absolute inset-0
+                            flex items-center justify-center
+                            bg-black/40 text-white text-sm font-medium
+                            opacity-0 group-hover:opacity-100
+                            transition-all duration-200
+                            cursor-pointer
+                          "
+                    >
+                      {preview ? "Змінити зображення" : "Обрати зображення"}
+                    </label>
                   </div>
                 </div>
+
                 <div className="mt-7">
                   <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                    Personal Information
+                    Особиста інформація
                   </h5>
 
                   <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                     <div className="col-span-2 lg:col-span-1">
-                      <Label>First Name</Label>
-                      <Input type="text" value="Musharof" />
+                      <Label>Ім'я</Label>
+                      <Input
+                          value={formData.firstName}
+                          onChange={e => handleChange("firstName", e.target.value)}
+                      />
                     </div>
 
                     <div className="col-span-2 lg:col-span-1">
-                      <Label>Last Name</Label>
-                      <Input type="text" value="Chowdhury" />
+                      <Label>Прізвище</Label>
+                      <Input
+                          value={formData.lastName}
+                          onChange={e => handleChange("lastName", e.target.value)}
+                      />
                     </div>
 
                     <div className="col-span-2 lg:col-span-1">
-                      <Label>Email Address</Label>
-                      <Input type="text" value="randomuser@pimjo.com" />
+                      <Label>Адреса електронної пошти</Label>
+                      <Input
+                          type="email"
+                          value={formData.email}
+                          onChange={e => handleChange("email", e.target.value)}
+                      />
                     </div>
 
                     <div className="col-span-2 lg:col-span-1">
-                      <Label>Phone</Label>
-                      <Input type="text" value="+09 363 398 46" />
+                      <Label>№ телефону</Label>
+                      <Input
+                          value={formData.phoneNumber}
+                          onChange={e => handleChange("phoneNumber", e.target.value)}
+                      />
                     </div>
 
                     <div className="col-span-2">
-                      <Label>Bio</Label>
-                      <Input type="text" value="Team Manager" />
+                      <Label>Ролі</Label>
+                      <Input
+                          value={formData.roles}
+                          onChange={e => handleChange("roles", e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
                 <Button size="sm" variant="outline" onClick={closeModal}>
-                  Close
+                  Закрити
                 </Button>
                 <Button size="sm" onClick={handleSave}>
-                  Save Changes
+                  Зберегти зміни
                 </Button>
               </div>
             </form>

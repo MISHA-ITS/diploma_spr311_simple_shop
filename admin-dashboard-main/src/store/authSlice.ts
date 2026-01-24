@@ -20,6 +20,8 @@ export const getUserFromToken = (token: string): IUser | null => {
         return {
             id: decodedToken.id,
             email: decodedToken.email,
+            firstName: decodedToken.firstName,
+            lastName: decodedToken.lastName,
             fullName: decodedToken.fullName,
             image: decodedToken.image,
             roles: roles,
