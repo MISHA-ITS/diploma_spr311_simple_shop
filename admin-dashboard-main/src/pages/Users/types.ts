@@ -11,6 +11,12 @@ export interface IUserItem {
     roles: string[];
 }
 
+export interface IUsersResponse {
+    payload: IUserItem[];
+    message: string;
+    isSuccess: boolean;
+}
+
 export interface IUserRowProps {
     user: IUserItem;
     initials: (name: string) => string;
@@ -18,6 +24,6 @@ export interface IUserRowProps {
 }
 
 export interface Props {
-    count: number;
+    count: number | undefined;
     children: React.ReactNode;
 }
