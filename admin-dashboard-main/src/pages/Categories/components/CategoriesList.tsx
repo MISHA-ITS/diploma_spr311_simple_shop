@@ -1,24 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import axios from "axios";
 import EnvConfig from "../../../config/env.ts";
 import {ICategory, ICategoryTreeNode} from "../../../types/Category/types.ts";
 import CategoriesCard from "./CategoriesCard.tsx";
 import CategoryRow from "./CategoryRow.tsx";
-import { TreeSelect } from 'antd';
-import {buildTree} from "../utils/funct.ts";
+import {Pagination, TreeSelect} from 'antd';
+import {buildTree} from "../utils/functions.ts";
 import { HiMiniXMark } from "react-icons/hi2";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 
 
-const urlCategories = `${EnvConfig.API_URL}/api/Category/list`;
+import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
 
 const CategoriesList: React.FC = () => {
     const [isDrawerOpen, setIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
     const [categories, setCategories] = useState<ICategory[]>([]);
+    const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [parentId, setParentId] = useState<number | null>(null);
     const [name, setName] = useState("");
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [total, setTotal] = useState(0);
+    const [isSearchVisible, setIsSearchVisible] = useState(false);
+    const [isParentSearchVisible, setIsParentSearchVisible] = useState(false);
+    const [filters, setFilters] = useState({
+        searchName: "",
+        parentName: ""
+    });
     const [categoryFilterData, setCategoryFilterData] = useState<{
         categoryTree: ICategoryTreeNode[];
         excludedFilters: number[];
@@ -31,6 +44,22 @@ const CategoriesList: React.FC = () => {
         setParentId(value);
     };
 
+    const toggleSearch = () => {
+        if (isSearchVisible) {
+            setFilters(prev => ({ ...prev, searchName: "" }));
+        }
+        setPage(1)
+        setIsSearchVisible(!isSearchVisible);
+    };
+
+    const toggleParentSearch = () => {
+        if (isParentSearchVisible) {
+            setFilters(prev => ({ ...prev, parentName: "" }));
+        }
+        setPage(1)
+        setIsParentSearchVisible(!isParentSearchVisible);
+    };
+
     const closeDrawer = () => {
         setIsOpen(false);
         setSelectedCategory(null);
@@ -38,31 +67,49 @@ const CategoriesList: React.FC = () => {
         setPreviewUrl(null);
     };
 
+    const loadAllCategories = async () => {
+        try {
+            const resp = await axios.get(
+                `${EnvConfig.API_URL}/api/Category/list`
+            );
+
+            setAllCategories(resp.data.payload ?? []);
+        } catch (err) {
+            console.error("Помилка завантаження всіх категорій:", err);
+        }
+    };
+
     const refreshCategories = async () => {
         try {
-            const resp = await axios.get(urlCategories);
-            setCategories(resp.data.payload);
+            const resp = await axios.get(`${EnvConfig.API_URL}/api/Category/page`,
+                {
+                    params:{
+                        page,
+                        size:pageSize,
+                        searchName: filters.searchName,
+                        parentName: filters.parentName
+                    }
+                });
+            setCategories(resp.data.payload.items ?? []);
+            setTotal(resp.data.payload.total ?? 0);
         } catch (err) {
-            console.error("Помилка при оновленні списку:", err);
+            console.error("Помилка при оновленні списку виникла помилка:", err);
         }
     };
 
     useEffect(() => {
-        axios.get(urlCategories)
-            .then(resp => {
-                console.log("Categories API:", resp.data);
-                setCategories(resp.data.payload);
-            })
-            .catch(err => {
-                console.error("Categories error", err);
-            });
+        refreshCategories();
+    }, [page, pageSize, filters]);
+
+    useEffect(() => {
+        loadAllCategories();
     }, []);
 
     useEffect(() => {
         if (!categories.length) return;
 
         const tree = buildTree(
-            categories,
+            allCategories,
             null,
             selectedCategory ? [selectedCategory.id] : []
         );
@@ -71,7 +118,7 @@ const CategoriesList: React.FC = () => {
             ...prev,
             categoryTree: tree,
         }));
-    }, [categories, selectedCategory]);
+    }, [allCategories, selectedCategory]);
 
     //скрол
     useEffect(() => {
@@ -104,16 +151,31 @@ const CategoriesList: React.FC = () => {
     };
 
     const handleDeleteCategory = async (categoryId: number) => {
-        if (!confirm("Ви впевнені, що хочете видалити категорію?")) return;
-        const resp = await axios.delete(`${EnvConfig.API_URL}/api/Category/Delete/${categoryId}`, {
-            params: { id: categoryId }
+        const result = await Swal.fire({
+            title: 'Ви впевнені?',
+            text: "Цю дію неможливо буде скасувати!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Так, видалити!',
+            cancelButtonText: 'Скасувати',
+            backdrop: false
         });
 
-        if (resp.status === 200 || resp.data.isSuccess) {
-            setCategories(
-                prev => prev.filter(c => c.id !== categoryId)
-            );
-            // alert("Категорію видалено");
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`${EnvConfig.API_URL}/api/Category/Delete/${categoryId}`, {
+                    params: { id: categoryId }
+                });
+
+                setCategories(prev => prev.filter(c => c.id !== categoryId));
+
+                toast.success("Категорію успішно видалено!");
+            } catch (error) {
+                console.error(error);
+                toast.error("Помилка при видаленні категорії.");
+            }
         }
     };
 
@@ -151,31 +213,78 @@ const CategoriesList: React.FC = () => {
                 await axios.post(`${EnvConfig.API_URL}/api/Category/create`, formData);
             }
 
-            refreshCategories()
+            await refreshCategories()
+            await loadAllCategories();
             closeDrawer()
-            //Змініти на react toastify
-            alert(selectedCategory ? "Оновлено" : "Створено");
+            toast.success(selectedCategory ? "Категорія оновлена" : "Категорія створена");
 
         } catch (error) {
             console.error(error);
-            //Змініти на react toastify
-            alert(selectedCategory ? "Помилка при оновлені" : "Помилка при створені");
+            toast.error(selectedCategory ? "Помилка при оновлені" : "Помилка при створені");
         }
     };
 
     return (
-        <div className="w-full">
+        <div className="relative w-full pb-24">
 
-            <CategoriesCard count={categories.length} onCreate={handleCreateCategory} onRefresh={refreshCategories}>
+            <CategoriesCard count={total} onCreate={handleCreateCategory} onRefresh={refreshCategories}>
                 <table className="min-w-full text-left">
-                    <thead className="bg-neutral-50 text-xs uppercase">
-                    <tr>
-                        <th className="px-4 py-2">ID</th>
-                        <th className="px-4 py-2">Назва</th>
-                        <th className="px-4 py-2">Батьківська категорія</th>
-                        <th className="px-4 py-2">Дочірні категорії</th>
-                        <th className="px-4 py-2 text-center">Дії</th>
-                    </tr>
+                    <thead className="bg-blue-50/50 dark:bg-blue-900/10 text-xs uppercase text-blue-900/70 dark:text-blue-300">
+                        <tr>
+                            <th className="px-4 py-2">ID</th>
+
+                            <th className="px-4 py-4 min-w-[200px]">
+                                <div className="flex items-center justify-between group">
+                                    <span className={isSearchVisible ? "hidden" : "block"}>Назва</span>
+
+                                    <div className={`flex items-center gap-2 transition-all duration-300 ${isSearchVisible ? "w-full" : "w-auto"}`}>
+                                        {isSearchVisible && (
+                                            <input
+                                                autoFocus
+                                                value={filters.searchName}
+                                                onChange={(e) => setFilters(prev => ({ ...prev, searchName: e.target.value }))}
+                                                placeholder="Шукати..."
+                                                className="w-full bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                            />
+                                        )}
+                                        <button
+                                            onClick={toggleSearch}
+                                            className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-blue-500 transition-colors"
+                                        >
+                                            {isSearchVisible ? <HiXMark size={18} /> : <HiMagnifyingGlass size={18} />}
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+
+                            <th className="px-4 py-4 min-w-[250px]">
+                                <div className="flex items-center justify-between">
+                                    <span className={isParentSearchVisible ? "hidden" : "block"}>Батьківська</span>
+
+                                    <div className={`flex items-center gap-2 transition-all duration-300 ${isParentSearchVisible ? "w-full" : "w-auto"}`}>
+                                        {isParentSearchVisible && (
+                                            <input
+                                                autoFocus
+                                                value={filters.parentName}
+                                                onChange={(e) => setFilters(prev => ({ ...prev, parentName: e.target.value }))}
+                                                placeholder="Пошук батьківської..."
+                                                className="w-full bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                            />
+                                        )}
+                                        <button
+                                            onClick={toggleParentSearch}
+                                            className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-blue-500 transition-colors"
+                                        >
+                                            {isParentSearchVisible ? <HiXMark size={18} /> : <HiMagnifyingGlass size={18} />}
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+
+                            <th className="px-4 py-2">Дочірні категорії</th>
+
+                            <th className="px-4 py-2 text-center">Дії</th>
+                        </tr>
                     </thead>
 
                     <tbody className="divide-y divide-black/5 dark:divide-white/10">
@@ -190,6 +299,21 @@ const CategoriesList: React.FC = () => {
                     </tbody>
                 </table>
             </CategoriesCard>
+
+            {/*Pagination*/}
+            <div className="bg-white dark:bg-neutral-800 px-6 py-2 rounded-2xl shadow-sm border border-blue-50 dark:border-blue-700/30">
+                <Pagination
+                    align="center"
+                    current={page}
+                    pageSize={pageSize}
+                    total={total}
+                    showSizeChanger
+                    onChange={(newPage, newSize) => {
+                        setPage(newPage);
+                        setPageSize(newSize);
+                    }}
+                />
+            </div>
 
             {/* Overlay  */}
             {isDrawerOpen && (
@@ -284,6 +408,18 @@ const CategoriesList: React.FC = () => {
                     </div>
                 </form>
             </div>
+            <ToastContainer
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 };

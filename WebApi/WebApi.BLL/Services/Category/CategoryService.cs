@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using WebApi.BLL.DTOs;
 using WebApi.BLL.DTOs.Category;
 using WebApi.BLL.Extensions;
 using WebApi.BLL.Services.Image;
@@ -85,7 +86,7 @@ namespace WebApi.BLL.Services.Category
             //var entities = categoryRepository.GetAll();
             //var dtos = mapper.Map<List<CategoryDTO>>(await entities.ToListAsync());
 
-            var dtos = await mapper.ProjectTo<CategoryDTO>(categoryRepository.GetAll()).ToListAsync();
+            var dtos = await mapper.ProjectTo<CategoryDTO>(categoryRepository.GetAll()).OrderBy(x => x.Id).ToListAsync();
 
             logger.LogInformation("Retrieved {Count} categories", dtos.Count);
 
@@ -174,6 +175,48 @@ namespace WebApi.BLL.Services.Category
                 logger.LogError(ex, "Error deleting category image {ImageUrl}", url);
                 return ServiceResponse.Error($"Error deleting category image: {ex.Message}");
             }
+        }
+
+        public async Task<ServiceResponse> GetPageAsync(int page, int size, string? searchName, string? parentName)
+        {
+            var query = mapper.ProjectTo<CategoryDTO>(
+                categoryRepository.GetAll().OrderBy(x => x.Id).AsNoTracking()
+            );
+
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                query = query.Where(x =>
+                    x.Name.ToLower().Contains(searchName.ToLower())
+                );
+            }
+
+            if (!string.IsNullOrWhiteSpace(parentName))
+            {
+                query = query.Where(x =>
+                    x.ParentName != null &&
+                    x.ParentName.ToLower().Contains(parentName.ToLower())
+                );
+            }
+
+            var total = await query.CountAsync();
+
+            var items = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            var result = new PageResponseDTO<CategoryDTO>
+            {
+                Total = total,
+                Items = items
+            };
+
+            logger.LogInformation("Categories page received. Size={Size}, Total={Total}, searchName={searchName}, parentName={parentName}", size, total, searchName, parentName);
+
+            return ServiceResponse.Success(
+                "Categories retrieved successfully",
+                result
+            );
         }
     }
 }
