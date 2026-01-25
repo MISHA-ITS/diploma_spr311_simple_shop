@@ -19,6 +19,7 @@ const CategoriesCard: React.FC<Props> = ({ count, children, onCreate, onRefresh 
 
     return (
         <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl shadow-blue-500/5 overflow-hidden border border-blue-100 dark:border-blue-900/30">
+
             <div className="flex items-center justify-between px-6 py-5 border-b border-blue-50 dark:border-blue-900/20 bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/10">
                 <div>
                     <h2 className="text-2xl font-black text-neutral-800 dark:text-white tracking-tight">

@@ -30,9 +30,9 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     }
 
     [HttpGet("page")]
-    public async Task<IActionResult> GetPage(int page = 1, int size = 10)
+    public async Task<IActionResult> GetPage(int page = 1, int size = 10, string? searchName ="", string? parentName="")
     {
-        var result = await categoryService.GetPageAsync(page, size);
+        var result = await categoryService.GetPageAsync(page, size ,searchName, parentName);
         return Ok(result);
     }
 
