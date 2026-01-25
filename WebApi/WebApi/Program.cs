@@ -14,7 +14,7 @@ using WebApi.BLL;
 using WebApi.BLL.Configuration;
 using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Account;
-using WebApi.BLL.Services.advertisement;
+using WebApi.BLL.Services.Advertisement;
 using WebApi.BLL.Services.Category;
 using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
@@ -25,12 +25,15 @@ using WebApi.BLL.Services.User;
 using WebApi.DAL;
 using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Entities.NewPostEntities;
-using WebApi.DAL.Repositories.advertisements;
+using WebApi.DAL.Repositories.Advertisements;
 using WebApi.DAL.Repositories.Category;
 using WebApi.DAL.Repositories.NewPost;
 using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddControllers();
 
 // Add services to the container.
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -54,6 +57,20 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+// Add identity
+builder.Services
+    .AddIdentity<AppUser, AppRole>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+        // password settings
+        options.Password.RequiredUniqueChars = 0;
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 //Add Jwt
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -120,19 +137,7 @@ builder.Services.AddHttpClient();
 var EmailSection = builder.Configuration.GetSection("EmailSettings");
 builder.Services.Configure<EmailSettings>(EmailSection);
 
-// Add identity
-builder.Services
-    .AddIdentity<AppUser, AppRole>(options =>
-    {
-        options.User.RequireUniqueEmail = true;
-        // password settings
-        options.Password.RequiredUniqueChars = 0;
-        options.Password.RequireDigit = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireNonAlphanumeric = false;
-    })
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+
 
 //Add automapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -158,7 +163,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .Enrich.FromLogContext();
 });
 
-builder.Services.AddControllers();
+
 
 builder.Services.AddCors();
 

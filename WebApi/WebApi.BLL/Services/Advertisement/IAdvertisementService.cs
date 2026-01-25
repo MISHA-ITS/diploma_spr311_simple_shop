@@ -1,6 +1,6 @@
-﻿using WebApi.BLL.DTOs.advertisement;
+﻿using WebApi.BLL.DTOs.Advertisement;
 
-namespace WebApi.BLL.Services.advertisement
+namespace WebApi.BLL.Services.Advertisement
 {
     public interface IAdvertisementService
     {
@@ -8,6 +8,6 @@ namespace WebApi.BLL.Services.advertisement
         Task<ServiceResponse> UpdateAsync(UpdateAdvertisementDTO dto);
         Task<ServiceResponse> DeleteAsync(long id);
         Task<ServiceResponse> GetByIdAsync(long id);
-        Task<ServiceResponse> GetAllAsync(advertisementFilterDto filter);
+        Task<ServiceResponse> GetAllAsync(AdvertisementFilterDto filter);
     }
 }

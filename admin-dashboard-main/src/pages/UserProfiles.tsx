@@ -14,6 +14,7 @@ const urlUser = `${EnvConfig.API_URL}/api/User/Get?id`;
 const UserProfiles: React.FC = () => {
 
     const { id } = useParams<{id:string}>();
+    console.log("id", id);
     const [user, setUser] = useState<IUserItem | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -47,11 +48,8 @@ const UserProfiles: React.FC = () => {
                 title="React.js Profile Dashboard | TailAdmin - Next.js Admin Dashboard Template"
                 description="This is React.js Profile Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
             />
-            <PageBreadcrumb pageTitle="Profile" />
+            <PageBreadcrumb pageTitle="Профіль користувача" />
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-                <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-                    Профіль користувача
-                </h3>
                 <div className="space-y-6">
                     <UserMetaCard user={user} />
                     <UserInfoCard user={user} />

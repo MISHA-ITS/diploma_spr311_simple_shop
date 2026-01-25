@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace WebApi.BLL.DTOs.advertisement
+namespace WebApi.BLL.DTOs.Advertisement
 {
     public class CreateAdvertisementDTO
     {

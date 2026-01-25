@@ -3,11 +3,11 @@ import * as React from "react";
 import {Link} from "react-router-dom";
 import EnvConfig from "../../config/env.ts";
 
-const urlUserImage = `${EnvConfig.API_URL}/images/users`;
+const urlUserImage = `${EnvConfig.API_URL}/images`;
 
 const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser}) => {
     return (
-        <div key={user.id}
+        <div
              className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm ring-1 ring-black/5 p-4">
             <div className="flex items-center gap-3">
                 <div

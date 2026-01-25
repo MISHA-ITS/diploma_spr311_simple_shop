@@ -3,10 +3,28 @@ export interface IUserItem {
     email: string;
     firstName: string;
     lastName: string;
+    fullName: string;
+    phoneNumber: string | null;
     image: string | null;
     dateCreated: string;
     dateOnline: string;
     roles: string[];
+}
+
+export interface IUsersResponse {
+    payload: IUserItem[];
+    message: string;
+    isSuccess: boolean;
+}
+
+export interface IUserUpdate {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string | null;
+    roles: string;
+    imageFile: File | null,
 }
 
 export interface IUserRowProps {
@@ -16,6 +34,6 @@ export interface IUserRowProps {
 }
 
 export interface Props {
-    count: number;
+    count: number | undefined;
     children: React.ReactNode;
 }
