@@ -26,6 +26,7 @@ export default function UserDropdown() {
   }
 
   const {user} = useAppSelector(globalState => globalState.auth);
+  console.log("UserDropdown user:", user);
 
   return (
     <div className="relative">
