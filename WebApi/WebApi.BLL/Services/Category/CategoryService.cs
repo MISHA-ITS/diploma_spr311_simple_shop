@@ -166,7 +166,7 @@ namespace WebApi.BLL.Services.Category
 
             try
             {
-                await imageService.DeleteImageAsync(url, Settings.CategoriesDir);
+                await imageService.DeleteImageAsync(url, "");
                 logger.LogInformation("Deleted image {ImageUrl}", url);
                 return null;
             }

@@ -3,15 +3,19 @@ import {apiAccount} from "../services/apiAccount.ts";
 import {apiUser} from "../services/apiUser.ts";
 import authReducer from "./authSlice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
+import {categoryApi} from "./api/categoryApi.ts";
 
 export const store = configureStore({
     reducer: {
+        [categoryApi.reducerPath]: categoryApi.reducer,
         [apiAccount.reducerPath]: apiAccount.reducer,
         [apiUser.reducerPath]: apiUser.reducer,
         auth: authReducer
+
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
+            categoryApi.middleware,
             apiAccount.middleware,
             apiUser.middleware
         )
