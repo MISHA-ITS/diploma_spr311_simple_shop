@@ -9,6 +9,7 @@ export interface IUserItem {
     dateCreated: string;
     dateOnline: string;
     roles: string[];
+    lockoutEnd?: string | null;
 }
 
 export interface IUsersResponse {
@@ -31,6 +32,8 @@ export interface IUserRowProps {
     user: IUserItem;
     initials: (name: string) => string;
     onDeleteUser: (userId: number) => Promise<void>;
+    onToggleLock: (user: IUserItem) => void | Promise<void>;
+    //onEditUser: (user: IUserItem) => void;
 }
 
 export interface Props {

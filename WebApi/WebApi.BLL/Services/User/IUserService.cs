@@ -9,4 +9,6 @@ public interface IUserService
     Task<ServiceResponse> DeleteAsync(long id);
     Task<ServiceResponse?> GetByIdAsync(long id);
     Task<ServiceResponse> GetAllAsync();
+    Task<ServiceResponse> LockUserAsync(long userId, TimeSpan? duration = null);
+    Task<ServiceResponse> UnlockUserAsync(long userId);
 }

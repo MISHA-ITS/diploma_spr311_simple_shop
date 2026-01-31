@@ -155,4 +155,46 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
         return ServiceResponse.Success("Користувача успішно оновлено");
     }
 
+    public async Task<ServiceResponse> LockUserAsync(long userId, TimeSpan? duration = null)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            return ServiceResponse.Error("Користувача не знайдено");
+
+        // дозволити блокування якщо раптом вимкнено
+        if (!user.LockoutEnabled)
+            await userManager.SetLockoutEnabledAsync(user, true);
+
+        // якщо не передали — блокуємо на 30 днів
+        var lockTime = duration ?? TimeSpan.FromDays(30);
+
+        await userManager.SetLockoutEndDateAsync(
+            user,
+            DateTimeOffset.UtcNow.Add(lockTime)
+        );
+
+        return ServiceResponse.Success("Користувача заблоковано");
+    }
+
+    public async Task<ServiceResponse> UnlockUserAsync(long userId)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            return ServiceResponse.Error("Користувача не знайдено");
+
+        await userManager.SetLockoutEndDateAsync(user, null);
+        await userManager.ResetAccessFailedCountAsync(user);
+
+        return ServiceResponse.Success("Користувача розблоковано");
+    }
+
+    public async Task<bool> IsUserLockedAsync(long userId)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null) return false;
+
+        return await userManager.IsLockedOutAsync(user);
+    }
 }

@@ -1,17 +1,26 @@
 // import {useEffect, useState} from "react";
-import axios from "axios";
+//import axios from "axios";
 // import {IUserItem} from "./types.ts";
 import UserRow from "./UserRow.tsx";
-import EnvConfig from "../../config/env.ts";
+//import EnvConfig from "../../config/env.ts";
 import UserRowMobile from "./UserRowMobile.tsx";
 import UsersCard from "./UsersCard.tsx";
-import {useGetAllListQuery} from "../../services/apiUser.ts";
+import {
+    useGetAllListQuery,
+    useDeleteUserMutation,
+    useLockUserMutation,
+    useUnlockUserMutation
+} from "../../services/apiUser.ts";
+import {IUserItem} from "./types.ts";
 
 const UsersList : React.FC = () => {
 
     // const urlUsers = `${EnvConfig.API_URL}/api/User/GetAll/List`;
-    const urlUsersImages = `${EnvConfig.API_URL}/images/users`;
+    //const urlUsersImages = `${EnvConfig.API_URL}/images/users`;
     const {data} = useGetAllListQuery();
+    const [deleteUser] = useDeleteUserMutation();
+    const [lockUser] = useLockUserMutation();
+    const [unlockUser] = useUnlockUserMutation();
 
     const users = data?.payload;
     // const [users, setUsers] = useState<IUserItem[]>([])
@@ -34,7 +43,22 @@ const UsersList : React.FC = () => {
     //     }
     // }, [users]);
 
-    const handleDeleteUser = async (userId: number) => {
+    const handleToggleLock = async (user: IUserItem) => {
+        try {
+            if (user.lockoutEnd && new Date(user.lockoutEnd) > new Date()) {
+                await unlockUser(user.id).unwrap();
+                alert(`Користувача ${user.fullName} розблоковано`);
+            } else {
+                await lockUser(user.id).unwrap();
+                alert(`Користувача ${user.fullName} заблоковано`);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Помилка при зміні статусу блокування");
+        }
+    };
+
+    const handleDeleteUser = async (id: number) => {
         if (!confirm("Ви впевнені, що хочете видалити користувача?")) return;
 
         try {
@@ -46,6 +70,8 @@ const UsersList : React.FC = () => {
             // alert("Користувача успішно видалено");
             //
             // setUsers(prev => prev.filter(u => u.id !== userId));
+            const res = await deleteUser(id).unwrap();
+            console.log(res);
         } catch (error: any) {
             console.error(error);
             alert(
@@ -82,6 +108,7 @@ const UsersList : React.FC = () => {
                                         user={u}
                                         initials={() => u.firstName[0] + u.lastName[0]}
                                         onDeleteUser={handleDeleteUser} // <-- передаємо callback
+                                        onToggleLock={handleToggleLock}
                                     />
                                 ))}
                                 </tbody>
@@ -101,6 +128,7 @@ const UsersList : React.FC = () => {
                                     user={u}
                                     initials={() => u.firstName[0] + u.lastName[0]}
                                     onDeleteUser={handleDeleteUser} // <-- передаємо callback
+                                    onToggleLock={handleToggleLock}
                                 />
                             ))}
                             </tbody>

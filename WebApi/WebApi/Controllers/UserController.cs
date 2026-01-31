@@ -42,4 +42,18 @@ public class UserController(IUserService userService) : ControllerBase
         var response = await userService.GetAllAsync();
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
+
+    [HttpPost]
+    public async Task<IActionResult> Lock(long id)
+    {
+        var response = await userService.LockUserAsync(id);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Unlock(long id)
+    {
+        var response = await userService.UnlockUserAsync(id);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
 }

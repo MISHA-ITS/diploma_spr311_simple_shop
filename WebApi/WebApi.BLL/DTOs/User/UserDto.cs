@@ -10,5 +10,6 @@ public class UserDTO
     public string? Image { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateOnline { get; set; }
+    public DateTimeOffset? LockoutEnd { get; set; }
     public string[] Roles { get; set; } = [];
 }

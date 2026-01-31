@@ -4,6 +4,7 @@ import {IResponse} from "../types/Account/IRegisterRequest.ts";
 import {ILoginRequest} from "../types/Account/ILoginRequest.ts";
 import {IUserCreate} from "../types/IUserCreate.ts";
 import {IUserProfile} from "../types/Account/IUserProfile.ts";
+//import {serialize} from "object-to-formdata";
 //import {ILoginRequest, IResponse, IUserCreate} from "../models/account";
 
 export const apiAccount = createApi({
@@ -22,16 +23,17 @@ export const apiAccount = createApi({
         }),
         register: builder.mutation<IResponse, IUserCreate>({
             query: (user) => {
+                //const formData = serialize(user);
                 const formData = new FormData();
 
+                formData.append("Email", user.email);
+                formData.append("Password", user.password);
                 formData.append("FirstName", user.firstName);
                 formData.append("LastName", user.lastName);
                 formData.append("UserName", user.email);
-                formData.append("Email", user.email);
-                formData.append("Password", user.password);
 
                 if (user.imageFile instanceof File) {
-                    formData.append("Image", user.imageFile);
+                    formData.append("ImageFile", user.imageFile);
                 }
 
                 return {
