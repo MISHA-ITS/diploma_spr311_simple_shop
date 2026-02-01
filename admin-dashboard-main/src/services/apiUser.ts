@@ -60,7 +60,6 @@ export const apiUser = createApi({
             }),
             invalidatesTags: ["User"]
         }),
-
         unlockUser: builder.mutation<IResponse, number>({
             query: id => ({
                 url: `Unlock?id=${id}`,

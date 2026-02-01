@@ -2,7 +2,7 @@ import {IUserItem, IUserRowProps} from "./types.ts";
 import * as React from "react";
 import {Link} from "react-router-dom";
 import EnvConfig from "../../config/env.ts";
-import { Lock, Unlock, UserX, UserRoundPen } from "lucide-react";
+import { Lock, UserCheck, UserX, UserRoundPen, UserLock } from "lucide-react";
 
 const urlUserImage = `${EnvConfig.API_URL}/images/users`;
 
@@ -142,12 +142,12 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggl
                     >
                         {locked ? (
                             <>
-                                <Unlock size={14} />
+                                <UserCheck size={14} />
                                 Активувати
                             </>
                         ) : (
                             <>
-                                <Lock size={14} />
+                                <UserLock size={14} />
                                 Блокувати
                             </>
                         )}

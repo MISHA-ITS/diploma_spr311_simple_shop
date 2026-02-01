@@ -7,19 +7,20 @@ interface CountryCode {
 
 interface PhoneInputProps {
   countries: CountryCode[];
+  value: string; // 👈 ДОДАТИ
   placeholder?: string;
   onChange?: (phoneNumber: string) => void;
-  selectPosition?: "start" | "end"; // New prop for dropdown position
+  selectPosition?: "start" | "end";
 }
 
 const PhoneInput: React.FC<PhoneInputProps> = ({
   countries,
+  value,
   placeholder = "+1 (555) 000-0000",
   onChange,
   selectPosition = "start", // Default position is 'start'
 }) => {
   const [selectedCountry, setSelectedCountry] = useState<string>("US");
-  const [phoneNumber, setPhoneNumber] = useState<string>("+1");
 
   const countryCodes: Record<string, string> = countries.reduce(
     (acc, { code, label }) => ({ ...acc, [code]: label }),
@@ -29,18 +30,13 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCountry = e.target.value;
     setSelectedCountry(newCountry);
-    setPhoneNumber(countryCodes[newCountry]);
-    if (onChange) {
-      onChange(countryCodes[newCountry]);
-    }
+
+    const newValue = countryCodes[newCountry];
+    onChange?.(newValue);
   };
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPhoneNumber = e.target.value;
-    setPhoneNumber(newPhoneNumber);
-    if (onChange) {
-      onChange(newPhoneNumber);
-    }
+    onChange?.(e.target.value);
   };
 
   return (
@@ -87,7 +83,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
       {/* Input field */}
       <input
         type="tel"
-        value={phoneNumber}
+        value={value}
         onChange={handlePhoneNumberChange}
         placeholder={placeholder}
         className={`dark:bg-dark-900 h-11 w-full ${

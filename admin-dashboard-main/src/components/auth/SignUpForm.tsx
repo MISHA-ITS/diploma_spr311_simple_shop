@@ -19,6 +19,7 @@ const userInitState: IUserCreate = {
   firstName: "",
   lastName: "",
   password: "",
+  phoneNumber: "",
   imageFile: null,
 }
 
@@ -103,9 +104,9 @@ export default function SignUpForm() {
     }));
   };
 
-    const handlePhoneNumberChange = (phoneNumber: string) => {
-        console.log("Updated phone number:", phoneNumber);
-      };
+    // const handlePhoneNumberChange = (phoneNumber: string) => {
+    //     console.log("Updated phone number:", phoneNumber);
+    //   };
 
     // --- Google login ---
     const loginByGoogle = useGoogleLogin({
@@ -265,9 +266,9 @@ export default function SignUpForm() {
                           }
                         ]}
                       />
-                      {errors.firstName && (
+                      {errors.includes("firstName") && (
                           <p className="text-red-500 text-sm mt-1">
-                            {errors.firstName}
+                            Помилка в полі Імʼя
                           </p>
                       )}
                     </div>
@@ -434,10 +435,14 @@ export default function SignUpForm() {
                       Номер телефону<span className="text-error-500">*</span>
                     </Label>
                     <PhoneInput
-                        selectPosition="start"
                         countries={countries}
-                        placeholder="+3 (555) 000-0000"
-                        onChange={handlePhoneNumberChange}
+                        value={createUser.phoneNumber}
+                        onChange={(phone) =>
+                            setCreateUser(prev => ({
+                              ...prev,
+                              phoneNumber: phone
+                            }))
+                        }
                     />
                   </div>{" "}
                     <div className="flex items-center justify-center mb-2 min-h-[19px]">
