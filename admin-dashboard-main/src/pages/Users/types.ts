@@ -40,3 +40,22 @@ export interface Props {
     count: number | undefined;
     children: React.ReactNode;
 }
+
+export interface IUserPagedResponse {
+    payload: {
+        items: IUserItem[];
+        total: number;
+        pageNumber: number;
+        pageSize: number;
+    };
+    isSuccess: boolean;
+    message: string;
+}
+
+export interface IUserFilter {
+    pageNumber: number;
+    pageSize: number;
+    search?: string;
+    isLocked?: boolean;
+    roles?: string[];
+}

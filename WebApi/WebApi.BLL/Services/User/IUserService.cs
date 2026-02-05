@@ -8,7 +8,7 @@ public interface IUserService
     Task<ServiceResponse> UpdateAsync(UpdateUserDto dto);
     Task<ServiceResponse> DeleteAsync(long id);
     Task<ServiceResponse?> GetByIdAsync(long id);
-    Task<ServiceResponse> GetAllAsync();
+    Task<ServiceResponse> GetAllAsync(UserFilterDto filter);
     Task<ServiceResponse> LockUserAsync(long userId, TimeSpan? duration = null);
     Task<ServiceResponse> UnlockUserAsync(long userId);
 }

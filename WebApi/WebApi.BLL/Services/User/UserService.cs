@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BLL.Constatnts;
+using WebApi.BLL.DTOs;
 using WebApi.BLL.DTOs.User;
 using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Image;
@@ -79,13 +80,33 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
         return ServiceResponse.Error($"Не вдалося видалити користувача");
     }
 
-    public async Task<ServiceResponse> GetAllAsync()
+    public async Task<ServiceResponse> GetAllAsync(UserFilterDto filter)
     {
-        var users = await dbContext.Users
+        //var users = await dbContext.Users
+        //    .ProjectTo<UserDTO>(mapper.ConfigurationProvider)
+        //    .ToListAsync();
+
+        var query = dbContext.Users.AsQueryable();
+
+        query = FilterUsers(query, filter);
+
+        var totalCount = await query.CountAsync();
+
+        var users = await query
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
             .ProjectTo<UserDTO>(mapper.ConfigurationProvider)
             .ToListAsync();
 
-        return ServiceResponse.Success("Користувачів отримано", users);
+        var response = new PageResponseDTO<UserDTO>
+        {
+            Items = users,
+            Total = totalCount,
+            PageNumber = filter.PageNumber,
+            PageSize = filter.PageSize
+        };
+
+        return ServiceResponse.Success("Користувачів отримано", response);
     }
 
     public async Task<ServiceResponse?> GetByIdAsync(long id)
@@ -190,11 +211,46 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
         return ServiceResponse.Success("Користувача розблоковано");
     }
 
-    public async Task<bool> IsUserLockedAsync(long userId)
-    {
-        var user = await userManager.FindByIdAsync(userId.ToString());
-        if (user == null) return false;
+    //public async Task<bool> IsUserLockedAsync(long userId)
+    //{
+    //    var user = await userManager.FindByIdAsync(userId.ToString());
+    //    if (user == null) return false;
 
-        return await userManager.IsLockedOutAsync(user);
+    //    return await userManager.IsLockedOutAsync(user);
+    //}
+
+    private IQueryable<AppUser> FilterUsers(
+        IQueryable<AppUser> users,
+        UserFilterDto filter)
+    {
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+        {
+            var search = filter.Search.Trim().ToLower();
+
+            users = users.Where(u =>
+                u.Email!.ToLower().Contains(search) ||
+                u.FirstName!.ToLower().Contains(search) ||
+                u.LastName!.ToLower().Contains(search) ||
+                (u.FirstName + " " + u.LastName).ToLower().Contains(search)
+            );
+        }
+
+        if (filter.IsLocked.HasValue)
+        {
+            var now = DateTimeOffset.UtcNow;
+
+            users = filter.IsLocked.Value
+                ? users.Where(u => u.LockoutEnd > now)
+                : users.Where(u => u.LockoutEnd == null || u.LockoutEnd <= now);
+        }
+
+        if (filter.Roles is { Count: > 0 })
+        {
+            users = users.Where(u =>
+                u.UserRoles.Any(ur => filter.Roles.Contains(ur.Role!.Name!))
+            );
+        }
+
+        return users.OrderBy(u => u.Id);
     }
 }

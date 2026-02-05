@@ -46,7 +46,7 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggl
                         )}
                     </div>
                     <div>
-                        <div className="font-medium leading-tight">
+                        <div className="font-medium leading-tight text-neutral-700 dark:text-neutral-200">
                             {`${user.firstName} ${user.lastName}`}
                         </div>
                         <div className="text-xs text-neutral-500">
@@ -54,11 +54,7 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggl
                         </div>
                         <div>
                             {locked && (
-                                <span className="
-                                    text-xs font-semibold
-                                    text-red-700
-                                    dark:bg-red-900 dark:text-red-200
-                                ">
+                                <span className="text-xs font-semibold text-red-700 dark:text-red-400">
                                     Заблокований
                                 </span>
                             )}

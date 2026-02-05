@@ -1,7 +1,12 @@
 import {createBaseQuery} from "../utils/createBaseQuery.ts";
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {IUserProfile} from "../types/Account/IUserProfile.ts";
-import {IUsersResponse, IUserUpdate} from "../pages/Users/types.ts";
+import {
+    IUserFilter,
+    IUserPagedResponse,
+    //IUsersResponse,
+    IUserUpdate
+} from "../pages/Users/types.ts";
 import {serialize} from "object-to-formdata";
 import {IResponse} from "../types/Account/IRegisterRequest.ts";
 
@@ -10,8 +15,22 @@ export const apiUser = createApi({
     baseQuery: createBaseQuery("User"),
     tagTypes: ["User"],
     endpoints: (builder) => ({
-        getAllList: builder.query<IUsersResponse, void>({
-            query: () => 'GetAll/List',
+        // getAllList: builder.query<IUsersResponse, void>({
+        //     query: () => 'GetAll/List',
+        //     providesTags: ['User']
+        // }),
+        getAllList: builder.query<IUserPagedResponse, IUserFilter>({
+            query: params => ({
+                url: "GetAll/List",
+                params
+            }),
+            providesTags: ["User"]
+        }),
+        getPaged: builder.query<IUserPagedResponse, IUserFilter>({
+            query: params => ({
+                url: 'GetAll/List',
+                params
+            }),
             providesTags: ['User']
         }),
 

@@ -37,9 +37,9 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpGet("List")]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync([FromQuery] UserFilterDto filter)
     {
-        var response = await userService.GetAllAsync();
+        var response = await userService.GetAllAsync(filter);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
