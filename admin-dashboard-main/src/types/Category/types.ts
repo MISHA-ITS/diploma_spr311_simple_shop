@@ -7,14 +7,12 @@ export interface ICategory {
     childs: ICategory[],
 }
 
-///
 export interface ICategoryTreeNode {
     title: string;
     value: number;
     key: number;
     children?: ICategoryTreeNode[];
 }
-
 
 export interface ICategoryRowProps {
     category: ICategory;
@@ -28,10 +26,6 @@ export interface Props {
     onCreate?: () => void;
     onRefresh?: () => void;
 }
-
-export type CategoryNode = ICategory & {
-    children: CategoryNode[];
-};
 
 export interface ICategoryPageRequest {
     size?: number
