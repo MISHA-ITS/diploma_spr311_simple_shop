@@ -16,14 +16,14 @@ type Props = {
 };
 
 const UserInfoCard: React.FC<Props> = ({ user }) => {
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUser, { isLoading }] = useUpdateUserMutation();
   const { isOpen, openModal, closeModal } = useModal();
   const [preview, setPreview] = useState<string | null>(null);
 
   console.log("USER:", user);
 
   const [formData, setFormData] = useState<IUserUpdate>({
-      id: user.id,
+    id: user.id,
     firstName: "",
     lastName: "",
     email: "",
@@ -42,7 +42,7 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
           lastName: user.lastName,
           email: user.email,
           phoneNumber: user.phoneNumber,
-          roles: user.roles,
+          roles: user.roles.join(", "),
       });
 
       setPreview(
@@ -65,22 +65,9 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSave = async () => {
 
       console.log("handleSave called");
-    // const payload = new FormData();
-    //
-    // payload.append("Id", user.id.toString());
-    // payload.append("FirstName", formData.firstName);
-    // payload.append("LastName", formData.lastName);
-    // payload.append("Email", formData.email);
-    // payload.append("Phone", formData.phoneNumber);
-    // payload.append("Roles", formData.roles);
-    //
-    // if (formData.imageFile) {
-    //   payload.append("Image", formData.imageFile);
-    // }
 
     try {
       const updated = await updateUser(formData).unwrap();
@@ -254,7 +241,7 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                     <div className="col-span-2 lg:col-span-1">
                       <Label>№ телефону</Label>
                       <Input
-                          value={formData.phoneNumber}
+                          value={formData.phoneNumber ?? ""}
                           onChange={e => handleChange("phoneNumber", e.target.value)}
                       />
                     </div>
@@ -273,8 +260,8 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                 <Button size="sm" variant="outline" onClick={closeModal}>
                   Закрити
                 </Button>
-                <Button size="sm" onClick={handleSave}>
-                  Зберегти зміни
+                <Button size="sm" disabled={isLoading} onClick={handleSave}>
+                  {isLoading ? "Зберігаю..." : "Зберегти зміни"}
                 </Button>
               </div>
             </form>

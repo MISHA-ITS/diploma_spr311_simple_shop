@@ -1,75 +1,89 @@
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import * as React from "react";
-import {ChevronLeftIcon} from "../icons";
-import {useAppDispatch, useAppSelector} from "../store";
-import {logout} from "../store/authSlice.ts";
+import {useAppSelector} from "../store";
+import { UserOutlined, BellOutlined, HeartOutlined } from '@ant-design/icons';
 
 const SimpleHeader: React.FC = () => {
 
     const {user} = useAppSelector(globalState => globalState.auth);
 
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        try {
-            localStorage.removeItem("token"); // або localStorage.clear()
-            dispatch(logout());
-            navigate("/signin");
-        } catch (error) {
-            console.log("Logout error", error);
-        }
-    };
-
     return (
-        <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+        <header className="sticky top-0 z-50 w-full bg-[rgb(33,33,33)] dark:bg-gray-900 dark:border-gray-800">
             <div className="flex items-center justify-between px-6 py-4">
 
                 {/* Logo */}
                 <Link
                     to="/"
-                    className="text-lg font-semibold text-gray-800 dark:text-white"
+                    className="text-[36px] ml-50 font-inter uppercase text-[rgb(245,245,245)] dark:text-white"
                 >
-                    OLX™
+                    SELLIX
                 </Link>
 
                 {/* Right side */}
                 <div className="flex items-center gap-3">
+                    {user && 
+                        (
+                        <>
+                            <Link
+                                to="/"
+                                className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"
+                            >
+                                <span className="text-[22px]">
+                                    <BellOutlined />
+                                </span>
+                                <span className="text-[15px] font-inter">
+                                    Сповіщення
+                                </span>
+                            </Link>
+                            
+                            <Link
+                                to="/"
+                                className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"
+                            >
+                                <span className="text-[22px]">
+                                    <UserOutlined />
+                                </span>
+                                <span className="text-[15px] font-inter">
+                                    Профіль
+                                </span>
+                            </Link>
+
+                            <Link
+                                to="/"
+                                className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"
+                            >
+                                <span className="text-[22px]">
+                                    <HeartOutlined />
+                                </span>
+                                <span className="text-[15px] font-inter">
+                                    Вподобані
+                                </span>
+                            </Link>
+
+                            <Link
+                                to="/"
+                                className="rounded-md bg-gray-200 px-4 py-2 text-sm font-inter text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                            >
+                                <span className="text-[15px] font-inter">
+                                    Створити оголошення
+                                </span>
+                            </Link>
+
+                        </>
+                    )}
+
                     <ThemeToggleButton />
 
-                    {/* ❌ Не залогінений */}
                     {!user && (
                         <Link
                             to="/signin"
-                            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                            className="rounded-md text-[17px] bg-gray-200 px-6 py-2.5 text-sm font-inter text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                         >
-                            Вхід
-                        </Link>
-                    )}
-
-                    {/* ✅ Залогінений USER */}
-                    {user && user?.roles === "User" && (
-                        <button
-                            onClick={handleLogout}
-                            className="rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                        >
-                            Вихід
-                        </button>
-                    )}
-
-                    {/* 👑 Залогінений ADMIN */}
-                    {user && user?.roles === "Admin" && (
-                        <Link
-                            to="/admin"
-                            className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                        >
-                            <ChevronLeftIcon className="size-5" />
-                            Панель адміністратора
+                            Увійти
                         </Link>
                     )}
                 </div>
-
             </div>
         </header>
 

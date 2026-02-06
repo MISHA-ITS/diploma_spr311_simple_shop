@@ -1,16 +1,36 @@
 import {createBaseQuery} from "../utils/createBaseQuery.ts";
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {IUserProfile} from "../types/Account/IUserProfile.ts";
-import {IUsersResponse, IUserUpdate} from "../pages/Users/types.ts";
+import {
+    IUserFilter,
+    IUserPagedResponse,
+    //IUsersResponse,
+    IUserUpdate
+} from "../pages/Users/types.ts";
 import {serialize} from "object-to-formdata";
+import {IResponse} from "../types/Account/IRegisterRequest.ts";
 
 export const apiUser = createApi({
     reducerPath: "apiUser",
     baseQuery: createBaseQuery("User"),
     tagTypes: ["User"],
     endpoints: (builder) => ({
-        getAllList: builder.query<IUsersResponse, void>({
-            query: () => 'GetAll/List',
+        // getAllList: builder.query<IUsersResponse, void>({
+        //     query: () => 'GetAll/List',
+        //     providesTags: ['User']
+        // }),
+        getAllList: builder.query<IUserPagedResponse, IUserFilter>({
+            query: params => ({
+                url: "GetAll/List",
+                params
+            }),
+            providesTags: ["User"]
+        }),
+        getPaged: builder.query<IUserPagedResponse, IUserFilter>({
+            query: params => ({
+                url: 'GetAll/List',
+                params
+            }),
             providesTags: ['User']
         }),
 
@@ -28,6 +48,11 @@ export const apiUser = createApi({
                 try {
                     console.log("User info", updateUser);
                     const formData = serialize(updateUser);
+
+                    if (updateUser.imageFile instanceof File) {
+                        formData.append("Image", updateUser.imageFile);
+                    }
+
                     return {
                         url: 'update',
                         method: 'PUT',
@@ -35,12 +60,39 @@ export const apiUser = createApi({
                     }
                 }
                 catch {
-                    throw new Error('Error create category');
+                    throw new Error('Error update user');
                 }
             },
             invalidatesTags: ['User'],
         }),
+        deleteUser: builder.mutation<{ isSuccess: boolean; message: string }, number>({
+            query: (id) => ({
+                url: `delete?id=${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['User'],
+        }),
+        lockUser: builder.mutation<IResponse, number>({
+            query: id => ({
+                url: `Lock?id=${id}`,
+                method: "POST"
+            }),
+            invalidatesTags: ["User"]
+        }),
+        unlockUser: builder.mutation<IResponse, number>({
+            query: id => ({
+                url: `Unlock?id=${id}`,
+                method: "POST"
+            }),
+            invalidatesTags: ["User"]
+        }),
     }),
 });
 
-export const { useUpdateUserMutation, useGetAllListQuery } = apiUser;
+export const {
+    useUpdateUserMutation,
+    useGetAllListQuery,
+    useDeleteUserMutation,
+    useLockUserMutation,
+    useUnlockUserMutation,
+} = apiUser;
