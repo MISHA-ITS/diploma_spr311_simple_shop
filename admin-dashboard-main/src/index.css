@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap")
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@400;500;600;700&display=swap")
 layer(base);
 
 @import "tailwindcss";
@@ -188,6 +188,9 @@ layer(base);
   body {
     @apply relative font-normal font-outfit z-1 bg-gray-50;
   }
+  h1, h2, h3, h4, h5, h6 {
+font-family: 'Inter', sans-serif;
+}
 }
 
 @utility menu-item {
@@ -776,3 +779,11 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
 }
+
+@keyframes spin-once {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-once {
+  animation: spin-once 0.5s ease-in-out}

@@ -29,6 +29,13 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
     }
 
+    [HttpGet("page")]
+    public async Task<IActionResult> GetPage(int page = 1, int size = 10, string? searchName ="", string? parentName="")
+    {
+        var result = await categoryService.GetPageAsync(page, size ,searchName, parentName);
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id)
     {
