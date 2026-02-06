@@ -1,115 +1,171 @@
-// import {useEffect, useState} from "react";
-import axios from "axios";
-// import {IUserItem} from "./types.ts";
-import UserRow from "./UserRow.tsx";
-import EnvConfig from "../../config/env.ts";
-import UserRowMobile from "./UserRowMobile.tsx";
-import UsersCard from "./UsersCard.tsx";
-import {useGetAllListQuery} from "../../services/apiUser.ts";
+import { useState } from "react";
+import UserRow from "./UserRow";
+import UserRowMobile from "./UserRowMobile";
+import UsersCard from "./UsersCard";
+import Pagination from "./Pagination";
 
-const UsersList : React.FC = () => {
+import {
+    useGetAllListQuery,
+    useDeleteUserMutation,
+    useLockUserMutation,
+    useUnlockUserMutation
+} from "../../services/apiUser";
 
-    // const urlUsers = `${EnvConfig.API_URL}/api/User/GetAll/List`;
-    const urlUsersImages = `${EnvConfig.API_URL}/images/users`;
-    const {data} = useGetAllListQuery();
+import { IUserItem } from "./types";
+import UsersLockedFilter from "./UsersLockedFilter.tsx";
+import UsersSearch from "./UsersSearch.tsx";
+import UsersRolesFilter from "./UsersRolesFilter.tsx";
 
-    const users = data?.payload;
-    // const [users, setUsers] = useState<IUserItem[]>([])
+const UsersList: React.FC = () => {
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(5);
 
-    // useEffect(() => {
-    //     axios.get(urlUsers)
-    //         .then(resp => {
-    //             console.log("API DATA:", resp.data);
-    //             setUsers(resp.data.payload);
-    //         })
-    //         .catch(error => {
-    //             console.log("axios error", error);
-    //         })
-    //     console.log("Working useEffect", urlUsers);
-    // }, []);
-    //
-    // useEffect(() => {
-    //     if (users.length > 0) {
-    //         console.log(`${urlUsersImages}/50_${users[0].image}`);
-    //     }
-    // }, [users]);
+    const [filters, setFilters] = useState<{
+        search: string;
+        isLocked?: boolean;
+        roles: string[];
+    }>({
+        search: "",
+        isLocked: undefined,
+        roles: []
+    });
 
-    const handleDeleteUser = async (userId: number) => {
-        if (!confirm("Ви впевнені, що хочете видалити користувача?")) return;
+    const { data } = useGetAllListQuery({
+        pageNumber: page,
+        pageSize,
+        search: filters.search || undefined,
+        isLocked: filters.isLocked,
+        roles: filters.roles.length ? filters.roles : undefined
+    });
+
+    const users = data?.payload.items ?? [];
+    const total = data?.payload.total ?? 0;
+
+    const [deleteUser] = useDeleteUserMutation();
+    const [lockUser] = useLockUserMutation();
+    const [unlockUser] = useUnlockUserMutation();
+
+
+    const handleToggleLock = async (user: IUserItem) => {
+        const isLocked =
+            user.lockoutEnd && new Date(user.lockoutEnd) > new Date();
 
         try {
-            // await axios.delete(
-            //     `${EnvConfig.API_URL}/api/User/Delete`,
-            //     { params: { id: userId } }
-            // );
-            //
-            // alert("Користувача успішно видалено");
-            //
-            // setUsers(prev => prev.filter(u => u.id !== userId));
-        } catch (error: any) {
-            console.error(error);
+            if (isLocked) {
+                await unlockUser(user.id).unwrap();
+            } else {
+                await lockUser(user.id).unwrap();
+            }
+
             alert(
-                error?.response?.data?.message ??
-                "Помилка при видаленні користувача"
+                `Користувача ${
+                    user.fullName ?? `${user.firstName} ${user.lastName}`
+                } ${isLocked ? "розблоковано" : "заблоковано"}`
             );
+        } catch {
+            alert("Помилка при зміні статусу");
         }
     };
 
-    // console.log("UsersList", users);
+    const handleDeleteUser = async (id: number) => {
+        if (!confirm("Видалити користувача?")) return;
+        try {
+            await deleteUser(id).unwrap();
+        } catch {
+            alert("Помилка при видаленні");
+        }
+    };
 
     return (
-        <>
-            <div className="w-full">
+        <div className="w-full space-y-4">
+            {/* DESKTOP */}
+            <div className="hidden md:block overflow-x-auto">
+                <UsersCard count={total}>
+                    <table className="min-w-full text-left align-middle text-neutral-700 dark:text-neutral-200">
+                        <thead className="bg-neutral-200 dark:bg-neutral-700 text-xs uppercase text-center">
+                        <tr>
+                            <th className="px-5 py-3">ID</th>
 
-                {/* Desktop */}
-                <div className="hidden md:block overflow-x-auto">
-                    <UsersCard count={users?.length}>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-left align-middle">
-                                <thead className="bg-neutral-50 dark:bg-neutral-500 text-xs text-center uppercase">
-                                <tr>
-                                    <th className="px-5 py-3">ID</th>
-                                    <th className="px-5 py-3">Користувач</th>
-                                    <th className="px-5 py-3">Електронна адреса</th>
-                                    <th className="px-5 py-3">Ролі</th>
-                                    <th className="px-5 py-3">Дії</th>
-                                </tr>
-                                </thead>
-                                <tbody className="divide-y divide-black/5 dark:divide-white/10">
-                                {users?.map(u => (
-                                    <UserRow
-                                        key={u.id}
-                                        user={u}
-                                        initials={() => u.firstName[0] + u.lastName[0]}
-                                        onDeleteUser={handleDeleteUser} // <-- передаємо callback
-                                    />
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </UsersCard>
-                </div>
-
-                {/* Mobile */}
-                <div className="md:hidden mt-4">
-                    <UsersCard count={users?.length}>
-                        <table className="min-w-full">
-                            <tbody className="divide-y divide-black/5 dark:divide-white/10">
-                            {users?.map(u => (
-                                <UserRowMobile
-                                    key={u.id}
-                                    user={u}
-                                    initials={() => u.firstName[0] + u.lastName[0]}
-                                    onDeleteUser={handleDeleteUser} // <-- передаємо callback
+                            <th className="px-5 py-3">
+                                <UsersLockedFilter
+                                    value={filters.isLocked}
+                                    onChange={value => {
+                                        setPage(1);
+                                        setFilters(p => ({ ...p, isLocked: value }));
+                                    }}
                                 />
-                            ))}
-                            </tbody>
-                        </table>
-                    </UsersCard>
-                </div>
+                            </th>
+
+                            <th className="px-5 py-3">
+                                <UsersSearch
+                                    value={filters.search}
+                                    onChange={value => {
+                                        setPage(1);
+                                        setFilters(p => ({ ...p, search: value }));
+                                    }}
+                                    onClear={() => {
+                                        setPage(1);
+                                        setFilters(p => ({ ...p, search: "" }));
+                                    }}
+                                />
+                            </th>
+
+                            <th className="px-5 py-3">
+                                <UsersRolesFilter
+                                    roles={filters.roles}
+                                    onChange={roles => {
+                                        setPage(1);
+                                        setFilters(p => ({ ...p, roles }));
+                                    }}
+                                />
+                            </th>
+
+                            <th className="px-5 py-3">Дії</th>
+                        </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-black/5 dark:divide-white/10">
+                        {users.map(u => (
+                            <UserRow
+                                key={u.id}
+                                user={u}
+                                initials={() =>
+                                    `${u.firstName?.[0] ?? ""}${u.lastName?.[0] ?? ""}`
+                                }
+                                onDeleteUser={handleDeleteUser}
+                                onToggleLock={handleToggleLock}
+                            />
+                        ))}
+                        </tbody>
+                    </table>
+                </UsersCard>
             </div>
-        </>
-    )
-}
+
+            {/* MOBILE */}
+            <div className="md:hidden">
+                <UsersCard count={total}>
+                    {users.map(u => (
+                        <UserRowMobile
+                            key={u.id}
+                            user={u}
+                            initials={() =>
+                                `${u.firstName?.[0] ?? ""}${u.lastName?.[0] ?? ""}`
+                            }
+                            onDeleteUser={handleDeleteUser}
+                            onToggleLock={handleToggleLock}
+                        />
+                    ))}
+                </UsersCard>
+            </div>
+
+            <Pagination
+                page={page}
+                pageSize={pageSize}
+                total={total}
+                onPageChange={setPage}
+            />
+        </div>
+    );
+};
 
 export default UsersList;

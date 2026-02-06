@@ -16,7 +16,17 @@ public class RegisterModel
     /// <example>surname</example>
     public string LastName { get; set; } = String.Empty;
 
+    /// <summary>
+    /// Користувача
+    /// </summary>
+    /// <example>admin@example.com</example>
     public string UserName { get; set; } = String.Empty;
+
+    /// <summary>
+    /// Номер телефону користувача
+    /// </summary>
+    /// <example>+380999999999</example>
+    public string PhoneNumber { get; set; } = String.Empty;
 
     /// <summary>
     /// Електронна пошта користувача
@@ -25,9 +35,9 @@ public class RegisterModel
     public string Email { get; set; } = String.Empty;
 
     /// <summary>
-    /// Пароль пошта користувача
+    /// Пароль користувача
     /// </summary>
-    /// <example>pass123?</example>
+    /// <example>Admin123!</example>
     public string Password { get; set; } = String.Empty;
     public IFormFile? ImageFile { get; set; } = null;
 }

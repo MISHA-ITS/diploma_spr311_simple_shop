@@ -3,20 +3,21 @@ import { Link, useLocation } from "react-router";
 import { BiCategory } from "react-icons/bi";
 // Assume these icons are imported from an icon library
 import {
-  BoxCubeIcon,
-  CalenderIcon,
+  //BoxCubeIcon,
+  //CalenderIcon,
   ChevronDownIcon,
-  GridIcon,
+  //GridIcon,
   HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
+  //ListIcon,
+  //PageIcon,
+  //PieChartIcon,
   PlugInIcon,
-  TableIcon,
+  //TableIcon,
   UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import SidebarWidget from "./SidebarWidget";
+import * as React from "react";
+//import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
   name: string;
@@ -26,76 +27,77 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  {
-    icon: <GridIcon />,
-    name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/admin", pro: false }],
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "calendar",
-  },
+  // {
+  //   icon: <GridIcon />,
+  //   name: "Dashboard",
+  //   subItems: [{ name: "Ecommerce", path: "/admin", pro: false }],
+  // },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "Calendar",
+  //   path: "calendar",
+  // },
   {
     icon: <UserCircleIcon />,
-    name: "Users",
-    subItems: [
-      { name: "Profile", path: "profile", pro: false },
-      { name: "List", path: "users-list", pro: false },
-    ],
+    name: "Користувачі",
+    path: "users-list",
+    // subItems: [
+    //   { name: "Profile", path: "profile", pro: false },
+    //   { name: "List", path: "users-list", pro: false },
+    // ],
   },
   {
     icon: <BiCategory />,
-    name: "Categories",
+    name: "Категорії",
     path: "categories-list",
   },
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "form-elements", pro: false }],
-  },
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "basic-tables", pro: false }],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Blank Page", path: "blank", pro: false },
-      { name: "404 Error", path: "error-404", pro: false },
-    ],
-  },
+  // {
+  //   name: "Forms",
+  //   icon: <ListIcon />,
+  //   subItems: [{ name: "Form Elements", path: "form-elements", pro: false }],
+  // },
+  // {
+  //   name: "Tables",
+  //   icon: <TableIcon />,
+  //   subItems: [{ name: "Basic Tables", path: "basic-tables", pro: false }],
+  // },
+  // {
+  //   name: "Pages",
+  //   icon: <PageIcon />,
+  //   subItems: [
+  //     { name: "Blank Page", path: "blank", pro: false },
+  //     { name: "404 Error", path: "error-404", pro: false },
+  //   ],
+  // },
 ];
 
 const othersItems: NavItem[] = [
-  {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "line-chart", pro: false },
-      { name: "Bar Chart", path: "bar-chart", pro: false },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "alerts", pro: false },
-      { name: "Avatar", path: "avatars", pro: false },
-      { name: "Badge", path: "badge", pro: false },
-      { name: "Buttons", path: "buttons", pro: false },
-      { name: "Images", path: "images", pro: false },
-      { name: "Videos", path: "videos", pro: false },
-    ],
-  },
+  // {
+  //   icon: <PieChartIcon />,
+  //   name: "Charts",
+  //   subItems: [
+  //     { name: "Line Chart", path: "line-chart", pro: false },
+  //     { name: "Bar Chart", path: "bar-chart", pro: false },
+  //   ],
+  // },
+  // {
+  //   icon: <BoxCubeIcon />,
+  //   name: "UI Elements",
+  //   subItems: [
+  //     { name: "Alerts", path: "alerts", pro: false },
+  //     { name: "Avatar", path: "avatars", pro: false },
+  //     { name: "Badge", path: "badge", pro: false },
+  //     { name: "Buttons", path: "buttons", pro: false },
+  //     { name: "Images", path: "images", pro: false },
+  //     { name: "Videos", path: "videos", pro: false },
+  //   ],
+  // },
   {
     icon: <PlugInIcon />,
-    name: "Authentication",
+    name: "Аутентифікація",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "Вхід", path: "/signin", pro: false },
+      { name: "Реєстрація", path: "/signup", pro: false },
     ],
   },
 ];
@@ -311,31 +313,14 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/">
+        <Link to="/"
+              className="text-[36px] font-inter uppercase dark:text-white">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <img
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
-              <img
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
+              <p>SELLIX</p>
             </>
           ) : (
-            <img
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-            />
+            <p>S</p>
           )}
         </Link>
       </div>
@@ -351,7 +336,7 @@ const AppSidebar: React.FC = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  "Меню"
                 ) : (
                   <HorizontaLDots className="size-6" />
                 )}
@@ -367,7 +352,7 @@ const AppSidebar: React.FC = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
+                  "Інше"
                 ) : (
                   <HorizontaLDots />
                 )}
@@ -376,7 +361,7 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {/*{isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}*/}
       </div>
     </aside>
   );

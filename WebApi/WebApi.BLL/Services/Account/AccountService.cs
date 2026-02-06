@@ -59,6 +59,7 @@ public class AccountService(UserManager<AppUser> userManager,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             UserName = dto.UserName,
+            PhoneNumber = dto.PhoneNumber,
             Email = dto.Email,
             Image = avatarPath
         };
