@@ -19,7 +19,7 @@ import BarChart from "../pages/Charts/BarChart.tsx";
 import SignIn from "../pages/AuthPages/SignIn.tsx";
 import SignUp from "../pages/AuthPages/SignUp.tsx";
 import NotFound from "../pages/OtherPage/NotFound.tsx";
-import MainPage from "../pages/MainPage.tsx";
+import MainPage from "../pages/MainPage/MainPage.tsx";
 import MainLayout from "../layout/MainLayout.tsx";
 import ForgotPassword from "../pages/OtherPage/ForgotPassword.tsx";
 import ResetPassword from "../pages/OtherPage/ResetPassword.tsx";
