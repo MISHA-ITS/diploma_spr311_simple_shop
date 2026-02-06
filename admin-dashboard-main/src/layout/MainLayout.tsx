@@ -4,13 +4,13 @@ import AppSimpleHeader from "./AppSimpleHeader.tsx";
 
 const MainLayout: React.FC = () => {
     return (
-        <div className="min-h-screen flex flex-col bg-white">
+        <div className="min-h-screen flex flex-col bg-[#F5F5F5]">
 
             {/* Header */}
             <AppSimpleHeader />
 
             {/* Основний контент */}
-            <main className="bg-white flex-1 p-6 rounded-lg shadow">
+            <main className="bg-[#F5F5F5] flex-1 p-6 rounded-lg shadow">
                 <Outlet />
             </main>
 
