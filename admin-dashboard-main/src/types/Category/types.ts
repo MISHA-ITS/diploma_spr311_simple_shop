@@ -28,16 +28,3 @@ export interface Props {
     onCreate?: () => void;
     onRefresh?: () => void;
 }
-
-export type CategoryNode = ICategory & {
-    children: CategoryNode[];
-};
-
-export interface ICategoryPageRequest {
-    size?: number
-    page?: number
-    sortKey: string
-    isDescending?: boolean
-    searchName?: string
-    parentName?: string
-}
