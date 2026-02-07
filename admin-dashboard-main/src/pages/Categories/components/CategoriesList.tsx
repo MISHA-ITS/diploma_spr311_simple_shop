@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import axios from "axios";
+import {useGetAllCategoriesQuery, useGetCategoryPageQuery} from "../../../store/api/categoryApi.ts";
 import EnvConfig from "../../../config/env.ts";
 import {ICategory, ICategoryTreeNode} from "../../../types/Category/types.ts";
 import CategoriesCard from "./CategoriesCard.tsx";
@@ -10,28 +10,20 @@ import { HiMiniXMark } from "react-icons/hi2";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
-
-
+import {ICategoryPageRequest} from "../../../models/category.ts";
 import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
+import {useSearchParams} from "react-router-dom";
+import { useDeleteCategoryMutation, useCreateCategoryMutation, useUpdateCategoryMutation} from "../../../store/api/categoryApi.ts";
 
 const CategoriesList: React.FC = () => {
     const [isDrawerOpen, setIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
-    const [categories, setCategories] = useState<ICategory[]>([]);
-    const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [parentId, setParentId] = useState<number | null>(null);
     const [name, setName] = useState("");
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(5);
-    const [total, setTotal] = useState(0);
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [isParentSearchVisible, setIsParentSearchVisible] = useState(false);
-    const [filters, setFilters] = useState({
-        searchName: "",
-        parentName: ""
-    });
     const [categoryFilterData, setCategoryFilterData] = useState<{
         categoryTree: ICategoryTreeNode[];
         excludedFilters: number[];
@@ -39,6 +31,50 @@ const CategoriesList: React.FC = () => {
         categoryTree: [],
         excludedFilters: [],
     });
+    const [deleteCategory] = useDeleteCategoryMutation();
+    const [createCategory] = useCreateCategoryMutation();
+    const [updateCategory] = useUpdateCategoryMutation();
+    const { data: allCategories  } = useGetAllCategoriesQuery();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [filters, setFilters] = useState({
+        searchName: searchParams.get("searchName") || "",
+        parentName: searchParams.get("parentName") || "",
+        page: Number(searchParams.get("page") || 1),
+        size: Number(searchParams.get("size") || 10),
+    });
+    const pageRequest: ICategoryPageRequest = {
+        searchName: filters.searchName,
+        parentName: filters.parentName,
+        page: filters.page,
+        size: filters.size,
+    };
+    const { data, refetch: refetchPage  } = useGetCategoryPageQuery(pageRequest);
+    const categories = data?.payload?.items ?? [];
+    const total = data?.payload?.total ?? 0;
+    const page = pageRequest.page;
+    const pageSize = pageRequest.size;
+
+
+    //пошук
+    useEffect(() => {
+        setSearchParams({
+            searchName: filters.searchName,
+            parentName: filters.parentName,
+            page: String(filters.page),
+            size: String(filters.size),
+        });
+    }, [filters, setSearchParams]);
+
+    //пошук
+    useEffect(() => {
+        setFilters({
+            searchName: searchParams.get("searchName") || "",
+            parentName: searchParams.get("parentName") || "",
+            page: Number(searchParams.get("page") || 1),
+            size: Number(searchParams.get("size") || 10),
+        });
+    }, [searchParams]);
 
     const onParentCategoryChange = (value: number | null) => {
         setParentId(value);
@@ -48,7 +84,10 @@ const CategoriesList: React.FC = () => {
         if (isSearchVisible) {
             setFilters(prev => ({ ...prev, searchName: "" }));
         }
-        setPage(1)
+        setSearchParams(prev => {
+            prev.set("page", "1");
+            return prev;
+        });
         setIsSearchVisible(!isSearchVisible);
     };
 
@@ -56,7 +95,10 @@ const CategoriesList: React.FC = () => {
         if (isParentSearchVisible) {
             setFilters(prev => ({ ...prev, parentName: "" }));
         }
-        setPage(1)
+        setSearchParams(prev => {
+            prev.set("page", "1");
+            return prev;
+        });
         setIsParentSearchVisible(!isParentSearchVisible);
     };
 
@@ -67,57 +109,26 @@ const CategoriesList: React.FC = () => {
         setPreviewUrl(null);
     };
 
-    const loadAllCategories = async () => {
+    //tree
+    useEffect(() => {
+        const categories = allCategories?.payload ?? [];
+
+        if (categories.length === 0) return;
+
         try {
-            const resp = await axios.get(
-                `${EnvConfig.API_URL}/api/Category/list`
+            const tree = buildTree(
+                categories,
+                null,
+                selectedCategory ? [selectedCategory.id] : []
             );
 
-            setAllCategories(resp.data.payload ?? []);
-        } catch (err) {
-            console.error("Помилка завантаження всіх категорій:", err);
+            setCategoryFilterData(prev => ({
+                ...prev,
+                categoryTree: tree,
+            }));
+        } catch (error) {
+            console.error("Помилка побудови дерева:", error);
         }
-    };
-
-    const refreshCategories = async () => {
-        try {
-            const resp = await axios.get(`${EnvConfig.API_URL}/api/Category/page`,
-                {
-                    params:{
-                        page,
-                        size:pageSize,
-                        searchName: filters.searchName,
-                        parentName: filters.parentName
-                    }
-                });
-            setCategories(resp.data.payload.items ?? []);
-            setTotal(resp.data.payload.total ?? 0);
-        } catch (err) {
-            console.error("Помилка при оновленні списку виникла помилка:", err);
-        }
-    };
-
-    useEffect(() => {
-        refreshCategories();
-    }, [page, pageSize, filters]);
-
-    useEffect(() => {
-        loadAllCategories();
-    }, []);
-
-    useEffect(() => {
-        if (!categories.length) return;
-
-        const tree = buildTree(
-            allCategories,
-            null,
-            selectedCategory ? [selectedCategory.id] : []
-        );
-
-        setCategoryFilterData(prev => ({
-            ...prev,
-            categoryTree: tree,
-        }));
     }, [allCategories, selectedCategory]);
 
     //скрол
@@ -165,12 +176,8 @@ const CategoriesList: React.FC = () => {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`${EnvConfig.API_URL}/api/Category/Delete/${categoryId}`, {
-                    params: { id: categoryId }
-                });
-
-                setCategories(prev => prev.filter(c => c.id !== categoryId));
-
+                await deleteCategory(categoryId).unwrap();
+                refetchPage();
                 toast.success("Категорію успішно видалено!");
             } catch (error) {
                 console.error(error);
@@ -208,13 +215,12 @@ const CategoriesList: React.FC = () => {
 
             if (selectedCategory) {
                 formData.append("Id", String(selectedCategory.id));
-                await axios.put(`${EnvConfig.API_URL}/api/Category/update`, formData);
+                await updateCategory(formData).unwrap();
             } else {
-                await axios.post(`${EnvConfig.API_URL}/api/Category/create`, formData);
+                await createCategory(formData).unwrap();
             }
 
-            await refreshCategories()
-            await loadAllCategories();
+            refetchPage();
             closeDrawer()
             toast.success(selectedCategory ? "Категорія оновлена" : "Категорія створена");
 
@@ -227,7 +233,7 @@ const CategoriesList: React.FC = () => {
     return (
         <div className="relative w-full pb-24">
 
-            <CategoriesCard count={total} onCreate={handleCreateCategory} onRefresh={refreshCategories}>
+            <CategoriesCard count={total} onCreate={handleCreateCategory} onRefresh={refetchPage}>
                 <table className="min-w-full text-left">
                     <thead className="bg-blue-50/50 dark:bg-blue-900/10 text-xs uppercase text-blue-900/70 dark:text-blue-300">
                         <tr>
@@ -286,7 +292,6 @@ const CategoriesList: React.FC = () => {
                             <th className="px-4 py-2 text-center">Дії</th>
                         </tr>
                     </thead>
-
                     <tbody className="divide-y divide-black/5 dark:divide-white/10">
                     {categories.map(c => (
                         <CategoryRow
@@ -299,7 +304,6 @@ const CategoriesList: React.FC = () => {
                     </tbody>
                 </table>
             </CategoriesCard>
-
             {/*Pagination*/}
             <div className="bg-white dark:bg-neutral-800 px-6 py-2 rounded-2xl shadow-sm border border-blue-50 dark:border-blue-700/30">
                 <Pagination
@@ -308,9 +312,13 @@ const CategoriesList: React.FC = () => {
                     pageSize={pageSize}
                     total={total}
                     showSizeChanger
+                    locale={{ items_per_page: ' / На сторінку' }}
                     onChange={(newPage, newSize) => {
-                        setPage(newPage);
-                        setPageSize(newSize);
+                        setSearchParams({
+                            ...Object.fromEntries(searchParams),
+                            page: String(newPage),
+                            size: String(newSize),
+                        });
                     }}
                 />
             </div>
@@ -372,7 +380,6 @@ const CategoriesList: React.FC = () => {
                                 </span>
                             </div>
                         </label>
-
                         <p className="mt-2 text-[10px] text-gray-400">Натисніть на фото, щоб оновити</p>
                     </div>
 
@@ -394,6 +401,7 @@ const CategoriesList: React.FC = () => {
                         value={parentId}
                         allowClear
                         showSearch
+                        treeNodeFilterProp="title"
                         size="small"
                         className="flex-1"
                         treeData={categoryFilterData.categoryTree}
