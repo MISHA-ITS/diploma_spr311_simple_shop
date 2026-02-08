@@ -3,12 +3,14 @@ import LocationIcon from "../../icons/Location.png";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useParams, Link } from "react-router-dom";
 import {useEffect, useState} from "react";
-import {IAdvertisement} from "../../types/Advertisement/IAdvertisement.ts";
+import {IAdvertisement} from "./types.ts";
+import {useGetAdvertisementByIdQuery} from "../../store/api/advertisementApi.ts";
 
 
 const AdvertisementPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [Advertisement, setAdvertisemet] = useState<IAdvertisement | null>(null);
+    const { data, isLoading, error } = useGetAdvertisementByIdQuery(Number(id));
 
     useEffect(() => {
 

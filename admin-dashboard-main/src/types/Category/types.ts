@@ -26,12 +26,3 @@ export interface Props {
     onCreate?: () => void;
     onRefresh?: () => void;
 }
-
-export interface ICategoryPageRequest {
-    size?: number
-    page?: number
-    sortKey: string
-    isDescending?: boolean
-    searchName?: string
-    parentName?: string
-}

@@ -9,22 +9,20 @@ public class AdvertisementMapperProfile : Profile
     {
         //CreateAdvertisementDTO -> AdvertisementEntity
         CreateMap<CreateAdvertisementDTO, AdvertisementEntity>()
-            .ForMember(dest => dest.Images, opt => opt.Ignore())
-            .ForMember(dest => dest.Categories, opt => opt.Ignore());
+            .ForMember(dest => dest.Images, opt => opt.Ignore());
 
         //UpdateAdvertisementEntity -> AdvertisementEntity
         CreateMap<UpdateAdvertisementDTO, AdvertisementEntity>()
-            .ForMember(dest => dest.Images, opt => opt.Ignore())
-            .ForMember(dest => dest.Categories, opt => opt.Ignore());
+            .ForMember(dest => dest.Images, opt => opt.Ignore());
 
         //AdvertisementEntity -> AdvertisementDTO
         CreateMap<AdvertisementEntity, AdvertisementDTO>()
-            .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.Categories.Select(c => c.Name)))
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl)));
+            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl)))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty));
 
         CreateMap<SeederAdvertisementDTO, AdvertisementEntity>()
             .ForMember(dest => dest.Images, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore())
-            .ForMember(dest => dest.Categories, opt => opt.Ignore());
+            .ForMember(dest => dest.CategoryId, opt => opt.Ignore());
     }
 }
