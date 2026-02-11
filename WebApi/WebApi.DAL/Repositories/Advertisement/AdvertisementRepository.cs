@@ -52,7 +52,7 @@ public class AdvertisementRepository(AppDbContext context, ILogger<GenericReposi
         return _context.Set<AdvertisementEntity>()
             .AsTracking(tracking)
             .Include(p => p.Images)
-            .Include(p => p.Categories)
+            .Include(p => p.Category)
             .AsSplitQuery();
     }
 
@@ -62,7 +62,7 @@ public class AdvertisementRepository(AppDbContext context, ILogger<GenericReposi
         {
             var advertisement = await _context.Advertisements
                 .Include(p => p.Images)
-                .Include(p => p.Categories)
+                .Include(p => p.Category)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(x => x.Id == id);
 

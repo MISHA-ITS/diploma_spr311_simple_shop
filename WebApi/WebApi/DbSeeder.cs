@@ -208,8 +208,6 @@ public static class DbSeeder
             {
                 var ad = mapper.Map<AdvertisementEntity>(dto);
 
-                ad.Categories = dto.Categories.Where(c => categories.ContainsKey(c)).Select(c => categories[c]).ToList();
-
                 if (dto.Images != null && dto.Images.Count > 0)
                 {
                     ad.Images ??= new List<AdvertisementImageEntity>();

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.Services.Advertisement;
 
@@ -8,10 +10,14 @@ namespace WebApi.Controllers;
 [Route("api/[controller]")]
 public class AdvertismentController(IAdvertisementService advertisementService) : ControllerBase
 {
+    [Authorize]
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromForm] CreateAdvertisementDTO dto)
     {
-        var response = await advertisementService.CreateAsync(dto);
+        var userIdClaim = User.FindFirstValue("id");
+        var currentUserId = long.Parse(userIdClaim!);
+
+        var response = await advertisementService.CreateAsync(dto, currentUserId);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 

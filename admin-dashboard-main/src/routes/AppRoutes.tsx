@@ -26,6 +26,7 @@ import ResetPassword from "../pages/OtherPage/ResetPassword.tsx";
 import CategoriesList from "../pages/Categories/components/CategoriesList.tsx";
 import AdminRoute from "./AdminRoutes.tsx";
 import Profile from "../pages/Profile.tsx";
+import AdvertisementPage from "../pages/Advertisement/AdvertisementPage.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -35,6 +36,7 @@ const AppRoutes : React.FC = () => {
                 {/* Main Layout */}
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<MainPage />} />
+                    <Route path="/advertisement/:id" element={<AdvertisementPage />} />
                 </Route>
 
                 {/* Dashboard Layout */}

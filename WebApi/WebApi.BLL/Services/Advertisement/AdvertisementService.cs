@@ -1,20 +1,22 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
 using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities;
-using WebApi.DAL.Repositories.Category;
+using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Repositories.Advertisements;
 
 namespace WebApi.BLL.Services.Advertisement
 {
     public class AdvertisementService(
-        IAdvertisementRepository advertisementRepository, ICategoryRepository categoryRepository,
+        IAdvertisementRepository advertisementRepository, IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager,
         IMapper mapper, IImageService imageService, ILogger<AdvertisementService> logger) : IAdvertisementService
     {
-        public async Task<ServiceResponse> CreateAsync(CreateAdvertisementDTO dto)
+
+        public async Task<ServiceResponse> CreateAsync(CreateAdvertisementDTO dto, long userId)
         {
             logger.LogInformation("Creating advertisement with name {advertisementName}", dto.Name);
 
@@ -25,6 +27,8 @@ namespace WebApi.BLL.Services.Advertisement
             }
 
             var entity = mapper.Map<AdvertisementEntity>(dto);
+
+            entity.UserId = userId;
 
             if (dto.Images != null)
             {
@@ -44,13 +48,6 @@ namespace WebApi.BLL.Services.Advertisement
                     logger.LogInformation("Saved image {ImageName} for advertisement {advertisementName}", imageName, dto.Name);
                 }
             }
-
-            var categories = categoryRepository
-                .GetAll()
-                .Where(c => dto.Categories.Select(x => x.ToUpper()).Contains(c.Name.ToUpper()))
-                .ToList();
-
-            entity.Categories = categories;
 
             return await advertisementRepository.CreateAsync(entity)
                 ? ServiceResponse.Success("advertisement created successfully")
@@ -85,7 +82,7 @@ namespace WebApi.BLL.Services.Advertisement
             logger.LogDebug("Retrieving all advertisements with filter {@Filter}", filter);
 
             var entities = advertisementRepository.GetAll();
-            entities = Filteradvertisements(entities, filter);
+            /*entities = Filteradvertisements(entities, filter);*/
 
             var dtos = mapper.Map<List<AdvertisementFilterDto>>(await entities.ToListAsync());
 
@@ -175,7 +172,7 @@ namespace WebApi.BLL.Services.Advertisement
             }
         }
 
-        private IQueryable<AdvertisementEntity> Filteradvertisements(IQueryable<AdvertisementEntity> advertisements, AdvertisementFilterDto filter)
+        /*private IQueryable<AdvertisementEntity> Filteradvertisements(IQueryable<AdvertisementEntity> advertisements, AdvertisementFilterDto filter)
         {
             if (filter.categoryId.HasValue)
             {
@@ -219,6 +216,6 @@ namespace WebApi.BLL.Services.Advertisement
             advertisements = advertisements.Skip(skip).Take(pageSize);
 
             return advertisements;
-        }
+        }*/
     }
 }
