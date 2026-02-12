@@ -17,8 +17,7 @@ public class AdvertisementMapperProfile : Profile
 
         //AdvertisementEntity -> AdvertisementDTO
         CreateMap<AdvertisementEntity, AdvertisementDTO>()
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl)))
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty));
+            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl)));
 
         CreateMap<SeederAdvertisementDTO, AdvertisementEntity>()
             .ForMember(dest => dest.Images, opt => opt.Ignore())

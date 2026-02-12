@@ -249,7 +249,7 @@ const CategoriesList: React.FC = () => {
                                                 autoFocus
                                                 value={filters.searchName}
                                                 onChange={(e) => setFilters(prev => ({ ...prev, searchName: e.target.value }))}
-                                                placeholder="Шукати..."
+                                                placeholder="Шукати категорію..."
                                                 className="w-full bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                             />
                                         )}
@@ -273,7 +273,7 @@ const CategoriesList: React.FC = () => {
                                                 autoFocus
                                                 value={filters.parentName}
                                                 onChange={(e) => setFilters(prev => ({ ...prev, parentName: e.target.value }))}
-                                                placeholder="Пошук батьківської..."
+                                                placeholder="Шукати батьківську категорію..."
                                                 className="w-full bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                             />
                                         )}

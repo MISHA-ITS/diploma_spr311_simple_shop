@@ -2,19 +2,24 @@ import * as React from "react";
 import LocationIcon from "../../icons/Location.png";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useParams, Link } from "react-router-dom";
-import {useEffect, useState} from "react";
-import {IAdvertisement} from "./types.ts";
 import {useGetAdvertisementByIdQuery} from "../../store/api/advertisementApi.ts";
+import {useGetUserByIdQuery} from "../../store/api/userApi.ts";
 
 
 const AdvertisementPage: React.FC = () => {
+
     const { id } = useParams<{ id: string }>();
-    const [Advertisement, setAdvertisemet] = useState<IAdvertisement | null>(null);
     const { data, isLoading, error } = useGetAdvertisementByIdQuery(Number(id));
+    const product = data?.payload;
+    const { data: userData, isLoading: isUserLoading } = useGetUserByIdQuery(
+        product?.userId ?? 0,
+        { skip: !product?.userId } // не робити запит, поки немає продукту
+    );
+    const seller = userData?.payload;
 
-    useEffect(() => {
+    if (isLoading && isUserLoading) return <div>Завантаження оголошення...</div>;
+    if (error || !product) return <div>Оголошення не знайдено</div>;
 
-    }, []);
     return (
         <div className="w-full flex justify-center">
             <div className="w-full max-w-[1430px] px-4 py-8 flex flex-col gap-10">
@@ -24,7 +29,7 @@ const AdvertisementPage: React.FC = () => {
                     <Link to={`/`}>
                         <span
                             className="cursor-pointer flex items-center" >
-                            <RiArrowLeftSLine /> Повернутись до покупок  {id}
+                            <RiArrowLeftSLine /> Повернутись до покупок
                         </span>
                     </Link>
                 </div>
@@ -60,17 +65,16 @@ const AdvertisementPage: React.FC = () => {
                     {/* PRICE */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex flex-col gap-4">
                             <span className="text-xl font-semibold">
-                                Кавоварка Philips
+                                {product.name}
                             </span>
 
                             <span className="text-2xl font-bold">
-                                15 000 грн
+                                {product.price} грн
                             </span>
 
-                            <input
-                                placeholder="(098) xxx xx xx"
-                                className="h-11 px-4 rounded-md border"
-                            />
+                            <div className="h-11 px-4 rounded-md border border-gray-300 bg-white flex items-center justify-center text-[#6C6C6C]">
+                                {seller?.phoneNumber || "Номер не вказано"}
+                            </div>
 
                             <button className="h-11 bg-[#6C6C6C] text-white rounded-md">
                                 Повідомлення
@@ -81,7 +85,7 @@ const AdvertisementPage: React.FC = () => {
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex gap-4">
                             <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" />
                             <div className="text-sm">
-                                <p className="font-semibold">Марія</p>
+                                <p className="font-semibold">{seller?.firstName}</p>
                                 <p className="text-[#555]">Професійний продавець</p>
                                 <p className="text-[#555]">⭐ 5 років на сервісі</p>
                             </div>
@@ -104,8 +108,7 @@ const AdvertisementPage: React.FC = () => {
                         Опис від продавця
                     </h3>
                     <p className="text-[#333]">
-                        Продаю майже нову кавоварку Philips! Ідеальний стан,
-                        користувалися дуже мало. Повний комплект.
+                        {product.description}
                     </p>
                 </div>
 
@@ -140,7 +143,6 @@ const AdvertisementPage: React.FC = () => {
                         ))}
                     </div>
                 </div>
-
             </div>
         </div>
     );

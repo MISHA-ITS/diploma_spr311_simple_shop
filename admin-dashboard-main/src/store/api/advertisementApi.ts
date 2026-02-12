@@ -1,7 +1,5 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
-import { ICategory, ICategoryPageRequest } from "../../models/category.ts"
 import {IAdvertisement} from "../../pages/Advertisement/types.ts";
-import { PageResponse } from "../../models/category.ts"
 import EnvConfig from "../../config/env.ts";
 
 interface ApiResponse<T> {
@@ -12,18 +10,18 @@ interface ApiResponse<T> {
 
 export const advertisementApi = createApi({
     reducerPath: 'advertisementApi',
-    baseQuery: fetchBaseQuery({ baseUrl: EnvConfig.API_URL + '/api/Advertisement' }),
+    baseQuery: fetchBaseQuery({ baseUrl: EnvConfig.API_URL + '/api/Advertisment' }),
     tagTypes: ['Advertisement'],
 
     endpoints: (builder) => ({
-        getAdvertisementById: builder.query<IAdvertisement, number>({
-            query: (advertisementId) => {
+        getAdvertisementById: builder.query<ApiResponse<IAdvertisement>, number>({
+            query: (Id) => {
                 return {
-                    url: `/${advertisementId}`,
+                    url: `/${Id}`,
                     method: 'GET',
                 }
             },
-            providesTags: ["Advertisement"]
+            providesTags: (_, __, id) => [{ type: 'Advertisement', id }]
         })
     }),
 })

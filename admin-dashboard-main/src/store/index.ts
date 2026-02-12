@@ -5,6 +5,7 @@ import authReducer from "./authSlice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import {categoryApi} from "./api/categoryApi.ts";
 import {advertisementApi} from "./api/advertisementApi.ts";
+import {userApi} from "./api/userApi.ts";
 
 export const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
         [apiAccount.reducerPath]: apiAccount.reducer,
         [apiUser.reducerPath]: apiUser.reducer,
         [advertisementApi.reducerPath]: advertisementApi.reducer,
+        [userApi.reducerPath]: userApi.reducer,
         auth: authReducer
 
     },
@@ -19,7 +21,9 @@ export const store = configureStore({
         getDefaultMiddleware().concat(
             categoryApi.middleware,
             apiAccount.middleware,
-            apiUser.middleware
+            apiUser.middleware,
+            advertisementApi.middleware,
+            userApi.middleware,
         )
 });
 
