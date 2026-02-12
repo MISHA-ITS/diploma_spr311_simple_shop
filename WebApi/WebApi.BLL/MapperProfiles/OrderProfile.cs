@@ -24,5 +24,8 @@ public class OrderProfile : Profile
             .ForMember(d => d.Status, o => o.Ignore())
             .ForMember(d => d.TrackingNumber, o => o.Ignore())
             .ForMember(d => d.UpdatedAt, o => o.Ignore());
+
+        CreateMap<OrderEntity, OrderResponseDto>()
+            .ForMember(d => d.AdvertisementName, o => o.MapFrom(s => s.Advertisement.Name));
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Order;
 using WebApi.DAL.Entities.Identity;
@@ -33,24 +34,21 @@ public class OrderService(
             return ServiceResponse.Error("Оголошення не знайдено");
         }
 
-        if (!advertisement.isActive || advertisement.isBlocked)
-        {
-            logger.LogWarning(
-                "Failed to create order: Advertisement {AdvertisementId} is inactive or blocked",
-                dto.AdvertisementId
-            );
-            return ServiceResponse.Error("Оголошення недоступне");
-        }
+        logger.LogInformation(
+            "Advertisement state: Active={Active}, Approved={Approved}, Blocked={Blocked}",
+            advertisement.isActive,
+            advertisement.isApproved,
+            advertisement.isBlocked
+        );
 
-        if (advertisement.UserId == buyerId)
-        {
-            logger.LogWarning(
-                "User {BuyerId} tried to buy own advertisement {AdvertisementId}",
-                buyerId,
-                dto.AdvertisementId
-            );
-            return ServiceResponse.Error("Ви не можете придбати власне оголошення");
-        }
+        if (!advertisement.isActive)
+            return ServiceResponse.Error("Оголошення неактивне");
+
+        if (!advertisement.isApproved)
+            return ServiceResponse.Error("Оголошення не підтверджене");
+
+        if (advertisement.isBlocked)
+            return ServiceResponse.Error("Оголошення заблоковане");
 
         // 🔍 Delivery validation
         if (dto.DeliveryMethod == DeliveryType.NewPost)
@@ -70,6 +68,11 @@ public class OrderService(
                 logger.LogWarning("Courier delivery validation failed");
                 return ServiceResponse.Error("Вкажіть адресу доставки");
             }
+        }
+
+        if (advertisement.UserId == buyerId)
+        {
+            return ServiceResponse.Error("Ви не можете замовити власне оголошення");
         }
 
         var order = mapper.Map<OrderEntity>(dto);
@@ -98,7 +101,52 @@ public class OrderService(
             advertisement.Id
         );
 
-        return ServiceResponse.Success("Order created successfully", new { order.Id });
+        return ServiceResponse.Success("Замовлення успішно створено", new { order.Id });
+    }
+
+    public async Task<ServiceResponse> GetAllAsync()
+    {
+        var orders = await orderRepository.GetAll().ToListAsync();
+
+        var result = mapper.Map<List<OrderResponseDto>>(orders);
+
+        return ServiceResponse.Success("Повний перелік замовлень успішно отримано", result);
+    }
+
+    public async Task<ServiceResponse> GetByIdAsync(long id, long userId)
+    {
+        var order = await orderRepository.GetByIdAsync(id);
+
+        if (order == null)
+            return ServiceResponse.Error("Замовлення не знайдено");
+
+        if (order.BuyerId != userId && order.SellerId != userId)
+            return ServiceResponse.Error("Немає доступу");
+
+        var dto = mapper.Map<OrderResponseDto>(order);
+
+        return ServiceResponse.Success("Замовлення з Id {OrderId} успішно отримано", dto);
+    }
+
+    public async Task<ServiceResponse> UpdateStatusAsync(long orderId, OrderStatus status, long userId)
+    {
+        var order = await orderRepository.GetByIdAsync(orderId);
+
+        if (order == null)
+            return ServiceResponse.Error("Замовлення не знайдено");
+
+        if (order.SellerId != userId)
+            return ServiceResponse.Error("Лише продавець може змінити статус");
+
+        order.Status = status;
+        order.UpdatedAt = DateTime.UtcNow;
+
+        var updated = await orderRepository.UpdateAsync(order);
+
+        if (!updated)
+            return ServiceResponse.Error("Не вдалося оновити замовлення");
+
+        return ServiceResponse.Success("Статус оновлено");
     }
 }
 
