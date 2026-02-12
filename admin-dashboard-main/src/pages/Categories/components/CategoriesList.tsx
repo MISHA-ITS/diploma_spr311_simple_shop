@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import {useGetAllCategoriesQuery, useGetCategoryPageQuery} from "../../../store/api/categoryApi.ts";
+import {useGetAllCategoriesQuery, useGetCategoryPageQuery} from "../../../services/apiCategory.ts";
 import EnvConfig from "../../../config/env.ts";
 import {ICategory, ICategoryTreeNode} from "../../../types/Category/types.ts";
 import CategoriesCard from "./CategoriesCard.tsx";
@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 import {ICategoryPageRequest} from "../../../models/category.ts";
 import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import {useSearchParams} from "react-router-dom";
-import { useDeleteCategoryMutation, useCreateCategoryMutation, useUpdateCategoryMutation} from "../../../store/api/categoryApi.ts";
+import { useDeleteCategoryMutation, useCreateCategoryMutation, useUpdateCategoryMutation} from "../../../services/apiCategory.ts";
 
 const CategoriesList: React.FC = () => {
     const [isDrawerOpen, setIsOpen] = useState(false);

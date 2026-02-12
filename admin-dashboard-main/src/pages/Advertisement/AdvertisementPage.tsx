@@ -2,8 +2,8 @@ import * as React from "react";
 import LocationIcon from "../../icons/Location.png";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useParams, Link } from "react-router-dom";
-import {useGetAdvertisementByIdQuery} from "../../store/api/advertisementApi.ts";
-import {useGetUserByIdQuery} from "../../store/api/userApi.ts";
+import {useGetAdvertisementByIdQuery} from "../../services/apiAdvertisement.ts";
+import {useGetUserByIdQuery} from "../../services/apiUser.ts";
 
 
 const AdvertisementPage: React.FC = () => {

@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
-import {IAdvertisement} from "../../pages/Advertisement/types.ts";
-import EnvConfig from "../../config/env.ts";
+import {IAdvertisement} from "../pages/Advertisement/types.ts";
+import EnvConfig from "../config/env.ts";
 
 interface ApiResponse<T> {
     isSuccess: boolean;
@@ -8,8 +8,8 @@ interface ApiResponse<T> {
     payload: T;
 }
 
-export const advertisementApi = createApi({
-    reducerPath: 'advertisementApi',
+export const apiAdvertisement = createApi({
+    reducerPath: 'apiAdvertisement',
     baseQuery: fetchBaseQuery({ baseUrl: EnvConfig.API_URL + '/api/Advertisment' }),
     tagTypes: ['Advertisement'],
 
@@ -28,4 +28,4 @@ export const advertisementApi = createApi({
 
 export const {
     useGetAdvertisementByIdQuery,
-} = advertisementApi
+} = apiAdvertisement
