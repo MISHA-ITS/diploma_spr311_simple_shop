@@ -2,11 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApi.BLL.DTOs.Order;
 using WebApi.BLL.Services.Order;
-using WebApi.DAL.Enums;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
     public class OrderController(IOrderService orderService) : ControllerBase
@@ -28,20 +27,58 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
+        //[HttpGet]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    var result = await orderService.GetAllAsync();
+        //    return Ok(result);
+        //}
+
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] OrderFilterDto? filter)
         {
-            var result = await orderService.GetAllAsync();
+            filter ??= new OrderFilterDto();
+
+            var result = await orderService.GetAllAsync(filter);
+
             return Ok(result);
         }
 
         [HttpPatch("{id}/status")]
         [Authorize]
-        public async Task<IActionResult> UpdateStatus(long id, [FromBody] OrderStatus status)
+        public async Task<IActionResult> UpdateStatus(long id, [FromBody] UpdateOrderStatusDto dto)
         {
             var userId = GetUserId();
-            var result = await orderService.UpdateStatusAsync(id, status, userId);
+            var result = await orderService.UpdateStatusAsync(id, dto, userId);
+            return Ok(result);
+        }
+
+        [HttpGet("buyer")]
+        [Authorize]
+        public async Task<IActionResult> GetMyBuyerOrders()
+        {
+            var userId = GetUserId();
+            var result = await orderService.GetMyOrdersAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("seller")]
+        [Authorize]
+        public async Task<IActionResult> GetMySellerOrders()
+        {
+            var userId = GetUserId();
+            var result = await orderService.GetSellerOrdersAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpPatch("{id}/cancel")]
+        [Authorize]
+        public async Task<IActionResult> Cancel(long id)
+        {
+            var userId = GetUserId();
+            var result = await orderService.CancelAsync(id, userId);
             return Ok(result);
         }
 

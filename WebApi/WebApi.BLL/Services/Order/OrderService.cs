@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Order;
@@ -106,11 +107,48 @@ public class OrderService(
 
     public async Task<ServiceResponse> GetAllAsync()
     {
-        var orders = await orderRepository.GetAll().ToListAsync();
+        var orders = await orderRepository.GetAllWithDetailsAsync();
 
         var result = mapper.Map<List<OrderResponseDto>>(orders);
 
         return ServiceResponse.Success("Повний перелік замовлень успішно отримано", result);
+    }
+
+    public async Task<ServiceResponse> GetAllAsync(OrderFilterDto filter)
+    {
+
+
+        IQueryable<OrderEntity> query = orderRepository
+            .GetAll()
+            .AsNoTracking();
+
+        if (filter.Status.HasValue)
+            query = query.Where(o => o.Status == filter.Status.Value);
+
+        if (filter.DateFrom.HasValue)
+            query = query.Where(o => o.CreateDate >= filter.DateFrom.Value);
+
+        if (filter.DateTo.HasValue)
+            query = query.Where(o => o.CreateDate <= filter.DateTo.Value);
+
+        var totalCount = await query.CountAsync();
+
+        var orders = await query
+            .OrderByDescending(o => o.CreateDate)
+            .ProjectTo<OrderResponseDto>(mapper.ConfigurationProvider)
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync();
+
+        //var result = mapper.Map<List<OrderResponseDto>>(orders);
+
+        return ServiceResponse.Success("Повний перелік замовлень успішно отримано", new
+        {
+            totalCount,
+            filter.PageNumber,
+            filter.PageSize,
+            items = orders
+        });
     }
 
     public async Task<ServiceResponse> GetByIdAsync(long id, long userId)
@@ -128,7 +166,7 @@ public class OrderService(
         return ServiceResponse.Success("Замовлення з Id {OrderId} успішно отримано", dto);
     }
 
-    public async Task<ServiceResponse> UpdateStatusAsync(long orderId, OrderStatus status, long userId)
+    public async Task<ServiceResponse> UpdateStatusAsync(long orderId, UpdateOrderStatusDto dto, long userId)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
 
@@ -138,7 +176,11 @@ public class OrderService(
         if (order.SellerId != userId)
             return ServiceResponse.Error("Лише продавець може змінити статус");
 
-        order.Status = status;
+        if (!IsValidStatusTransition(order.Status, dto.Status))
+            return ServiceResponse.Error(
+                $"Неможливо змінити статус з {order.Status} на {dto.Status}");
+
+        order.Status = dto.Status;
         order.UpdatedAt = DateTime.UtcNow;
 
         var updated = await orderRepository.UpdateAsync(order);
@@ -147,6 +189,84 @@ public class OrderService(
             return ServiceResponse.Error("Не вдалося оновити замовлення");
 
         return ServiceResponse.Success("Статус оновлено");
+    }
+
+    public async Task<ServiceResponse> GetMyOrdersAsync(long userId)
+    {
+        var orders = await orderRepository
+            .GetAll()
+            .Where(o => o.BuyerId == userId)
+            .Include(o => o.Seller)
+            .OrderByDescending(o => o.CreateDate)
+            .ProjectTo<BuyerOrderDto>(mapper.ConfigurationProvider)
+            .ToListAsync();
+
+        var mapped = mapper.Map<List<BuyerOrderDto>>(orders);
+
+        return ServiceResponse.Success("Перелік моїх замовлень як покупця отримано", mapped);
+    }
+
+    public async Task<ServiceResponse> GetSellerOrdersAsync(long sellerId)
+    {
+        var orders = await orderRepository
+            .GetAll()
+            .Where(o => o.SellerId == sellerId)
+            .OrderByDescending(o => o.CreateDate)
+            .ProjectTo<SellerOrderDto>(mapper.ConfigurationProvider)
+            .ToListAsync();
+
+        var mapped = mapper.Map<List<SellerOrderDto>>(orders);
+
+        return ServiceResponse.Success($"Перелік моїм замовлень як продавця отримано", mapped);
+    }
+
+    public async Task<ServiceResponse> CancelAsync(long orderId, long userId)
+    {
+        var order = await orderRepository.GetByIdAsync(orderId);
+
+        if (order == null)
+            return ServiceResponse.Error("Замовлення не знайдено");
+
+        var isBuyer = order.BuyerId == userId;
+        var isSeller = order.SellerId == userId;
+
+        if (!isBuyer && !isSeller)
+            return ServiceResponse.Error("Ви не маєте доступу до цього замовлення");
+
+        if (order.Status == OrderStatus.Completed)
+            return ServiceResponse.Error("Завершене замовлення не можна скасувати");
+
+        if (isBuyer && order.Status != OrderStatus.Pending)
+            return ServiceResponse.Error("Покупець може скасувати лише замовлення зі статусом Pending");
+
+        order.Status = OrderStatus.Canceled;
+        order.UpdatedAt = DateTime.UtcNow;
+
+        var updated = await orderRepository.UpdateAsync(order);
+
+        if (!updated)
+            return ServiceResponse.Error("Не вдалося скасувати замовлення");
+
+        return ServiceResponse.Success("Замовлення скасовано");
+    }
+
+
+    private bool IsValidStatusTransition(OrderStatus current, OrderStatus next)
+    {
+        return current switch
+        {
+            OrderStatus.Pending => next == OrderStatus.Accepted
+                                   || next == OrderStatus.Canceled,
+
+            OrderStatus.Accepted => next == OrderStatus.Completed
+                                     || next == OrderStatus.Canceled,
+
+            OrderStatus.Completed => false, // фінальний статус
+
+            OrderStatus.Canceled => false, // фінальний статус
+
+            _ => false
+        };
     }
 }
 
