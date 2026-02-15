@@ -1,9 +1,12 @@
 import * as React from "react";
-import LocationIcon from "../../icons/Location.png";
+import LocationIcon from "../../../icons/Location.png";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useParams, Link } from "react-router-dom";
-import {useGetAdvertisementByIdQuery} from "../../services/apiAdvertisement.ts";
-import {useGetUserByIdQuery} from "../../services/apiUser.ts";
+import {useGetAdvertisementByIdQuery} from "../../../services/apiAdvertisement.ts";
+import {useGetUserByIdQuery} from "../../../services/apiUser.ts";
+import AdvertisementGallery from "./AdvertisementGallery.tsx";
+import {createParentDic, findPath} from "../utils/functions.ts";
+import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
 
 
 const AdvertisementPage: React.FC = () => {
@@ -16,6 +19,21 @@ const AdvertisementPage: React.FC = () => {
         { skip: !product?.userId } // не робити запит, поки немає продукту
     );
     const seller = userData?.payload;
+    const { data: Categories, error: CategoriesError  } = useGetAllCategoriesQuery();
+    if (CategoriesError || !Categories?.payload) {
+        return <div>Помилка завантаження категорій</div>;
+    }
+    if (!product){
+        return <div>Помилка завантаження продукта</div>;
+    }
+
+    const parentDictionary = createParentDic(Categories.payload);
+    const listIdPath = findPath(product.categoryId, parentDictionary)
+    const categoryNamesDic = Categories.payload.reduce((acc, cat) => {
+        acc[cat.id] = cat.name;
+        return acc;
+    }, {} as Record<number, string>)
+    const namedPath = listIdPath.map(id => categoryNamesDic[id]).join(" / ");
 
     if (isLoading && isUserLoading) return <div>Завантаження оголошення...</div>;
     if (error || !product) return <div>Оголошення не знайдено</div>;
@@ -40,22 +58,11 @@ const AdvertisementPage: React.FC = () => {
                     <div className="flex flex-col gap-4 flex-[2]">
 
                         {/* BREADCRUMBS */}
-                        <span className="text-sm text-[#9A9A9A] h-[24px] flex items-center">
-                            Головна / Електроніка / Техніка для кухні / Кавоварки
+                        <span className="text-sm  h-[24px] flex items-center">
+                            {namedPath}
                         </span>
 
-                        {/* MAIN IMAGE */}
-                        <div className="w-full h-[430px] bg-[#BDBDBD] rounded-lg" />
-
-                        {/* THUMBNAILS */}
-                        <div className="flex gap-4">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="w-[160px] h-[100px] bg-[#BDBDBD] rounded-md"
-                                />
-                            ))}
-                        </div>
+                        <AdvertisementGallery images={product.images} />
                     </div>
 
                     {/* RIGHT */}

@@ -26,7 +26,7 @@ import ResetPassword from "../pages/OtherPage/ResetPassword.tsx";
 import CategoriesList from "../pages/Categories/components/CategoriesList.tsx";
 import AdminRoute from "./AdminRoutes.tsx";
 import Profile from "../pages/Profile.tsx";
-import AdvertisementPage from "../pages/Advertisement/AdvertisementPage.tsx";
+import AdvertisementPage from "../pages/Advertisement/components/AdvertisementPage.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
