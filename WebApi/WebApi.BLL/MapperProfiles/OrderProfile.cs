@@ -1,7 +1,7 @@
 ﻿
 using AutoMapper;
 using WebApi.BLL.DTOs.Order;
-using WebApi.DAL.Entities.Identity;
+using WebApi.DAL.Entities;
 
 namespace WebApi.BLL.MapperProfiles;
 

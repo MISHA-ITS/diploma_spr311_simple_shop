@@ -3,7 +3,8 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Order;
-using WebApi.DAL.Entities.Identity;
+using WebApi.BLL.Services.NewPost;
+using WebApi.DAL.Entities;
 using WebApi.DAL.Enums;
 using WebApi.DAL.Repositories.Advertisements;
 using WebApi.DAL.Repositories.Order;
@@ -12,7 +13,8 @@ namespace WebApi.BLL.Services.Order;
 
 public class OrderService(
     IOrderRepository orderRepository, 
-    IAdvertisementRepository advertisementRepository, 
+    IAdvertisementRepository advertisementRepository,
+    INewPostService newPostService,
     ILogger<OrderService> logger, 
     IMapper mapper
 ) : IOrderService
@@ -51,26 +53,6 @@ public class OrderService(
         if (advertisement.isBlocked)
             return ServiceResponse.Error("Оголошення заблоковане");
 
-        // 🔍 Delivery validation
-        if (dto.DeliveryMethod == DeliveryType.NewPost)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Settlement) ||
-                string.IsNullOrWhiteSpace(dto.NewPostWarehouse))
-            {
-                logger.LogWarning("NewPost delivery validation failed");
-                return ServiceResponse.Error("Вкажіть місто та відділення Нової Пошти");
-            }
-        }
-
-        if (dto.DeliveryMethod == DeliveryType.Courier)
-        {
-            if (string.IsNullOrWhiteSpace(dto.DeliveryAddress))
-            {
-                logger.LogWarning("Courier delivery validation failed");
-                return ServiceResponse.Error("Вкажіть адресу доставки");
-            }
-        }
-
         if (advertisement.UserId == buyerId)
         {
             return ServiceResponse.Error("Ви не можете замовити власне оголошення");
@@ -84,6 +66,42 @@ public class OrderService(
         order.AdvertisementId = advertisement.Id;
         order.Price = advertisement.Price;
         order.Status = OrderStatus.Pending;
+
+        // 🔍 Delivery validation
+        if (dto.DeliveryMethod == DeliveryType.NewPost)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Settlement) ||
+                string.IsNullOrWhiteSpace(dto.NewPostWarehouse))
+            {
+                logger.LogWarning("NewPost delivery validation failed");
+                return ServiceResponse.Error("Вкажіть місто та відділення Нової Пошти");
+            }
+
+            var settlement = await newPostService.GetSettlement(dto.Settlement);
+
+            if (settlement == null)
+                return ServiceResponse.Error("Невірний населений пункт");
+
+            var warehouses = await newPostService.GetWarehousesBySettlementAsync(dto.Settlement);
+
+            var warehouse = warehouses.FirstOrDefault(w => w.Ref == dto.NewPostWarehouse);
+
+            if (warehouse == null)
+                return ServiceResponse.Error("Невірне відділення");
+
+            // зберігаємо стабільні дані
+            order.City = settlement.Description;
+            order.NewPostWarehouse = warehouse.Description;
+        }
+
+        if (dto.DeliveryMethod == DeliveryType.Courier)
+        {
+            if (string.IsNullOrWhiteSpace(dto.DeliveryAddress))
+            {
+                logger.LogWarning("Courier delivery validation failed");
+                return ServiceResponse.Error("Вкажіть адресу доставки");
+            }
+        }
 
         var created = await orderRepository.CreateAsync(order);
 
@@ -116,8 +134,6 @@ public class OrderService(
 
     public async Task<ServiceResponse> GetAllAsync(OrderFilterDto filter)
     {
-
-
         IQueryable<OrderEntity> query = orderRepository
             .GetAll()
             .AsNoTracking();

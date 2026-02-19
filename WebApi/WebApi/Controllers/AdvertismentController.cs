@@ -8,7 +8,7 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AdvertismentController(IAdvertisementService advertisementService) : ControllerBase
+public class AdvertisementController(IAdvertisementService advertisementService) : ControllerBase
 {
     [Authorize]
     [HttpPost("create")]

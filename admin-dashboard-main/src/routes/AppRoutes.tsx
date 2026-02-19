@@ -27,6 +27,8 @@ import CategoriesList from "../pages/Categories/components/CategoriesList.tsx";
 import AdminRoute from "./AdminRoutes.tsx";
 import Profile from "../pages/Profile.tsx";
 import AdvertisementPage from "../pages/Advertisement/AdvertisementPage.tsx";
+import OrderPage from "../pages/Order/OrderPage.tsx";
+import PrivateRoute from "./PrivateRoute.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -37,6 +39,16 @@ const AppRoutes : React.FC = () => {
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<MainPage />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
+                    <Route
+                        path="/order/:id"
+                        element={
+                            <PrivateRoute>
+                                <OrderPage />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    {/*<Route path="/order-success" element={<OrderSuccessPage />} />*/}
                 </Route>
 
                 {/* Dashboard Layout */}

@@ -1,4 +1,4 @@
-﻿using WebApi.DAL.Entities.Identity;
+﻿using WebApi.DAL.Entities;
 
 namespace WebApi.DAL.Repositories.Order;
 

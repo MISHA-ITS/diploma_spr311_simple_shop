@@ -1,5 +1,4 @@
 ﻿using WebApi.BLL.DTOs.Order;
-using WebApi.DAL.Enums;
 
 namespace WebApi.BLL.Services.Order;
 

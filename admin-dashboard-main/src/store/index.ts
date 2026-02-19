@@ -1,17 +1,23 @@
 import {configureStore} from "@reduxjs/toolkit"
 import {apiAccount} from "../services/apiAccount.ts";
 import {apiUser} from "../services/apiUser.ts";
+import {apiAdvertisement} from "../services/apiAdvertisement.ts";
 import authReducer from "./authSlice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import {categoryApi} from "./api/categoryApi.ts";
-import {advertisementApi} from "./api/advertisementApi.ts";
+import {apiNewPost} from "../services/apiNewPost.ts";
+import {apiOrder} from "../services/apiOrder.ts";
+//import {advertisementApi} from "./api/advertisementApi.ts";
 
 export const store = configureStore({
     reducer: {
         [categoryApi.reducerPath]: categoryApi.reducer,
         [apiAccount.reducerPath]: apiAccount.reducer,
         [apiUser.reducerPath]: apiUser.reducer,
-        [advertisementApi.reducerPath]: advertisementApi.reducer,
+        [apiAdvertisement.reducerPath]: apiAdvertisement.reducer,
+        [apiNewPost.reducerPath]: apiNewPost.reducer,
+        [apiOrder.reducerPath]: apiOrder.reducer,
+        //[advertisementApi.reducerPath]: advertisementApi.reducer,
         auth: authReducer
 
     },
@@ -19,7 +25,11 @@ export const store = configureStore({
         getDefaultMiddleware().concat(
             categoryApi.middleware,
             apiAccount.middleware,
-            apiUser.middleware
+            apiUser.middleware,
+            apiAdvertisement.middleware,
+            apiNewPost.middleware,
+            apiOrder.middleware,
+            //advertisementApi.middleware
         )
 });
 

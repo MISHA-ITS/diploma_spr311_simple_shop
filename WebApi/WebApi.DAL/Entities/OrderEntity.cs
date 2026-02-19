@@ -1,6 +1,7 @@
-﻿using WebApi.DAL.Enums;
+﻿using WebApi.DAL.Entities.Identity;
+using WebApi.DAL.Enums;
 
-namespace WebApi.DAL.Entities.Identity;
+namespace WebApi.DAL.Entities;
 
 public class OrderEntity : BaseEntity<long>
 {
