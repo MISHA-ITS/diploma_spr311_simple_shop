@@ -5,7 +5,7 @@ using WebApi.BLL.Services.Order;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class OrderController(IOrderService orderService) : ControllerBase

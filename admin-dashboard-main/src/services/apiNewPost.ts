@@ -1,13 +1,13 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQuery } from "../utils/createBaseQuery";
-import {ISettlement, IWarehouse} from "../models/newPost.ts";
+import {IArea, IRegion, ISettlement, IWarehouse} from "../models/newPost.ts";
 
 export const apiNewPost = createApi({
     reducerPath: "apiNewPost",
     baseQuery: createBaseQuery("NewPost"),
     tagTypes: ["NewPost", "Areas", "Regions", "Settlements", "Settlement","Warehouses"],
     endpoints: (builder) => ({
-        getAreas: builder.query<any[], void>({
+        getAreas: builder.query<IArea[], void>({
             query: () => {
                 return {
                     url: `areas`,
@@ -17,7 +17,7 @@ export const apiNewPost = createApi({
             providesTags: ["Areas"],
         }),
 
-        getRegionsByArea: builder.query({
+        getRegionsByArea: builder.query<IRegion[], string>({
             query: (areaRef) => {
                 return {
                     url: `areas/regions?areaRef=${areaRef}`,
@@ -27,7 +27,7 @@ export const apiNewPost = createApi({
             providesTags: ["Regions"],
         }),
 
-        getSettlementsByRegion: builder.query({
+        getSettlementsByRegion: builder.query<ISettlement[], string>({
             query: (regionRef) => {
                 return {
                     url: `region/settlements?regionRef=${regionRef}`,

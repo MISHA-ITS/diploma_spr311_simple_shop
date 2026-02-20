@@ -6,23 +6,48 @@ import {
     useGetWarehousesQuery,
 } from "../../services/apiNewPost";
 import { useProfileQuery } from "../../services/apiAccount";
+import { useCreateOrderMutation } from "../../services/apiOrder";
+import {OrderCreateDto} from "./types.ts";
+import { useParams } from "react-router-dom";
 
 type DeliveryMethod = "nova_poshta" | "courier";
 
 const OrderPage = () => {
+    const { id } = useParams<{ id: string }>();
+
+    const advertisementId = useMemo(() => {
+        return id ? Number(id) : 0;
+    }, [id]);
+
+    useEffect(() => {
+        console.log("ADVERTISEMENT ID:", id);
+    }, [id]);
+
     // ==============================
     // PROFILE (AUTO-FILL)
     // ==============================
 
     const { data: profile } = useProfileQuery();
 
-    const [fullName, setFullName] = useState("");
+    useEffect(() => {
+        console.log("PROFILE:", profile);
+    }, [profile]);
+
+
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    //const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
 
     useEffect(() => {
-        if (profile) {
-            setFullName(profile.fullName ?? "");
-            setPhone(profile.phoneNumber ?? "");
+        if (profile?.payload) {
+            const user = profile.payload;
+
+            setFirstName(user.firstName ?? "");
+            setLastName(user.lastName ?? "");
+            setEmail(user.email ?? "");
+            setPhone(user.phoneNumber ?? "");
         }
     }, [profile]);
 
@@ -63,6 +88,9 @@ const OrderPage = () => {
         useGetWarehousesQuery(settlementRef!, {
             skip: !settlementRef,
         });
+
+    const [createOrder, { isLoading }] = useCreateOrderMutation();
+
 
     // ==============================
     // RESET LOGIC
@@ -109,38 +137,70 @@ const OrderPage = () => {
     ]);
 
     const isFormValid =
-        fullName.trim().length > 3 &&
+        //fullName.trim().length > 3 &&
+        firstName.trim().length > 3 &&
+        lastName.trim().length > 3 &&
         phone.trim().length > 8 &&
+        email.trim().length > 8 &&
         isLocationValid;
 
     // ==============================
     // SUBMIT
     // ==============================
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!isFormValid) return;
 
-        const orderPayload = {
-            fullName,
-            phone,
-            deliveryMethod,
-            areaRef,
-            regionRef,
-            settlementRef,
-            warehouseRef:
-                deliveryMethod === "nova_poshta" ? warehouseRef : null,
-            courierAddress:
-                deliveryMethod === "courier" ? courierAddress : null,
+        //const [firstName, lastName] = fullName.split(" ");
+
+        const orderPayload: OrderCreateDto = {
+            advertisementId: advertisementId,
+
+            firstName: firstName ?? "",
+            lastName: lastName ?? "",
+
+            email: email,
+            phoneNumber: phone,
+
+            deliveryMethod:
+                deliveryMethod === "nova_poshta" ? 0 : 1,
+
+            settlement:
+                deliveryMethod === "nova_poshta"
+                    ? settlementRef
+                    : settlementRef, // для кур'єра теж передаємо місто
+
+            newPostWarehouse:
+                deliveryMethod === "nova_poshta"
+                    ? warehouseRef
+                    : null,
+
+            deliveryAddress:
+                deliveryMethod === "courier"
+                    ? courierAddress
+                    : null,
+
+            paymentMethod: 0 // або що там у тебе
         };
 
-        console.log("ORDER:", orderPayload);
+        try {
+            await createOrder(orderPayload).unwrap();
+            alert("Замовлення створено успішно!");
+        } catch (error) {
+            console.error(error);
+            alert("Помилка при створенні замовлення");
+        }
     };
 
     // ==============================
     // UI
     // ==============================
+
+    if (!profile) {
+        return <div className="p-6">Завантаження профілю...</div>;
+    }
 
     return (
         <div className="max-w-3xl mx-auto p-6">
@@ -152,11 +212,29 @@ const OrderPage = () => {
 
                 {/* PERSONAL INFO */}
                 <div className="space-y-4">
+                    {/*<input*/}
+                    {/*    type="text"*/}
+                    {/*    placeholder="ПІБ"*/}
+                    {/*    value={fullName}*/}
+                    {/*    onChange={(e) => setFullName(e.target.value)}*/}
+                    {/*    className="w-full border p-3 rounded"*/}
+                    {/*    required*/}
+                    {/*/>*/}
+
                     <input
                         type="text"
-                        placeholder="ПІБ"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Ім'я"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="w-full border p-3 rounded"
+                        required
+                    />
+
+                    <input
+                        type="text"
+                        placeholder="Прізвище"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
                         className="w-full border p-3 rounded"
                         required
                     />
@@ -166,6 +244,15 @@ const OrderPage = () => {
                         placeholder="Телефон"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
+                        className="w-full border p-3 rounded"
+                        required
+                    />
+
+                    <input
+                        type="tel"
+                        placeholder="Електронна пошта"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full border p-3 rounded"
                         required
                     />
@@ -298,7 +385,7 @@ const OrderPage = () => {
                             : "bg-gray-400 cursor-not-allowed"
                     }`}
                 >
-                    Підтвердити замовлення
+                    {isLoading ? "Створення..." : "Підтвердити замовлення"}
                 </button>
             </form>
         </div>

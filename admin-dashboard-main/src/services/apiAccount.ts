@@ -5,6 +5,7 @@ import {ILoginRequest} from "../types/Account/ILoginRequest.ts";
 import {IUserCreate} from "../types/IUserCreate.ts";
 import {IUserProfile} from "../types/Account/IUserProfile.ts";
 import {serialize} from "object-to-formdata";
+import {ServiceResponse} from "../types/IServiceResponse.ts";
 //import {ILoginRequest, IResponse, IUserCreate} from "../models/account";
 
 export const apiAccount = createApi({
@@ -48,7 +49,7 @@ export const apiAccount = createApi({
                 };
             },
         }),
-        profile: builder.query<IUserProfile, void>({
+        profile: builder.query<ServiceResponse<IUserProfile>, void>({
             query: () => ({
                 url: "profile",
                 method: "GET"

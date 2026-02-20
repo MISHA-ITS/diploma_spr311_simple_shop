@@ -10,12 +10,19 @@ export enum PaymentMethod {
 
 export interface OrderCreateDto {
     advertisementId: number;
+
     firstName: string;
-    phone: string;
-    deliveryType: DeliveryType;
-    paymentMethod: PaymentMethod;
-    cityRef: string;
-    warehouseId?: number;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+
+    deliveryMethod: number; // enum numeric
+
+    settlement: string | null;
+    newPostWarehouse: string | null;
+    deliveryAddress: string | null;
+
+    paymentMethod: number;
 }
 
 export interface OrderResponseDto {
