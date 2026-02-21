@@ -7,6 +7,7 @@
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public long CategoryId { get; set; }
+        public long UserId { get; set; }
         public List<string> Images { get; set; } = [];
     }
 }

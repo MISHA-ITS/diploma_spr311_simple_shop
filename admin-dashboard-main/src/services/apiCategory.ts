@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
-import { ICategory, ICategoryPageRequest } from "../../models/category.ts"
-import { PageResponse } from "../../models/category.ts"
-import EnvConfig from "../../config/env.ts";
+import { ICategory, ICategoryPageRequest } from "../models/category.ts"
+import { PageResponse } from "../models/category.ts"
+import EnvConfig from "../config/env.ts";
 
 interface ApiResponse<T> {
     isSuccess: boolean;
@@ -9,8 +9,8 @@ interface ApiResponse<T> {
     payload: T;
 }
 
-export const categoryApi = createApi({
-    reducerPath: 'categoryApi',
+export const apiCategory = createApi({
+    reducerPath: 'apiCategory',
     baseQuery: fetchBaseQuery({ baseUrl: EnvConfig.API_URL + '/api/Category' }),
     tagTypes: ['Categories','CategoriesPage','Category'],
 
@@ -78,4 +78,4 @@ export const {
     useCreateCategoryMutation,
     useUpdateCategoryMutation,
     useDeleteCategoryMutation
-} = categoryApi
+} = apiCategory

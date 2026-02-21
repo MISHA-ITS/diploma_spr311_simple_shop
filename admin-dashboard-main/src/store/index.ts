@@ -1,9 +1,10 @@
 import {configureStore} from "@reduxjs/toolkit"
 import {apiAccount} from "../services/apiAccount.ts";
 import {apiUser} from "../services/apiUser.ts";
-import {apiAdvertisement} from "../services/apiAdvertisement.ts";
 import authReducer from "./authSlice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
+import {apiCategory} from "../services/apiCategory.ts";
+import {apiAdvertisement} from "../services/apiAdvertisement.ts";
 import {categoryApi} from "./api/categoryApi.ts";
 import {apiNewPost} from "../services/apiNewPost.ts";
 import {apiOrder} from "../services/apiOrder.ts";
@@ -11,7 +12,7 @@ import {apiOrder} from "../services/apiOrder.ts";
 
 export const store = configureStore({
     reducer: {
-        [categoryApi.reducerPath]: categoryApi.reducer,
+        [apiCategory.reducerPath]: apiCategory.reducer,
         [apiAccount.reducerPath]: apiAccount.reducer,
         [apiUser.reducerPath]: apiUser.reducer,
         [apiAdvertisement.reducerPath]: apiAdvertisement.reducer,
@@ -23,7 +24,7 @@ export const store = configureStore({
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
-            categoryApi.middleware,
+            apiCategory.middleware,
             apiAccount.middleware,
             apiUser.middleware,
             apiAdvertisement.middleware,

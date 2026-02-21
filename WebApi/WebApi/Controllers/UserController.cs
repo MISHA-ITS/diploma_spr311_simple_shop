@@ -15,7 +15,7 @@ public class UserController(IUserService userService) : ControllerBase
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
-    [HttpGet]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(long id)
     {
         var response = await userService.GetByIdAsync(id);

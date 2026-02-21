@@ -1,25 +1,31 @@
-import {createApi} from "@reduxjs/toolkit/query/react";
-import {createBaseQuery} from "../utils/createBaseQuery.ts";
+import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
+import {IAdvertisement} from "../pages/Advertisement/types.ts";
+import EnvConfig from "../config/env.ts";
 
-export interface AdvertisementDto {
-    id: number;
-    title: string;
-    price: number;
-    imageUrl: string;
-    sellerId: number;
-    sellerName: string;
-    sellerPhone?: string;
+interface ApiResponse<T> {
+    isSuccess: boolean;
+    message: string;
+    payload: T;
 }
 
 export const apiAdvertisement = createApi({
-    reducerPath: "apiAdvertisement",
-    baseQuery: createBaseQuery("Advertisement"),
-    tagTypes: ["Advertisement"],
-    endpoints: (builder) => ({
-        getAdvertisementById: builder.query<AdvertisementDto, number>({
-            query: (id) => `/${id}`,
-        }),
-    }),
-});
+    reducerPath: 'apiAdvertisement',
+    baseQuery: fetchBaseQuery({ baseUrl: EnvConfig.API_URL + '/api/Advertisement' }),
+    tagTypes: ['Advertisement'],
 
-export const { useGetAdvertisementByIdQuery } = apiAdvertisement;
+    endpoints: (builder) => ({
+        getAdvertisementById: builder.query<ApiResponse<IAdvertisement>, number>({
+            query: (Id) => {
+                return {
+                    url: `/${Id}`,
+                    method: 'GET',
+                }
+            },
+            providesTags: (_, __, id) => [{ type: 'Advertisement', id }]
+        })
+    }),
+})
+
+export const {
+    useGetAdvertisementByIdQuery,
+} = apiAdvertisement

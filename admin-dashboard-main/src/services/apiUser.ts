@@ -9,6 +9,13 @@ import {
 } from "../pages/Users/types.ts";
 import {serialize} from "object-to-formdata";
 import {IResponse} from "../types/Account/IRegisterRequest.ts";
+import {IUser} from "../types/User/types.ts";
+
+interface ApiResponse<T> {
+    isSuccess: boolean;
+    message: string;
+    payload: T;
+}
 
 export const apiUser = createApi({
     reducerPath: "apiUser",
@@ -86,6 +93,15 @@ export const apiUser = createApi({
             }),
             invalidatesTags: ["User"]
         }),
+        getUserById: builder.query<ApiResponse<IUser>, number>({
+            query: (Id) => {
+                return {
+                    url: `Get/${Id}`,
+                    method: 'GET',
+                }
+            },
+            providesTags: (_, __, id) => [{ type: 'User', id }]
+        })
     }),
 });
 
@@ -95,4 +111,5 @@ export const {
     useDeleteUserMutation,
     useLockUserMutation,
     useUnlockUserMutation,
+    useGetUserByIdQuery
 } = apiUser;
