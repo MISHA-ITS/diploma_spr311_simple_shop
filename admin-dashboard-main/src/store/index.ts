@@ -5,7 +5,6 @@ import authReducer from "./authSlice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import {apiCategory} from "../services/apiCategory.ts";
 import {apiAdvertisement} from "../services/apiAdvertisement.ts";
-import {categoryApi} from "./api/categoryApi.ts";
 import {apiNewPost} from "../services/apiNewPost.ts";
 import {apiOrder} from "../services/apiOrder.ts";
 //import {advertisementApi} from "./api/advertisementApi.ts";
