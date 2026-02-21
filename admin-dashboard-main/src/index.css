@@ -187,6 +187,7 @@ layer(base);
   }
   body {
     @apply relative font-normal font-outfit z-1 bg-gray-50;
+    overflow-x: hidden;
   }
   h1, h2, h3, h4, h5, h6 {
 font-family: 'Inter', sans-serif;
