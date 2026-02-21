@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useGetAllCategoriesQuery} from "../../store/api/categoryApi.ts";
+import {useGetAllCategoriesQuery} from "../../services/apiCategory.ts";
 import SearchBlock from "./SearchBlock.tsx";
 import PromoBlock from "./PromoBlock.tsx";
 import CategoriesBlock from "./CategoriesBlock.tsx";
