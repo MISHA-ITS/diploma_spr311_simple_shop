@@ -6,9 +6,9 @@ type CardProps = {
 };
 
 const Card: React.FC<CardProps> = ({ category }) => (
-    <div className="w-[125px] h-[139px] flex flex-col items-center gap-[15px]">
+    <div className="w-[125px] h-[145px] flex flex-col items-center gap-[15px]">
         <img
-            src={category.imageUrl ? `${EnvConfig.API_URL}/images/categories/600_${category.imageUrl}` : `${EnvConfig.API_URL}/images/noimage.jpeg`}
+            src={category.imageUrl ? `${EnvConfig.API_URL}/images/categories/800_${category.imageUrl}` : `${EnvConfig.API_URL}/images/noimage.jpeg`}
             alt={category.name}
             className="w-[100px] h-[100px] rounded-[5px]"
         />

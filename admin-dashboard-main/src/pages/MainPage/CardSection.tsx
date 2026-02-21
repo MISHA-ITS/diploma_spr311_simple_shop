@@ -6,14 +6,18 @@ type CardSectionProps = {
 };
 
 const CardSection: React.FC<CardSectionProps> = ({ categories }) => {
+    const parentCategories = categories.filter(
+        category => category.parentId === null
+    );
+
     const rows = [];
 
-    for (let i = 0; i < categories.length; i += 8) {
-        rows.push(categories.slice(i, i + 8));
+    for (let i = 0; i < parentCategories.length; i += 8) {
+        rows.push(parentCategories.slice(i, i + 8));
     }
 
     return (
-        <div className="w-[1364px] flex flex-col gap-[52px] items-center">
+        <div className="w-[1364px] mx-auto flex flex-col gap-[52px]">
             {rows.map((rowCategories, i) => (
                 <CardRow key={i} categories={rowCategories} />
             ))}
