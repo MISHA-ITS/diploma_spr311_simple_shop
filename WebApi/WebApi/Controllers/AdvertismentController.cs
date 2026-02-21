@@ -8,7 +8,7 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AdvertismentController(IAdvertisementService advertisementService) : ControllerBase
+public class AdvertisementController(IAdvertisementService advertisementService) : ControllerBase
 {
     [Authorize]
     [HttpPost("create")]
@@ -29,7 +29,7 @@ public class AdvertismentController(IAdvertisementService advertisementService) 
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetAll([FromQuery] AdvertisementFilterDto filter)
+    public async Task<IActionResult> GetAll([FromQuery] AdvertisementDTO filter)
     {
         var responce = await advertisementService.GetAllAsync(filter);
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);

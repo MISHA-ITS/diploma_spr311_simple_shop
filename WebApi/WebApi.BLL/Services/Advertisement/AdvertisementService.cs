@@ -77,14 +77,14 @@ namespace WebApi.BLL.Services.Advertisement
                 : ServiceResponse.Error("Failed to delete advertisement");
         }
 
-        public async Task<ServiceResponse> GetAllAsync(AdvertisementFilterDto filter)
+        public async Task<ServiceResponse> GetAllAsync(AdvertisementDTO filter)
         {
             logger.LogDebug("Retrieving all advertisements with filter {@Filter}", filter);
 
             var entities = advertisementRepository.GetAll();
             /*entities = Filteradvertisements(entities, filter);*/
 
-            var dtos = mapper.Map<List<AdvertisementFilterDto>>(await entities.ToListAsync());
+            var dtos = mapper.Map<List<AdvertisementDTO>>(await entities.ToListAsync());
 
             logger.LogInformation("Retrieved {Count} advertisements", dtos.Count);
 
