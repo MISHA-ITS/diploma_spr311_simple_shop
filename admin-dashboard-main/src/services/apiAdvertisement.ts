@@ -10,7 +10,7 @@ interface ApiResponse<T> {
 
 export const apiAdvertisement = createApi({
     reducerPath: 'apiAdvertisement',
-    baseQuery: fetchBaseQuery({ baseUrl: EnvConfig.API_URL + '/api/Advertisment' }),
+    baseQuery: fetchBaseQuery({ baseUrl: EnvConfig.API_URL + '/api/Advertisement' }),
     tagTypes: ['Advertisement'],
 
     endpoints: (builder) => ({
