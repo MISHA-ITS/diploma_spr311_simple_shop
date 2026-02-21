@@ -27,7 +27,10 @@ namespace WebApi.DAL.Entities
         [Unicode(false)]
         public string? SettlementRef { get; set; }
         public Settlement? Settlement { get; set; }
-        public ICollection<CategoryEntity> Categories { get; set; } = [];
+        public long CategoryId { get; set; }
+
+        [ForeignKey("CategoryId")]
+        public CategoryEntity? Category { get; set; }
         public ICollection<AdvertisementImageEntity> Images { get; set; } = [];
     }
 }

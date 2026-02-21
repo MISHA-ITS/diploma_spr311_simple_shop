@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using WebApi.BLL.Resources;
 using System.Net;
 using System.Text;
 using WebApi.BLL.DTOs.NewPost;
 using WebApi.BLL.Exceptions;
 using WebApi.BLL.Models.NewPost;
+using WebApi.BLL.Resources;
 using WebApi.DAL.Entities.NewPostEntities;
 using WebApi.DAL.Repositories.NewPost;
 
@@ -90,9 +91,17 @@ public class NewPostService(IConfiguration configuration,
             .Select(z => z.First());
     }
 
-    public async Task<SettlementDto> GetSettlement(string settlementRef) =>
-        await mapper.ProjectTo<SettlementDto>(settlementRepository.GetQuery().Where(x => x.Ref == settlementRef)).FirstOrDefaultAsync()
-        ?? throw new HttpException(Errors.InvalidSettlementRef, HttpStatusCode.BadRequest);
+    public async Task<SettlementDto?> GetSettlement(string settlementRef)
+    {
+        if (string.IsNullOrWhiteSpace(settlementRef))
+            return null;
+
+        return await settlementRepository
+            .GetQuery()
+            .Where(x => x.Ref == settlementRef)
+            .ProjectTo<SettlementDto>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
+    }
 
     public async Task<IEnumerable<SettlementDto>> GetSettlementsByRegionAsync(string regionRef)
     {

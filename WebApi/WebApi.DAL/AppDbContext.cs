@@ -21,6 +21,7 @@ public class AppDbContext
     public DbSet<Area> Areas { get; set; }
     public DbSet<Region> Regions { get; set; }
     public DbSet<Settlement> Settlements { get; set; }
+    public DbSet<OrderEntity> Orders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
