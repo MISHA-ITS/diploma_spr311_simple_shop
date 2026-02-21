@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import {useGetAllCategoriesQuery, useGetCategoryPageQuery} from "../../../store/api/categoryApi.ts";
+import {useGetAllCategoriesQuery, useGetCategoryPageQuery} from "../../../services/apiCategory.ts";
 import EnvConfig from "../../../config/env.ts";
 import {ICategory, ICategoryTreeNode} from "../../../types/Category/types.ts";
 import CategoriesCard from "./CategoriesCard.tsx";
@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 import {ICategoryPageRequest} from "../../../models/category.ts";
 import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import {useSearchParams} from "react-router-dom";
-import { useDeleteCategoryMutation, useCreateCategoryMutation, useUpdateCategoryMutation} from "../../../store/api/categoryApi.ts";
+import { useDeleteCategoryMutation, useCreateCategoryMutation, useUpdateCategoryMutation} from "../../../services/apiCategory.ts";
 
 const CategoriesList: React.FC = () => {
     const [isDrawerOpen, setIsOpen] = useState(false);
@@ -249,7 +249,7 @@ const CategoriesList: React.FC = () => {
                                                 autoFocus
                                                 value={filters.searchName}
                                                 onChange={(e) => setFilters(prev => ({ ...prev, searchName: e.target.value }))}
-                                                placeholder="Шукати..."
+                                                placeholder="Шукати категорію..."
                                                 className="w-full bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                             />
                                         )}
@@ -273,7 +273,7 @@ const CategoriesList: React.FC = () => {
                                                 autoFocus
                                                 value={filters.parentName}
                                                 onChange={(e) => setFilters(prev => ({ ...prev, parentName: e.target.value }))}
-                                                placeholder="Пошук батьківської..."
+                                                placeholder="Шукати батьківську категорію..."
                                                 className="w-full bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                             />
                                         )}

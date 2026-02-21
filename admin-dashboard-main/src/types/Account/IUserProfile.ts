@@ -3,6 +3,7 @@ export interface IUserProfile {
     lastName: string;
     fullName: string;
     email: string;
+    phoneNumber: string;
     image?: string|null;
     dateRegister: string;
     roles: string[];

@@ -20,6 +20,7 @@ using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
 using WebApi.BLL.Services.NewPost;
+using WebApi.BLL.Services.Order;
 using WebApi.BLL.Services.Role;
 using WebApi.BLL.Services.User;
 using WebApi.DAL;
@@ -28,6 +29,7 @@ using WebApi.DAL.Entities.NewPostEntities;
 using WebApi.DAL.Repositories.Advertisements;
 using WebApi.DAL.Repositories.Category;
 using WebApi.DAL.Repositories.NewPost;
+using WebApi.DAL.Repositories.Order;
 using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,12 +47,14 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
 builder.Services.AddScoped<INewPostService, NewPostService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAdvertisementRepository, AdvertisementRepository>();
 builder.Services.AddScoped<INewPostRepository<Area>, NewPostRepository<Area>>();
 builder.Services.AddScoped<INewPostRepository<Region>, NewPostRepository<Region>>();
 builder.Services.AddScoped<INewPostRepository<Settlement>, NewPostRepository<Settlement>>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddSwaggerGen();
 
