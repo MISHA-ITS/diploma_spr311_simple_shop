@@ -1,28 +1,54 @@
-import React from "react";
-import { SearchOutlined } from "@ant-design/icons";
-import LocationIcon from "../../icons/Location.png";
-import MoreIcon from "../../icons/More.png";
+import {FC, useState} from "react";
+import SearchIcon from "../../icons/Search.png";
+import {useGetAreasQuery, useGetSettlementsQuery} from "../../services/apiNewPost.ts";
+import {IArea, ISettlement} from "../../models/newPost.ts";
+import AreasDropDown from "./AreasDropDown.tsx";
 
-const SearchBlock: React.FC = () => {
+const SearchBlock: FC = () => {
+    const { data: areas } = useGetAreasQuery();
+    const {data: settlements, isLoading } = useGetSettlementsQuery();
+
+    const [searchValue, setSearchValue] = useState("");
+
+    const [selectedArea, setSelectedArea] = useState<IArea | null>(null);
+    const [selectedSettlement, setSelectedSettlement] = useState<ISettlement | null>(null);
+
+    const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(e.target.value);
+    }
+
     return (
         <div className="mt-[57px] w-full max-w-[1430px] px-4 flex gap-9 h-[54px]">
-            <div className="flex flex-1 min-w-[800px] h-full rounded-[5px] border border-[#6C6C6C] bg-[#AEAEAE] px-4 gap-4 items-center">
-                <SearchOutlined className="text-[25px] text-[#6C6C6C]" />
-                <span className="text-[16px] font-inter text-[#212121] truncate">
-                    Що шукаєте?
-                </span>
+            <div className="flex flex-row items-center gap-4 px-4 w-[981px] h-[48px] rounded-[5px] border-[2px] border-[rgba(0,23,72,0.58)] box-border">
+                <img
+                    src={SearchIcon}
+                    alt="icon"
+                    className="w-[30px] h-[30px] flex-none"
+                />
+
+                <input
+                    type="text"
+                    placeholder="Що шукаєте?"
+                    value={searchValue}
+                    onChange={handleChange}
+                    className="flex-1 bg-transparent outline-none font-inter text-[16px] leading-[19px] text-[rgba(0,23,72,0.8)] placeholder:text-[rgba(0,23,72,0.58)]"
+                />
             </div>
 
-            <div className="flex items-center w-[413px] h-full rounded-[5px] border border-[#6C6C6C] bg-[#AEAEAE] px-4">
-                <div className="flex items-center gap-4">
-                    <img src={LocationIcon} alt="icon" className="w-[25px] h-[30px]" />
-                    <span className="text-[16px] font-inter text-[#212121] truncate">
-                        Вся Україна
-                    </span>
-                </div>
-
-                <img src={MoreIcon} alt="arrow" className="w-[28px] h-[12px] ml-auto" />
-            </div>
+            {areas && (
+                <AreasDropDown
+                    areas={areas}
+                    settlements={settlements!}
+                    isLoading={isLoading}
+                    selectedArea={selectedArea}
+                    selectedSettlement={selectedSettlement}
+                    onSelectArea={(area) => {
+                        setSelectedArea(area);
+                        setSelectedSettlement(null);
+                    }}
+                    onSelectSettlement={(settlement) => setSelectedSettlement(settlement)}
+                />
+            )}
         </div>
     );
 };

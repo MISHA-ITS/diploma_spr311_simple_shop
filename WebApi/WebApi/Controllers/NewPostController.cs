@@ -13,8 +13,14 @@ public class NewPostController(INewPostService newPostService) : ControllerBase
     [HttpGet("regions")]
     public async Task<ActionResult> GetRegions() => Ok(await newPostService.GetRegionsAsync());
 
+    [HttpGet("settlement")]
+    public async Task<ActionResult> GetSettlement() => Ok(await newPostService.GetSettlementsAsync());
+
     [HttpGet("areas/regions")]
     public async Task<ActionResult> GetRegions([FromQuery] string areaRef) => Ok(await newPostService.GetRegionsByAreaAsync(areaRef));
+
+    [HttpGet("areas/settlements")]
+    public async Task<ActionResult> GetSettlementsByArea([FromQuery] string areaRef) => Ok(await newPostService.GetSettlementsByAreaAsync(areaRef));
 
     [HttpGet("region/settlements")]
     public async Task<ActionResult> GetSettlements([FromQuery] string regionRef) => Ok(await newPostService.GetSettlementsByRegionAsync(regionRef));

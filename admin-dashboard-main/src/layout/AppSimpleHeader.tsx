@@ -4,29 +4,58 @@ import * as React from "react";
 import {useAppSelector} from "../store";
 import { UserOutlined, BellOutlined, HeartOutlined } from '@ant-design/icons';
 import SelixLogo from "../icons/Sellix.png";
+import {useEffect, useRef, useState} from "react";
 
 const SimpleHeader: React.FC = () => {
+    const { user } = useAppSelector(globalState => globalState.auth);
 
-    const {user} = useAppSelector(globalState => globalState.auth);
+    const [isVisible, setIsVisible] = useState(true);
+    const lastScrollY = useRef(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY < 50) {
+                setIsVisible(true);
+                return;
+            }
+
+            if (currentScrollY > lastScrollY.current) {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+
+            lastScrollY.current = currentScrollY;
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-[rgb(33,33,33)] h-[91px] dark:bg-[#071739] dark:border-gray-800">
+        <header
+            className={`fixed top-0 left-0 w-full z-50 bg-[rgb(33,33,33)] h-[91px] 
+            transition-transform duration-300 
+            ${isVisible ? "translate-y-0" : "-translate-y-full"}
+            dark:bg-[#071739]`}
+        >
             <div className="flex pt-5 justify-between px-6 py-4">
 
                 <Link
                     to="/"
-                    className="ml-50 mr-6 flex items-center"
+                    className="ml-50 mr-6 pb-2 flex items-center"
                 >
                     <img
                         src={SelixLogo}
                         alt="Sellix"
-                        className="h-[27px] w-auto object-contain"
+                        className="h-[27px] min-w-[102px] w-auto object-contain"
                     />
                 </Link>
 
                 <div className="flex items-center gap-3">
-                    {user && 
-                        (
+                    {user && (
                         <>
                             <Link
                                 to="/"
@@ -39,7 +68,7 @@ const SimpleHeader: React.FC = () => {
                                     Сповіщення
                                 </span>
                             </Link>
-                            
+
                             <Link
                                 to="/"
                                 className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"
@@ -87,8 +116,9 @@ const SimpleHeader: React.FC = () => {
                     )}
                 </div>
             </div>
-        </header>
 
+            <div className="w-full h-[22px] bg-[#E3C39D]"></div>
+        </header>
     );
 };
 
