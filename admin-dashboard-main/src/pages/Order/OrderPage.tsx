@@ -7,7 +7,7 @@ import {
 } from "../../services/apiNewPost";
 import { useProfileQuery } from "../../services/apiAccount";
 import { useCreateOrderMutation } from "../../services/apiOrder";
-import {OrderCreateDto} from "./types.ts";
+import {DeliveryType, OrderCreateDto, PaymentMethod} from "./types.ts";
 import { useParams } from "react-router-dom";
 
 type DeliveryMethod = "nova_poshta" | "courier";
@@ -156,21 +156,19 @@ const OrderPage = () => {
         //const [firstName, lastName] = fullName.split(" ");
 
         const orderPayload: OrderCreateDto = {
-            advertisementId: advertisementId,
+            advertisementId,
 
-            firstName: firstName ?? "",
-            lastName: lastName ?? "",
-
-            email: email,
+            firstName,
+            lastName,
+            email,
             phoneNumber: phone,
 
             deliveryMethod:
-                deliveryMethod === "nova_poshta" ? 0 : 1,
-
-            settlement:
                 deliveryMethod === "nova_poshta"
-                    ? settlementRef
-                    : settlementRef, // для кур'єра теж передаємо місто
+                    ? DeliveryType.NewPost
+                    : DeliveryType.Courier,
+
+            settlement: settlementRef,
 
             newPostWarehouse:
                 deliveryMethod === "nova_poshta"
@@ -182,7 +180,7 @@ const OrderPage = () => {
                     ? courierAddress
                     : null,
 
-            paymentMethod: 0 // або що там у тебе
+            paymentMethod: PaymentMethod.Cash
         };
 
         try {

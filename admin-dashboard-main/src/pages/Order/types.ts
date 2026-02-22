@@ -1,6 +1,7 @@
 export enum DeliveryType {
-    Courier = 0,
-    NovaPoshta = 1,
+    NewPost = 0,
+    SelfPickup = 1,
+    Courier = 2,
 }
 
 export enum PaymentMethod {
