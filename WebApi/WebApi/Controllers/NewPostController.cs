@@ -32,6 +32,9 @@ public class NewPostController(INewPostService newPostService) : ControllerBase
     [HttpGet("settlements")]
     public async Task<ActionResult> GetSettlement([FromQuery] string settlementRef) => Ok(await newPostService.GetSettlement(settlementRef));
 
+    [HttpGet("areas/area")]
+    public async Task<IActionResult> GetAreaById([FromQuery] string areaRef) => Ok(await newPostService.GetAreaByIdAsync(areaRef));
+
     [HttpPost("update")]
     public async Task<ActionResult> UpdateData()
     {

@@ -115,6 +115,18 @@ public class NewPostService(IConfiguration configuration,
             .ProjectTo<SettlementDto>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
     }
+    public async Task<AreaDto?> GetAreaByIdAsync(string areaRef)
+    {
+        if (string.IsNullOrWhiteSpace(areaRef))
+            return null;
+
+        return await areaRepository
+            .GetQuery()
+            .Where(x => x.Ref == areaRef)
+            .ProjectTo<AreaDto>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
+    }
+
 
     public async Task<IEnumerable<SettlementDto>> GetSettlementsByRegionAsync(string regionRef)
     {

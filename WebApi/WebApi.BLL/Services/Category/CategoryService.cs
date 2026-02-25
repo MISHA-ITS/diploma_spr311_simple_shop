@@ -97,12 +97,11 @@ namespace WebApi.BLL.Services.Category
         {
             logger.LogInformation("Retrieving category with Id {CategoryId}", id);
 
-            var entity = await categoryRepository.GetByIdAsync(id);
-            if (entity == null)
+            var dto = await mapper.ProjectTo<CategoryDTO>(categoryRepository.GetAll())
+                          .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (dto == null)
                 return ServiceResponse.Error($"Category with Id {id} not found");
-
-            var dto = mapper.Map<CategoryDTO>(entity);
-
             logger.LogInformation("Category with Id {CategoryId} retrieved successfully", id);
 
             return ServiceResponse.Success("Category retrieved successfully", dto);

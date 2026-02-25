@@ -29,6 +29,9 @@ import Profile from "../pages/Profile.tsx";
 import AdvertisementPage from "../pages/Advertisement/components/AdvertisementPage.tsx";
 import OrderPage from "../pages/Order/OrderPage.tsx";
 import PrivateRoute from "./PrivateRoute.tsx";
+import CreateAdvertisementPage from "../pages/Advertisement/components/CreateAdvertisementPage.tsx";
+import AdvertisementPreview from "../pages/Advertisement/components/AdvertisementPreview.tsx";
+import {AdvertisementProvider} from "../context/AdvertisementContext.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -39,6 +42,10 @@ const AppRoutes : React.FC = () => {
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<MainPage />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
+                    <Route element={<AdvertisementProvider />}>
+                        <Route path="/createAdvertisement" element={<CreateAdvertisementPage />} />
+                        <Route path="/advertpreview" element={<AdvertisementPreview />} />
+                    </Route>
                     <Route
                         path="/order/:id"
                         element={

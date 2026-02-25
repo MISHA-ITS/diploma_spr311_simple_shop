@@ -16,5 +16,6 @@ public interface INewPostService : IDisposable
     Task<IEnumerable<RegionDto>> GetRegionsAsync();
     Task<IEnumerable<RegionDto>> GetRegionsByAreaAsync(string areaRef);
     Task<SettlementDto> GetSettlement(string settlementRef);
+    Task<AreaDto?> GetAreaByIdAsync(string areaRef);
     Task UpdateNewPostData();
 }
