@@ -5,7 +5,7 @@ using WebApi.BLL.Services.User;
 namespace WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]/[action]")]
+[Route("api/[controller]")]
 public class UserController(IUserService userService) : ControllerBase
 {
     [HttpPost]
@@ -43,14 +43,14 @@ public class UserController(IUserService userService) : ControllerBase
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
-    [HttpPost]
+    [HttpPost("Lock")]
     public async Task<IActionResult> Lock(long id)
     {
         var response = await userService.LockUserAsync(id);
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
-    [HttpPost]
+    [HttpPost("Unlock")]
     public async Task<IActionResult> Unlock(long id)
     {
         var response = await userService.UnlockUserAsync(id);

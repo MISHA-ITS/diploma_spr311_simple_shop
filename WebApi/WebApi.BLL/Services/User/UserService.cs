@@ -173,6 +173,15 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
             return ServiceResponse.Error($"Не вдалося оновити користувача: {errors}");
         }
 
+        var currentRoles = await userManager.GetRolesAsync(user);
+
+        await userManager.RemoveFromRolesAsync(user, currentRoles);
+
+        if (dto.Roles.Any())
+        {
+            await userManager.AddToRolesAsync(user, dto.Roles);
+        }
+
         return ServiceResponse.Success("Користувача успішно оновлено");
     }
 

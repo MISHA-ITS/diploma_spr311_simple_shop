@@ -24,7 +24,7 @@ export interface IUserUpdate {
     firstName: string;
     lastName: string;
     phoneNumber: string | null;
-    roles: string;
+    roles: string[];
     imageFile: File | null,
 }
 

@@ -38,6 +38,11 @@ const AppRoutes : React.FC = () => {
                 {/* Main Layout */}
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<MainPage />} />
+                    <Route path="/signin" element={<SignIn />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="forgot-password" element={<ForgotPassword />} />
+                    <Route path="reset-password" element={<ResetPassword />} />
+                    <Route path="/profile" element={<Profile />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
                     <Route
                         path="/order/:id"
@@ -88,11 +93,6 @@ const AppRoutes : React.FC = () => {
                 </Route>
 
                 {/* Auth Layout */}
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="reset-password" element={<ResetPassword />} />
 
                 {/* Fallback Route */}
                 <Route path="*" element={<NotFound />} />

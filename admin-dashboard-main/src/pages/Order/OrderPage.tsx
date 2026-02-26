@@ -9,6 +9,8 @@ import { useProfileQuery } from "../../services/apiAccount";
 import { useCreateOrderMutation } from "../../services/apiOrder";
 import {DeliveryType, OrderCreateDto, PaymentMethod} from "./types.ts";
 import { useParams } from "react-router-dom";
+import {useGetAdvertisementByIdQuery} from "../../services/apiAdvertisement.ts";
+import EnvConfig from "../../config/env.ts";
 
 type DeliveryMethod = "nova_poshta" | "courier";
 
@@ -19,9 +21,16 @@ const OrderPage = () => {
         return id ? Number(id) : 0;
     }, [id]);
 
-    useEffect(() => {
-        console.log("ADVERTISEMENT ID:", id);
-    }, [id]);
+    console.log("ADVERTISEMENT ID:", id);
+
+    const urlAdImage = `${EnvConfig.API_URL}/images/advertisements`;
+
+    const { data: advertisement, isLoading: adLoading } =
+        useGetAdvertisementByIdQuery(advertisementId, {
+            skip: !advertisementId,
+        });
+
+    console.log("ADVERTISEMENT:", advertisement);
 
     // ==============================
     // PROFILE (AUTO-FILL)
@@ -201,191 +210,326 @@ const OrderPage = () => {
     }
 
     return (
-        <div className="max-w-3xl mx-auto p-6">
-            <h1 className="text-2xl font-semibold mb-6">
-                Оформлення замовлення
+        <div className="max-w-6xl mx-auto px-6 py-10">
+
+            {/* TITLE */}
+            <h1 className="text-3xl font-semibold text-center mb-10">
+                Купити з доставкою
             </h1>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
-                {/* PERSONAL INFO */}
-                <div className="space-y-4">
-                    {/*<input*/}
-                    {/*    type="text"*/}
-                    {/*    placeholder="ПІБ"*/}
-                    {/*    value={fullName}*/}
-                    {/*    onChange={(e) => setFullName(e.target.value)}*/}
-                    {/*    className="w-full border p-3 rounded"*/}
-                    {/*    required*/}
-                    {/*/>*/}
+                {/* ================= LEFT COLUMN ================= */}
+                <div className="space-y-8">
 
-                    <input
-                        type="text"
-                        placeholder="Ім'я"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full border p-3 rounded"
-                        required
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Прізвище"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="w-full border p-3 rounded"
-                        required
-                    />
-
-                    <input
-                        type="tel"
-                        placeholder="Телефон"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full border p-3 rounded"
-                        required
-                    />
-
-                    <input
-                        type="tel"
-                        placeholder="Електронна пошта"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full border p-3 rounded"
-                        required
-                    />
-                </div>
-
-                {/* DELIVERY METHOD */}
-                <div>
-                    <h2 className="font-medium mb-3">Спосіб доставки</h2>
-
-                    <div className="flex gap-4">
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="radio"
-                                checked={deliveryMethod === "nova_poshta"}
-                                onChange={() =>
-                                    setDeliveryMethod("nova_poshta")
+                    {/* PRODUCT BLOCK */}
+                    {adLoading ? (
+                        <div>Завантаження товару...</div>
+                    ) : advertisement?.payload && (
+                        <div className="flex gap-6 border rounded-xl p-6 shadow-sm bg-white">
+                            <img
+                                src={
+                                    advertisement.payload.images?.length
+                                        ? `${urlAdImage}/800_${advertisement.payload.images[0]}`
+                                        : "/noimage.jpeg"
                                 }
+                                alt={advertisement.payload.name}
+                                className="w-32 h-32 object-cover rounded-lg border"
                             />
-                            Нова Пошта
-                        </label>
 
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="radio"
-                                checked={deliveryMethod === "courier"}
-                                onChange={() =>
-                                    setDeliveryMethod("courier")
-                                }
+                            <div className="flex flex-col justify-between">
+                                <div>
+                                    <h2 className="text-lg font-semibold">
+                                        {advertisement.payload.name}
+                                    </h2>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        {advertisement.payload.description}
+                                    </p>
+                                </div>
+
+                                <div className="text-xl font-bold mt-4">
+                                    {advertisement.payload.price} грн
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* DELIVERY SERVICE */}
+                    <div className="space-y-4">
+                        <div>
+                            <h2 className="text-lg font-semibold">
+                                Служба доставки
+                            </h2>
+                            <p className="text-sm text-gray-500">
+                                Оберіть спосіб отримання замовлення
+                            </p>
+                        </div>
+
+                        {/* WAREHOUSE */}
+                        <div
+                            onClick={() => setDeliveryMethod("nova_poshta")}
+                            className={`cursor-pointer border rounded-xl p-5 flex justify-between items-center transition
+                            ${deliveryMethod === "nova_poshta"
+                                ? "border-black bg-gray-50"
+                                : "border-gray-400 hover:border-black bg-gray-200"}
+                        `}
+                        >
+                            <div>
+                                <div className="font-medium">
+                                    У відділення Нова Пошта
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    доставка протягом 1-3 днів
+                                </div>
+                                <hr className="my-2 border-gray-400" />
+                                <div className="font-medium text-gray-500">
+                                    Доставка від 60 грн
+                                </div>
+                            </div>
+
+                            <img
+                                src="/nova-poshta-logo.svg"
+                                alt="NP"
+                                className="w-16 object-contain"
                             />
-                            Кур'єр
-                        </label>
+                        </div>
+
+                        {/* COURIER */}
+                        <div
+                            onClick={() => setDeliveryMethod("courier")}
+                            className={`cursor-pointer border rounded-xl p-5 flex justify-between items-center transition
+                            ${deliveryMethod === "courier"
+                                ? "border-black bg-gray-50"
+                                : "border-gray-300 hover:border-black bg-gray-200"}
+                        `}
+                        >
+                            <div>
+                                <div className="font-medium">
+                                    Кур'єром Нова Пошта
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    доставка протягом 1-3 днів
+                                </div>
+                                <hr className="my-2 border-gray-400" />
+                                <div className="font-medium text-gray-500">
+                                    Доставка від 95 грн
+                                </div>
+                            </div>
+
+                            <img
+                                src="/nova-poshta-logo.svg"
+                                alt="NP"
+                                className="w-16 object-contain"
+                            />
+                        </div>
                     </div>
                 </div>
 
-                {/* LOCATION (СПІЛЬНИЙ БЛОК) */}
-                <div className="space-y-4">
+                {/* ================= RIGHT COLUMN ================= */}
+                <div>
 
-                    <select
-                        value={areaRef ?? ""}
-                        onChange={(e) =>
-                            setAreaRef(e.target.value || null)
-                        }
-                        className="w-full border p-3 rounded"
-                        required
-                    >
-                        <option value="">Оберіть область</option>
-                        {areas.map((a) => (
-                            <option key={a.ref} value={a.ref}>
-                                {a.description}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="border rounded-xl p-8 shadow-sm bg-white space-y-6">
 
-                    <select
-                        value={regionRef ?? ""}
-                        onChange={(e) =>
-                            setRegionRef(e.target.value || null)
-                        }
-                        disabled={!areaRef}
-                        className="w-full border p-3 rounded"
-                        required
-                    >
-                        <option value="">Оберіть район</option>
-                        {regions.map((r) => (
-                            <option key={r.ref} value={r.ref}>
-                                {r.description}
-                            </option>
-                        ))}
-                    </select>
+                        <div>
+                            <h2 className="text-lg font-semibold">
+                                Контактні дані
+                            </h2>
+                            <p className="text-sm text-gray-500">
+                                Заповніть контактні дані отримувача
+                            </p>
+                        </div>
 
-                    <select
-                        value={settlementRef ?? ""}
-                        onChange={(e) =>
-                            setSettlementRef(e.target.value || null)
-                        }
-                        disabled={!regionRef}
-                        className="w-full border p-3 rounded"
-                        required
-                    >
-                        <option value="">Оберіть населений пункт</option>
-                        {settlements.map((s) => (
-                            <option key={s.ref} value={s.ref}>
-                                {s.description}
-                            </option>
-                        ))}
-                    </select>
+                        <form onSubmit={handleSubmit} className="space-y-4">
 
-                    {/* NOVA POSHTA */}
-                    {deliveryMethod === "nova_poshta" && (
-                        <select
-                            value={warehouseRef ?? ""}
-                            onChange={(e) =>
-                                setWarehouseRef(e.target.value || null)
-                            }
-                            disabled={!settlementRef}
-                            className="w-full border p-3 rounded"
-                            required
-                        >
-                            <option value="">Оберіть відділення</option>
-                            {warehouses.map((w) => (
-                                <option key={w.ref} value={w.ref}>
-                                    {w.description}
-                                </option>
-                            ))}
-                        </select>
-                    )}
+                            {/* CONTACT FIELDS */}
+                            <div className="relative">
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Прізвище*
+                                </p>
+                                <input
+                                    type="text"
+                                    placeholder="Прізвище"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                    required
+                                />
+                                {lastName.trim().length > 2 && (
+                                    <span className="absolute right-0 top-9 text-gray-500">
+                                        ✓
+                                    </span>
+                                )}
+                            </div>
 
-                    {/* COURIER */}
-                    {deliveryMethod === "courier" && (
-                        <input
-                            type="text"
-                            placeholder="Введіть точну адресу доставки"
-                            value={courierAddress}
-                            onChange={(e) =>
-                                setCourierAddress(e.target.value)
-                            }
-                            className="w-full border p-3 rounded"
-                            required
-                        />
-                    )}
+                            <div className="relative">
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Ім'я*
+                                </p>
+                                <input
+                                    type="text"
+                                    placeholder="Ім'я"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                    required
+                                />
+                                {firstName.trim().length > 2 && (
+                                    <span className="absolute right-0 top-9 text-gray-500">
+                                        ✓
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="relative">
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Номер телефону*
+                                </p>
+                                <input
+                                    type="tel"
+                                    placeholder="Номер телефону"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                    required
+                                />
+                                {phone.trim().length > 2 && (
+                                    <span className="absolute right-0 top-9 text-gray-500">
+                                        ✓
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="relative">
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Електронна пошта*
+                                </p>
+                                <input
+                                    type="email"
+                                    placeholder="Електронна пошта"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                    required
+                                />
+                                {email.trim().length > 2 && (
+                                    <span className="absolute right-0 top-9 text-gray-500">
+                                        ✓
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* LOCATION SELECTS */}
+                            <div className="space-y-3 pt-4">
+
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Область*
+                                </p>
+                                <select
+                                    value={areaRef ?? ""}
+                                    onChange={(e) => setAreaRef(e.target.value || null)}
+                                    className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                    required
+                                >
+                                    <option value="">Оберіть область</option>
+                                    {areas.map((a) => (
+                                        <option key={a.ref} value={a.ref}>
+                                            {a.description}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Района*
+                                </p>
+                                <select
+                                    value={regionRef ?? ""}
+                                    onChange={(e) => setRegionRef(e.target.value || null)}
+                                    disabled={!areaRef}
+                                    className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                    required
+                                >
+                                    <option value="">Оберіть район</option>
+                                    {regions.map((r) => (
+                                        <option key={r.ref} value={r.ref}>
+                                            {r.description}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Населений пункт*
+                                </p>
+                                <select
+                                    value={settlementRef ?? ""}
+                                    onChange={(e) => setSettlementRef(e.target.value || null)}
+                                    disabled={!regionRef}
+                                    className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                    required
+                                >
+                                    <option value="">Оберіть населений пункт</option>
+                                    {settlements.map((s) => (
+                                        <option key={s.ref} value={s.ref}>
+                                            {s.description}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {/* CONDITIONAL BLOCK */}
+                                <p className="text-sm mb-0 text-gray-500">
+                                    Відділення Нової Пошти або адреса отримувача*
+                                </p>
+                                {deliveryMethod === "nova_poshta" &&  (
+                                    <select
+                                        value={warehouseRef ?? ""}
+                                        onChange={(e) => setWarehouseRef(e.target.value || null)}
+                                        disabled={!settlementRef}
+                                        className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                        required
+                                    >
+                                        <option value="">Оберіть відділення</option>
+                                        {warehouses.map((w) => (
+                                            <option key={w.ref} value={w.ref}>
+                                                {w.description}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+
+                                {deliveryMethod === "courier" && (
+                                    <input
+                                        type="text"
+                                        placeholder="Введіть точну адресу доставки"
+                                        value={courierAddress}
+                                        onChange={(e) => setCourierAddress(e.target.value)}
+                                        className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
+                                        required
+                                    />
+                                )}
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-gray-500 mt-1 p-5">
+                                    *обов'язкове поле для заповнення
+                                </p>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={!isFormValid}
+                                className={`w-full py-3 rounded-lg text-white font-medium transition
+                                ${isFormValid
+                                    ? "bg-black hover:opacity-90"
+                                    : "bg-gray-400 cursor-not-allowed"}
+                            `}
+                            >
+                                {isLoading
+                                    ? "Створення..."
+                                    : "Підтвердити замовлення"}
+                            </button>
+                        </form>
+                    </div>
                 </div>
-
-                {/* SUBMIT */}
-                <button
-                    type="submit"
-                    disabled={!isFormValid}
-                    className={`w-full py-3 rounded text-white transition ${
-                        isFormValid
-                            ? "bg-black hover:opacity-90"
-                            : "bg-gray-400 cursor-not-allowed"
-                    }`}
-                >
-                    {isLoading ? "Створення..." : "Підтвердити замовлення"}
-                </button>
-            </form>
+            </div>
         </div>
     );
 };
