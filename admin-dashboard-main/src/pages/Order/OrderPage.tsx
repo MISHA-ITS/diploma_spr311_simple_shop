@@ -24,6 +24,7 @@ const OrderPage = () => {
     console.log("ADVERTISEMENT ID:", id);
 
     const urlAdImage = `${EnvConfig.API_URL}/images/advertisements`;
+    //const urlAdImage = `${EnvConfig.API_URL}/images`;
 
     const { data: advertisement, isLoading: adLoading } =
         useGetAdvertisementByIdQuery(advertisementId, {

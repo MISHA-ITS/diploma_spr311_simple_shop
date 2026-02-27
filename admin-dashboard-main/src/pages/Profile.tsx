@@ -1,16 +1,54 @@
 import PageMeta from "../components/common/PageMeta";
 import { useProfileQuery } from "../services/apiAccount";
-import { useState } from "react";
+import {useMemo, useState} from "react";
+import {useGetMyAdvertisementsQuery} from "../services/apiAdvertisement.ts";
+import {Link} from "react-router-dom";
+import {IAdvertisement} from "./Advertisement/types.ts";
 
 const Profile = () => {
-    const { data, isLoading } = useProfileQuery();
+    const { data: profileData, isLoading: profileLoading } = useProfileQuery();
+    const { data: adsData, isLoading: adsLoading } = useGetMyAdvertisementsQuery();
 
     const [activeTab, setActiveTab] = useState("active");
 
-    if (isLoading) return <div className="p-10">Завантаження...</div>;
-    if (!data?.payload) return <div className="p-10">Помилка завантаження</div>;
+    const advertisements: IAdvertisement[] = adsData?.payload ?? [];
 
-    const user = data.payload;
+    // ===============================
+    // 🔎 ФІЛЬТРАЦІЯ ПО СТАТУСУ
+    // ===============================
+
+    const filteredAds = useMemo(() => {
+        return advertisements.filter(ad => {
+            switch (activeTab) {
+                case "active":
+                    return ad.isApproved && ad.isActive && !ad.isBlocked;
+
+                case "waiting":
+                    return !ad.isApproved && !ad.isBlocked;
+
+                case "inactive":
+                    return ad.isApproved && !ad.isActive && !ad.isBlocked;
+
+                case "rejected":
+                    return ad.isBlocked;
+
+                default:
+                    return true;
+            }
+        });
+    }, [advertisements, activeTab]);
+
+    if (profileLoading || adsLoading)
+        return <div className="p-10">Завантаження...</div>;
+
+    if (!profileData?.payload)
+        return <div className="p-10">Помилка завантаження профілю</div>;
+
+    const user = profileData.payload;
+
+    // ===============================
+    // UI
+    // ===============================
 
     return (
         <>
@@ -42,16 +80,15 @@ const Profile = () => {
                         { key: "active", label: "Активні" },
                         { key: "waiting", label: "Очікуючі" },
                         { key: "inactive", label: "Неактивні" },
-                        { key: "unpaid", label: "Неоплачені" },
                         { key: "rejected", label: "Відхилені" },
                     ].map(tab => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`pb-2 ${
+                            className={`pb-2 transition ${
                                 activeTab === tab.key
                                     ? "text-black border-b-2 border-black"
-                                    : "text-gray-400"
+                                    : "text-gray-400 hover:text-black"
                             }`}
                         >
                             {tab.label}
@@ -59,42 +96,60 @@ const Profile = () => {
                     ))}
                 </div>
 
-                {/* FILTERS */}
-                <div className="flex flex-wrap gap-4 mb-12">
-                    <button className="px-4 py-2 bg-gray-200 rounded-lg text-sm">
-                        Фільтри
-                    </button>
+                {/* CONTENT */}
+                {filteredAds.length === 0 ? (
+                    <div className="flex flex-col items-center text-center mt-20">
+                        <div className="w-20 h-20 bg-gray-200 rounded-md mb-6" />
+                        <p className="font-medium mb-2">
+                            Немає оголошень у цій категорії
+                        </p>
+                        <p className="text-sm text-gray-500 mb-6">
+                            Створіть нове оголошення або змініть вкладку.
+                        </p>
+                        <Link
+                            to="/create-advertisement"
+                            className="px-6 py-3 bg-black text-white rounded-lg"
+                        >
+                            Створити оголошення
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="grid gap-6">
+                        {filteredAds.map(ad => (
+                            <div
+                                key={ad.id}
+                                className="border rounded-xl p-6 bg-white shadow-sm flex justify-between items-center"
+                            >
+                                <div className="flex gap-4 items-center">
+                                    {ad.images?.length > 0 && (
+                                        <img
+                                            src={ad.images[0]}
+                                            alt={ad.name}
+                                            className="w-20 h-20 object-cover rounded-lg border"
+                                        />
+                                    )}
 
-                    <input
-                        placeholder="Пошук"
-                        className="px-4 py-2 bg-gray-200 rounded-lg text-sm w-60"
-                    />
+                                    <div>
+                                        <h3 className="font-semibold text-lg">
+                                            {ad.name}
+                                        </h3>
+                                        <p className="text-gray-500 text-sm mt-1">
+                                            {ad.price} грн
+                                        </p>
+                                    </div>
+                                </div>
 
-                    <button className="px-4 py-2 bg-gray-200 rounded-lg text-sm">
-                        Категорія
-                    </button>
-
-                    <button className="px-4 py-2 bg-gray-200 rounded-lg text-sm">
-                        Час публікації
-                    </button>
-                </div>
-
-                {/* EMPTY STATE */}
-                <div className="flex flex-col items-center text-center mt-20">
-                    <div className="w-20 h-20 bg-gray-200 rounded-md mb-6" />
-
-                    <p className="font-medium mb-2">
-                        Активні оголошення відображаються тут до закінчення їх терміну дії
-                    </p>
-
-                    <p className="text-sm text-gray-500 mb-6">
-                        Ці оголошення доступні для перегляду всім і стануть неактивними через 30 днів після їх активації.
-                    </p>
-
-                    <button className="px-6 py-3 bg-black text-white rounded-lg">
-                        Створити оголошення
-                    </button>
-                </div>
+                                <div className="text-sm text-gray-400">
+                                    {ad.isBlocked
+                                        ? "Відхилено"
+                                        : ad.isActive
+                                            ? "Активне"
+                                            : "Неактивне"}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
             </div>
         </>

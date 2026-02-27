@@ -16,10 +16,18 @@ const AdvertisementGallery: React.FC<{ images: string[] }> = ({ images }) => {
         i == 0 ? images.length - 1 : i - 1
     ));
 
+    const currentImage = images[index];
+
+    const isBlob = currentImage.startsWith('blob:');
+
+    const imageSrc = isBlob
+        ? currentImage
+        : `${EnvConfig.API_URL}/images/advertisements/1200_${currentImage}`;
+
     return (
         <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black group">
             <img
-                src={`${EnvConfig.API_URL}/images/advertisements/1200_${images[index]}`}
+                src={imageSrc}
                 className="w-full h-full object-contain"
                 alt="Product"
             />

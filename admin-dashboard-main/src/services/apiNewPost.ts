@@ -27,6 +27,16 @@ export const apiNewPost = createApi({
             providesTags: ["Regions"],
         }),
 
+        getSettlements: builder.query<ISettlement[], void>({
+            query: () => {
+                return {
+                    url: `settlement`,
+                    method: "GET",
+                };
+            },
+            providesTags: ["Settlements"],
+        }),
+
         getSettlementsByRegion: builder.query<ISettlement[], string>({
             query: (regionRef) => {
                 return {
@@ -56,13 +66,22 @@ export const apiNewPost = createApi({
             },
             providesTags: ["Settlement"],
         }),
+
+        getAreaById: builder.query<IArea, string>({
+            query: (areaRef) => ({
+                url: `areas/area?areaRef=${areaRef}`,
+                method: "GET",
+            }),
+        }),
     }),
 });
 
 export const {
     useGetAreasQuery,
     useGetRegionsByAreaQuery,
+    useGetSettlementsQuery,
     useGetSettlementsByRegionQuery,
     useGetSettlementsByIdQuery,
-    useGetWarehousesQuery
+    useGetWarehousesQuery,
+    useGetAreaByIdQuery,
 } = apiNewPost;
