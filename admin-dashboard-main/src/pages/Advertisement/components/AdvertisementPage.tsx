@@ -237,7 +237,7 @@ const AdvertisementPage: React.FC = () => {
                             <div
                                 key={ad.id}
                                 onClick={() => navigate(`/advertisement/${ad.id}`)}
-                                className="min-w-[200px] snap-start hover:scale-102 rounded-lg overflow-hidden transition-all cursor-pointer flex flex-col"
+                                className="min-w-[218px] snap-start hover:scale-102 rounded-lg overflow-hidden transition-all cursor-pointer flex flex-col"
                             >
                                 <div className="h-[170px] w-fuloverflow-hidden rounded-lg overflow-hidden">
                                     {ad.images?.[0] ? (
