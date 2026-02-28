@@ -11,7 +11,6 @@ namespace WebApi.BLL.DTOs.Advertisement
         public bool IsApproved { get; set; }
         public bool IsBlocked { get; set; }
         public bool IsActive { get; set; }
-        public string? SettlementRef { get; set; }
         public long CategoryId { get; set; }
         public long UserId { get; set; }
         public List<string> Images { get; set; } = [];
