@@ -8,6 +8,6 @@ public class UpdateUserDto
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? PhoneNumber { get; set; }
-    public string Roles { get; set; } = null!;
+    public List<string> Roles { get; set; } = new();
     public IFormFile? Image { get; set; }
 }

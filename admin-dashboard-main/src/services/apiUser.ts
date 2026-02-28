@@ -2,14 +2,14 @@ import {createBaseQuery} from "../utils/createBaseQuery.ts";
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {IUserProfile} from "../types/Account/IUserProfile.ts";
 import {
-    IUserFilter,
+    IUserFilter, IUserItem,
     IUserPagedResponse,
     //IUsersResponse,
     IUserUpdate
 } from "../pages/Users/types.ts";
 import {serialize} from "object-to-formdata";
 import {IResponse} from "../types/Account/IRegisterRequest.ts";
-import {IUser} from "../types/User/types.ts";
+//import {IUser} from "../types/User/types.ts";
 
 interface ApiResponse<T> {
     isSuccess: boolean;
@@ -28,14 +28,14 @@ export const apiUser = createApi({
         // }),
         getAllList: builder.query<IUserPagedResponse, IUserFilter>({
             query: params => ({
-                url: "GetAll/List",
+                url: "List",
                 params
             }),
             providesTags: ["User"]
         }),
         getPaged: builder.query<IUserPagedResponse, IUserFilter>({
             query: params => ({
-                url: 'GetAll/List',
+                url: 'List',
                 params
             }),
             providesTags: ['User']
@@ -56,12 +56,16 @@ export const apiUser = createApi({
                     console.log("User info", updateUser);
                     const formData = serialize(updateUser);
 
+                    updateUser.roles.forEach(role => {
+                        formData.append("Roles", role);
+                    });
+
                     if (updateUser.imageFile instanceof File) {
                         formData.append("Image", updateUser.imageFile);
                     }
 
                     return {
-                        url: 'update',
+                        url: '',
                         method: 'PUT',
                         body: formData
                     }
@@ -74,7 +78,7 @@ export const apiUser = createApi({
         }),
         deleteUser: builder.mutation<{ isSuccess: boolean; message: string }, number>({
             query: (id) => ({
-                url: `delete?id=${id}`,
+                url: `?id=${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['User'],
@@ -93,10 +97,10 @@ export const apiUser = createApi({
             }),
             invalidatesTags: ["User"]
         }),
-        getUserById: builder.query<ApiResponse<IUser>, number>({
+        getUserById: builder.query<ApiResponse<IUserItem>, number>({
             query: (Id) => {
                 return {
-                    url: `Get/${Id}`,
+                    url: `${Id}`,
                     method: 'GET',
                 }
             },

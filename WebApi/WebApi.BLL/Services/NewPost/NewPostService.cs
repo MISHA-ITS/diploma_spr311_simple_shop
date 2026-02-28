@@ -65,6 +65,9 @@ public class NewPostService(IConfiguration configuration,
     public async Task<IEnumerable<RegionDto>> GetRegionsAsync() =>
        await mapper.ProjectTo<RegionDto>(regionRepository.GetQuery()).ToArrayAsync();
 
+    public async Task<IEnumerable<SettlementDto>> GetSettlementsAsync() =>
+       await mapper.ProjectTo<SettlementDto>(settlementRepository.GetQuery()).ToArrayAsync();
+
     public async Task<IEnumerable<RegionDto>> GetRegionsByAreaAsync(string areaRef)
     {
         if (!await areaRepository.AnyAsync(x => x.Ref == areaRef))
@@ -72,6 +75,16 @@ public class NewPostService(IConfiguration configuration,
             throw new HttpException(Errors.InvalidAreaRef, HttpStatusCode.BadRequest);
         }
         return await mapper.ProjectTo<RegionDto>(regionRepository.GetQuery().Where(x => x.AreaRef == areaRef)).ToArrayAsync();
+    }
+
+    public async Task<IEnumerable<SettlementDto>> GetSettlementsByAreaAsync(string areaRef)
+    {
+        if (!await areaRepository.AnyAsync(x => x.Ref == areaRef))
+        {
+            throw new HttpException(Errors.InvalidAreaRef, HttpStatusCode.BadRequest);
+        }
+        var regions = await regionRepository.GetQuery().Where(x => x.AreaRef == areaRef).Select(x => x.Ref).ToArrayAsync();
+        return await mapper.ProjectTo<SettlementDto>(settlementRepository.GetQuery().Where(x => regions.Contains(x.Region))).ToArrayAsync();
     }
 
     public async Task<IEnumerable<Region>> GetRegionsDataAsync(IEnumerable<string> areaRefs)
@@ -102,6 +115,18 @@ public class NewPostService(IConfiguration configuration,
             .ProjectTo<SettlementDto>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
     }
+    public async Task<AreaDto?> GetAreaByIdAsync(string areaRef)
+    {
+        if (string.IsNullOrWhiteSpace(areaRef))
+            return null;
+
+        return await areaRepository
+            .GetQuery()
+            .Where(x => x.Ref == areaRef)
+            .ProjectTo<AreaDto>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
+    }
+
 
     public async Task<IEnumerable<SettlementDto>> GetSettlementsByRegionAsync(string regionRef)
     {

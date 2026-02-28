@@ -29,6 +29,9 @@ import Profile from "../pages/Profile.tsx";
 import AdvertisementPage from "../pages/Advertisement/components/AdvertisementPage.tsx";
 import OrderPage from "../pages/Order/OrderPage.tsx";
 import PrivateRoute from "./PrivateRoute.tsx";
+import CreateAdvertisementPage from "../pages/Advertisement/components/CreateAdvertisementPage.tsx";
+import AdvertisementPreview from "../pages/Advertisement/components/AdvertisementPreview.tsx";
+import {AdvertisementProvider} from "../context/AdvertisementContext.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -38,7 +41,16 @@ const AppRoutes : React.FC = () => {
                 {/* Main Layout */}
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<MainPage />} />
+                    <Route path="/signin" element={<SignIn />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="forgot-password" element={<ForgotPassword />} />
+                    <Route path="reset-password" element={<ResetPassword />} />
+                    <Route path="/profile" element={<Profile />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
+                    <Route element={<AdvertisementProvider />}>
+                        <Route path="/createAdvertisement" element={<CreateAdvertisementPage />} />
+                        <Route path="/advertpreview" element={<AdvertisementPreview />} />
+                    </Route>
                     <Route
                         path="/order/:id"
                         element={
@@ -88,11 +100,6 @@ const AppRoutes : React.FC = () => {
                 </Route>
 
                 {/* Auth Layout */}
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="reset-password" element={<ResetPassword />} />
 
                 {/* Fallback Route */}
                 <Route path="*" element={<NotFound />} />
