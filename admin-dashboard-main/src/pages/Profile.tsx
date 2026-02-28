@@ -1,11 +1,14 @@
 import PageMeta from "../components/common/PageMeta";
 import { useProfileQuery } from "../services/apiAccount";
-import {useMemo, useState} from "react";
-import {useGetMyAdvertisementsQuery} from "../services/apiAdvertisement.ts";
-import {Link} from "react-router-dom";
-import {IAdvertisement} from "./Advertisement/types.ts";
+import { useMemo, useState } from "react";
+import { useGetMyAdvertisementsQuery } from "../services/apiAdvertisement.ts";
+import { Link, useNavigate } from "react-router-dom";
+import { IAdvertisement } from "./Advertisement/types.ts";
+import EnvConfig from "../config/env.ts";
 
 const Profile = () => {
+    const navigate = useNavigate();
+
     const { data: profileData, isLoading: profileLoading } = useProfileQuery();
     const { data: adsData, isLoading: adsLoading } = useGetMyAdvertisementsQuery();
 
@@ -13,29 +16,38 @@ const Profile = () => {
 
     const advertisements: IAdvertisement[] = adsData?.payload ?? [];
 
+    const urlAdImage = `${EnvConfig.API_URL}/images/advertisements`;
+
     // ===============================
-    // 🔎 ФІЛЬТРАЦІЯ ПО СТАТУСУ
+    // 📊 ЛІЧИЛЬНИКИ
+    // ===============================
+
+    const counters = useMemo(() => {
+        return {
+            active: advertisements.filter(ad => ad.isApproved && ad.isActive && !ad.isBlocked).length,
+            waiting: advertisements.filter(ad => !ad.isApproved && !ad.isBlocked).length,
+            inactive: advertisements.filter(ad => ad.isApproved && !ad.isActive && !ad.isBlocked).length,
+            rejected: advertisements.filter(ad => ad.isBlocked).length,
+        };
+    }, [advertisements]);
+
+    // ===============================
+    // 🔎 ФІЛЬТРАЦІЯ
     // ===============================
 
     const filteredAds = useMemo(() => {
-        return advertisements.filter(ad => {
-            switch (activeTab) {
-                case "active":
-                    return ad.isApproved && ad.isActive && !ad.isBlocked;
-
-                case "waiting":
-                    return !ad.isApproved && !ad.isBlocked;
-
-                case "inactive":
-                    return ad.isApproved && !ad.isActive && !ad.isBlocked;
-
-                case "rejected":
-                    return ad.isBlocked;
-
-                default:
-                    return true;
-            }
-        });
+        switch (activeTab) {
+            case "active":
+                return advertisements.filter(ad => ad.isApproved && ad.isActive && !ad.isBlocked);
+            case "waiting":
+                return advertisements.filter(ad => !ad.isApproved && !ad.isBlocked);
+            case "inactive":
+                return advertisements.filter(ad => ad.isApproved && !ad.isActive && !ad.isBlocked);
+            case "rejected":
+                return advertisements.filter(ad => ad.isBlocked);
+            default:
+                return advertisements;
+        }
     }, [advertisements, activeTab]);
 
     if (profileLoading || adsLoading)
@@ -45,10 +57,6 @@ const Profile = () => {
         return <div className="p-10">Помилка завантаження профілю</div>;
 
     const user = profileData.payload;
-
-    // ===============================
-    // UI
-    // ===============================
 
     return (
         <>
@@ -69,13 +77,14 @@ const Profile = () => {
                     <button className="font-medium text-black border-b-2 border-black pb-1">
                         Оголошення
                     </button>
-                    <button className="hover:text-black">Шукаю роботу</button>
-                    <button className="hover:text-black">Рейтинг</button>
-                    <button className="hover:text-black">Sellix Доставка</button>
+
+                    <button className="hover:text-black transition">
+                        Sellix Доставка
+                    </button>
                 </div>
 
                 {/* TABS */}
-                <div className="flex gap-6 text-sm mb-6 border-b pb-3">
+                <div className="flex gap-8 text-sm mb-8 border-b pb-3">
                     {[
                         { key: "active", label: "Активні" },
                         { key: "waiting", label: "Очікуючі" },
@@ -85,13 +94,13 @@ const Profile = () => {
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`pb-2 transition ${
+                            className={`pb-2 transition font-medium ${
                                 activeTab === tab.key
                                     ? "text-black border-b-2 border-black"
                                     : "text-gray-400 hover:text-black"
                             }`}
                         >
-                            {tab.label}
+                            {tab.label} ({counters[tab.key as keyof typeof counters]})
                         </button>
                     ))}
                 </div>
@@ -114,43 +123,46 @@ const Profile = () => {
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                         {filteredAds.map(ad => (
                             <div
                                 key={ad.id}
-                                className="border rounded-xl p-6 bg-white shadow-sm flex justify-between items-center"
+                                onClick={() => navigate(`/advertisement/${ad.id}`)}
+                                className="cursor-pointer border rounded-lg bg-white hover:shadow-md transition overflow-hidden"
                             >
-                                <div className="flex gap-4 items-center">
-                                    {ad.images?.length > 0 && (
+                                {/* IMAGE */}
+                                <div className="h-36 bg-gray-100">
+                                    {ad.images?.length > 0 ? (
                                         <img
-                                            src={ad.images[0]}
+                                            src={
+                                                ad.images?.length
+                                                    ? `${urlAdImage}/800_${ad.images[0]}`
+                                                    : "/noimage.jpeg"
+                                            }
                                             alt={ad.name}
-                                            className="w-20 h-20 object-cover rounded-lg border"
+                                            className="w-full h-full object-cover"
                                         />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                                            Немає фото
+                                        </div>
                                     )}
-
-                                    <div>
-                                        <h3 className="font-semibold text-lg">
-                                            {ad.name}
-                                        </h3>
-                                        <p className="text-gray-500 text-sm mt-1">
-                                            {ad.price} грн
-                                        </p>
-                                    </div>
                                 </div>
 
-                                <div className="text-sm text-gray-400">
-                                    {ad.isBlocked
-                                        ? "Відхилено"
-                                        : ad.isActive
-                                            ? "Активне"
-                                            : "Неактивне"}
+                                {/* BODY */}
+                                <div className="p-3">
+                                    <h3 className="text-sm font-medium truncate">
+                                        {ad.name}
+                                    </h3>
+
+                                    <p className="mt-1 text-sm font-semibold">
+                                        {ad.price} грн
+                                    </p>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
-
             </div>
         </>
     );
