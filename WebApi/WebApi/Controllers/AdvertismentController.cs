@@ -29,7 +29,7 @@ public class AdvertisementController(IAdvertisementService advertisementService)
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetAll([FromQuery] AdvertisementDTO filter)
+    public async Task<IActionResult> GetAll([FromQuery] AdvertisementFilterDto filter)
     {
         var responce = await advertisementService.GetAllAsync(filter);
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);

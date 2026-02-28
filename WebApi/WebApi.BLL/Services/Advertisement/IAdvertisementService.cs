@@ -8,7 +8,7 @@ namespace WebApi.BLL.Services.Advertisement
         Task<ServiceResponse> UpdateAsync(UpdateAdvertisementDTO dto);
         Task<ServiceResponse> DeleteAsync(long id);
         Task<ServiceResponse> GetByIdAsync(long id);
-        Task<ServiceResponse> GetAllAsync(AdvertisementDTO filter);
+        Task<ServiceResponse> GetAllAsync(AdvertisementFilterDto filter);
         Task<ServiceResponse> GetByUserIdAsync(long userId);
     }
 }
