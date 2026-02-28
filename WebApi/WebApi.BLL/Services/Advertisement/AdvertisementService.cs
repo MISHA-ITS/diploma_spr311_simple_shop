@@ -1,19 +1,17 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.Services.Image;
+using WebApi.BLL.Services.NewPost;
 using WebApi.DAL.Entities;
-using WebApi.DAL.Entities.Identity;
 using WebApi.DAL.Repositories.Advertisements;
 
 namespace WebApi.BLL.Services.Advertisement
 {
     public class AdvertisementService(
-        IAdvertisementRepository advertisementRepository, IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager,
-        IMapper mapper, IImageService imageService, ILogger<AdvertisementService> logger) : IAdvertisementService
+        IAdvertisementRepository advertisementRepository, IMapper mapper, IImageService imageService, 
+        ILogger<AdvertisementService> logger, INewPostService newPostService) : IAdvertisementService
     {
 
         public async Task<ServiceResponse> CreateAsync(CreateAdvertisementDTO dto, long userId)
@@ -77,14 +75,31 @@ namespace WebApi.BLL.Services.Advertisement
                 : ServiceResponse.Error("Failed to delete advertisement");
         }
 
-        public async Task<ServiceResponse> GetAllAsync(AdvertisementDTO filter)
+        public async Task<ServiceResponse> GetAllAsync(AdvertisementFilterDto filter)
         {
             logger.LogDebug("Retrieving all advertisements with filter {@Filter}", filter);
 
             var entities = advertisementRepository.GetAll();
-            /*entities = Filteradvertisements(entities, filter);*/
+            entities = FilterAdvertisements(entities, filter);
 
-            var dtos = mapper.Map<List<AdvertisementDTO>>(await entities.ToListAsync());
+            var entityList = await entities.ToListAsync();
+
+            var dtos = mapper.Map<List<AdvertisementDTO>>(entityList);
+
+            var entityDict = entityList.ToDictionary(e => e.Id);
+
+            dtos = (await Task.WhenAll(
+                dtos.Select(async dto =>
+                {
+                    var entity = entityDict[dto.Id];
+
+                    dto.Settlement = entity.SettlementRef != null
+                        ? await newPostService.GetSettlement(entity.SettlementRef)
+                        : null;
+
+                    return dto;
+                })
+            )).ToList();
 
             logger.LogInformation("Retrieved {Count} advertisements", dtos.Count);
 
@@ -172,12 +187,12 @@ namespace WebApi.BLL.Services.Advertisement
             }
         }
 
-        /*private IQueryable<AdvertisementEntity> Filteradvertisements(IQueryable<AdvertisementEntity> advertisements, AdvertisementFilterDto filter)
+        private IQueryable<AdvertisementEntity> FilterAdvertisements(IQueryable<AdvertisementEntity> advertisements, AdvertisementFilterDto filter)
         {
             if (filter.categoryId.HasValue)
             {
                 advertisements = advertisements
-                    .Where(p => p.Categories.Any(c => c.Id == filter.categoryId.Value));
+                    .Where(p => p.CategoryId == filter.categoryId.Value);
             }
             if (filter.minPrice.HasValue)
             {
@@ -216,6 +231,6 @@ namespace WebApi.BLL.Services.Advertisement
             advertisements = advertisements.Skip(skip).Take(pageSize);
 
             return advertisements;
-        }*/
+        }
     }
 }

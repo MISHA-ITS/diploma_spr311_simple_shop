@@ -1,4 +1,6 @@
-﻿namespace WebApi.BLL.DTOs.Advertisement
+﻿using WebApi.BLL.DTOs.NewPost;
+
+namespace WebApi.BLL.DTOs.Advertisement
 {
     public class AdvertisementDTO
     {
@@ -9,5 +11,6 @@
         public long CategoryId { get; set; }
         public long UserId { get; set; }
         public List<string> Images { get; set; } = [];
+        public SettlementDto? Settlement { get; set; }
     }
 }

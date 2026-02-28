@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using WebApi.BLL.DTOs.Advertisement;
+using WebApi.BLL.Services.NewPost;
 using WebApi.DAL.Entities;
 
 namespace WebApi.BLL.MapperProfiles;
