@@ -157,7 +157,13 @@ const AdvertisementPage: React.FC = () => {
 
                         {/* SELLER */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex gap-4">
-                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" />
+                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" >
+                                <img src={seller?.image
+                                    ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
+                                    : `${EnvConfig.API_URL}/images/noimage.jpeg`
+                                    }
+                                />
+                            </div>
                             <div className="text-sm">
                                 <p className="font-semibold">{seller?.lastName} {seller?.firstName}</p>
                                 <p className="text-[#555]">Професійний продавець</p>
