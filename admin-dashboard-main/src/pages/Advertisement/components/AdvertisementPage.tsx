@@ -9,7 +9,7 @@ import {createParentDic, findPath} from "../utils/functions.ts";
 import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
 import {useNavigate} from "react-router-dom";
 
-import {useGetAreaByIdQuery, useGetSettlementsByIdQuery} from "../../../services/apiNewPost.ts";
+import {useGetAreaByIdQuery} from "../../../services/apiNewPost.ts";
 import EnvConfig from "../../../config/env.ts";
 import {useEffect, useState} from "react";
 
