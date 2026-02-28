@@ -53,6 +53,7 @@ public class AdvertisementRepository(AppDbContext context, ILogger<GenericReposi
             .AsTracking(tracking)
             .Include(p => p.Images)
             .Include(p => p.Category)
+            .Include(p => p.Settlement)
             .AsSplitQuery();
     }
 
