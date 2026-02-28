@@ -49,6 +49,14 @@ export const apiAdvertisement = createApi({
             }),
             providesTags: ["Advertisements"]
         }),
+
+        getUserAdvertisements: builder.query<ApiResponse<IAdvertisement[]>, number>({
+            query: (Id) => ({
+                url: `/userAdverts/${Id}`,
+                method: "GET"
+            }),
+            providesTags: ["Advertisements"]
+        }),
     }),
 })
 
@@ -56,4 +64,5 @@ export const {
     useGetAdvertisementByIdQuery,
     useCreateAdvertisementMutation,
     useGetMyAdvertisementsQuery,
+    useGetUserAdvertisementsQuery,
 } = apiAdvertisement
