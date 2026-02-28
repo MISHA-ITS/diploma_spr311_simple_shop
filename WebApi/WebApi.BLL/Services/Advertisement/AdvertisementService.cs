@@ -121,6 +121,10 @@ namespace WebApi.BLL.Services.Advertisement
 
             var dto = mapper.Map<AdvertisementDTO>(entity);
 
+            dto.Settlement = entity.SettlementRef != null
+                ? await newPostService.GetSettlement(entity.SettlementRef)
+                : null;
+
             logger.LogInformation("advertisement with Id {advertisementId} retrieved successfully", id);
 
             return ServiceResponse.Success("advertisement retrieved successfully", dto);

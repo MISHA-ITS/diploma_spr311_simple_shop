@@ -9,7 +9,7 @@ import {createParentDic, findPath} from "../utils/functions.ts";
 import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
 import {useNavigate} from "react-router-dom";
 import { TbTruckDelivery } from "react-icons/tb";
-import {useGetAreaByIdQuery, useGetSettlementsByIdQuery} from "../../../services/apiNewPost.ts";
+import {useGetAreaByIdQuery} from "../../../services/apiNewPost.ts";
 
 const AdvertisementPage: React.FC = () => {
 
@@ -17,13 +17,12 @@ const AdvertisementPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { data, isLoading, error } = useGetAdvertisementByIdQuery(Number(id));
     const product = data?.payload;
-    const { data: settlement } = useGetSettlementsByIdQuery(
-        product?.settlementRef ?? "",
-        { skip: !product?.settlementRef }
-    );
+
+    console.log(product);
+
     const { data: area } = useGetAreaByIdQuery(
-        settlement?.area ?? "",
-        { skip: !settlement?.area }
+        product?.settlement?.area ?? "",
+        { skip: !product?.settlement?.area },
     );
     const { data: userData, isLoading: isUserLoading } = useGetUserByIdQuery(
         product?.userId ?? 0,
@@ -50,8 +49,6 @@ const AdvertisementPage: React.FC = () => {
 
     if (isLoading && isUserLoading) return <div>Завантаження оголошення...</div>;
     if (error || !product) return <div>Оголошення не знайдено</div>;
-
-    console.log(settlement)
 
     return (
         <div className="w-full flex justify-center">
@@ -127,7 +124,7 @@ const AdvertisementPage: React.FC = () => {
                                 {/* Текстовий блок */}
                                 <div className="flex flex-col">
                                     <span className="text-xl font-bold text-[#002f34]">
-                                        {settlement?.description || "Місто"}
+                                        {product.settlement.description || "Місто"}
                                     </span>
                                     <span className="text-[#406367] text-lg mt-1">
                                         {area?.description ? `${area.description} область` : "Область"}
