@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import noimage from "../../assets/images/noimage.jpeg";
 import EnvConfig from "../../config/env.ts";
 import {useUpdateUserMutation} from "../../services/apiUser.ts";
+import MultiSelect from "../form/MultiSelect.tsx";
 
 const urlUserImage = `${EnvConfig.API_URL}/images/users`;
 
@@ -28,7 +29,7 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
     lastName: "",
     email: "",
     phoneNumber: "",
-    roles: "",
+    roles: [],
     imageFile: null as File | null,
   });
 
@@ -36,13 +37,13 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
   useEffect(() => {
     if (isOpen) {
       setFormData({
-          ...formData,
-          id: user?.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-          roles: user.roles.join(", "),
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber ?? "",
+        roles: user.roles ?? [],
+        imageFile: null
       });
 
       setPreview(
@@ -179,7 +180,7 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                         className="w-full h-full object-cover"
                     />
 
-                    img src={`${urlUserImage}/200_${user.image}`} alt="user" /
+                    //img src={`${urlUserImage}/200_${user.image}`} alt="user" /
 
                     {/* HIDDEN FILE INPUT */}
                     <input
@@ -248,9 +249,19 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
 
                     <div className="col-span-2">
                       <Label>Ролі</Label>
-                      <Input
+                      <MultiSelect
+                          label="Ролі"
+                          options={[
+                            { value: "Admin", text: "Admin" },
+                            { value: "User", text: "User" }
+                          ]}
                           value={formData.roles}
-                          onChange={e => handleChange("roles", e.target.value)}
+                          onChange={(selected) =>
+                              setFormData(prev => ({
+                                ...prev,
+                                roles: selected
+                              }))
+                          }
                       />
                     </div>
                   </div>

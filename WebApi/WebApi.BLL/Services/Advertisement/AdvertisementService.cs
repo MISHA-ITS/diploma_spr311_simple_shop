@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.NewPost;
@@ -120,6 +124,17 @@ namespace WebApi.BLL.Services.Advertisement
             logger.LogInformation("advertisement with Id {advertisementId} retrieved successfully", id);
 
             return ServiceResponse.Success("advertisement retrieved successfully", dto);
+        }
+
+        public async Task<ServiceResponse> GetByUserIdAsync(long userId)
+        {
+            var entity = await advertisementRepository
+                .GetAll()
+                .Where(a => a.UserId == userId)
+                .ProjectTo<AdvertisementDTO>(mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return ServiceResponse.Success("advertisement retrieved successfully", entity);
         }
 
         public async Task<ServiceResponse> UpdateAsync(UpdateAdvertisementDTO dto)

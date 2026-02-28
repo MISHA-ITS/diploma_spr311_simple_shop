@@ -8,6 +8,7 @@ export interface IAdvertisement {
     isActive: boolean;
     isContractPrice: boolean;
     userId: number;
+    settlementRef: string;
     categoryId: number;
     images: string[];
 }

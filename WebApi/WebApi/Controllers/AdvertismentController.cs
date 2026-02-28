@@ -42,6 +42,15 @@ public class AdvertisementController(IAdvertisementService advertisementService)
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
     }
 
+    [Authorize]
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMy()
+    {
+        var userId = long.Parse(User.FindFirst("id")!.Value);
+        var responce = await advertisementService.GetByUserIdAsync(userId);
+        return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
+    }
+
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromForm] UpdateAdvertisementDTO dto)
     {

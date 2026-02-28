@@ -66,6 +66,13 @@ export const apiNewPost = createApi({
             },
             providesTags: ["Settlement"],
         }),
+
+        getAreaById: builder.query<IArea, string>({
+            query: (areaRef) => ({
+                url: `areas/area?areaRef=${areaRef}`,
+                method: "GET",
+            }),
+        }),
     }),
 });
 
@@ -75,5 +82,6 @@ export const {
     useGetSettlementsQuery,
     useGetSettlementsByRegionQuery,
     useGetSettlementsByIdQuery,
-    useGetWarehousesQuery
+    useGetWarehousesQuery,
+    useGetAreaByIdQuery,
 } = apiNewPost;
