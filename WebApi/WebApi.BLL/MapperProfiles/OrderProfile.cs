@@ -34,7 +34,12 @@ public class OrderProfile : Profile
             .ForMember(d => d.Status,
                 o => o.MapFrom(s => s.Status))
             .ForMember(d => d.CreateDate,
-                o => o.MapFrom(s => s.CreateDate));
+                o => o.MapFrom(s => s.CreateDate))
+                .ForMember(d => d.AdvertisementImage,
+                o => o.MapFrom(s =>
+                    s.Advertisement.Images
+                        .Select(i => i.ImageUrl)
+                        .FirstOrDefault()));
 
         // Buyer
         CreateMap<OrderEntity, BuyerOrderDto>()

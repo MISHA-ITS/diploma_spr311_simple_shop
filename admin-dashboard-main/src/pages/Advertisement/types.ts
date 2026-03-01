@@ -8,7 +8,28 @@ export interface IAdvertisement {
     isActive: boolean;
     isContractPrice: boolean;
     userId: number;
-    settlementRef: string;
     categoryId: number;
     images: string[];
+    settlement: SettlementDto;
 }
+
+type SettlementDto = {
+    ref: string;
+    description: string;
+    settlementTypeDescription: string;
+    region: string;
+    area: string;
+    warehouse: number;
+}
+
+export type AdvertisementsTab =
+    | "all"
+    | "active"
+    | "waiting"
+    | "inactive"
+    | "rejected";
+
+export interface Props {
+    advertisements: IAdvertisement[];
+}
+
