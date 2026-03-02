@@ -227,30 +227,46 @@ const OrderPage = () => {
                     {adLoading ? (
                         <div>Завантаження товару...</div>
                     ) : advertisement?.payload && (
-                        <div className="flex gap-6 border rounded-xl p-6 shadow-sm bg-white">
-                            <img
-                                src={
-                                    advertisement.payload.images?.length
-                                        ? `${urlAdImage}/800_${advertisement.payload.images[0]}`
-                                        : "/noimage.jpeg"
-                                }
-                                alt={advertisement.payload.name}
-                                className="w-32 h-32 object-cover rounded-lg border"
-                            />
+                        <div className="flex gap-6 border rounded-xl shadow-sm bg-white">
+                            {/*<img*/}
+                            {/*    src={*/}
+                            {/*        advertisement.payload.images?.length*/}
+                            {/*            ? `${urlAdImage}/800_${advertisement.payload.images[0]}`*/}
+                            {/*            : "/noimage.jpeg"*/}
+                            {/*    }*/}
+                            {/*    alt={advertisement.payload.name}*/}
+                            {/*    className="w-32 h-32 object-cover rounded-lg border"*/}
+                            {/*/>*/}
 
-                            <div className="flex flex-col justify-between">
+                            {/* IMAGE */}
+                            {advertisement.payload.images?.length > 0 ? (
+                                <img
+                                    src={`${urlAdImage}/400_${advertisement.payload.images[0]}`}
+                                    alt={advertisement.payload.name}
+                                    className="w-36 h-36 object-cover rounded-lg"
+                                />
+                            ) : (
+                                <div className="w-36 h-36 flex items-center justify-center rounded-lg border text-xs text-gray-400 bg-gray-100">
+                                    Немає фото
+                                </div>
+                            )}
+
+                            <div className="flex flex-col p-2 justify-between">
                                 <div>
                                     <h2 className="text-lg font-semibold">
                                         {advertisement.payload.name}
                                     </h2>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        {advertisement.payload.description}
+                                    <p className="text-xl text-gray-500 mt-1">
+                                        {advertisement.payload.price} грн
                                     </p>
+                                    {/*<p className="text-sm text-gray-500 mt-1">*/}
+                                    {/*    {advertisement.payload.description}*/}
+                                    {/*</p>*/}
                                 </div>
 
-                                <div className="text-xl font-bold mt-4">
-                                    {advertisement.payload.price} грн
-                                </div>
+                                {/*<div className="text-xl font-bold mt-4">*/}
+                                {/*    {advertisement.payload.price} грн*/}
+                                {/*</div>*/}
                             </div>
                         </div>
                     )}
@@ -277,7 +293,7 @@ const OrderPage = () => {
                         >
                             <div>
                                 <div className="font-medium">
-                                    У відділення Нова Пошта
+                                    У відділення Нова Пошта (оплата у відділенні)
                                 </div>
                                 <div className="text-sm text-gray-500">
                                     доставка протягом 1-3 днів
@@ -306,7 +322,7 @@ const OrderPage = () => {
                         >
                             <div>
                                 <div className="font-medium">
-                                    Кур'єром Нова Пошта
+                                    Кур'єром Нова Пошта (оплата готівкою кур'єру)
                                 </div>
                                 <div className="text-sm text-gray-500">
                                     доставка протягом 1-3 днів
@@ -393,7 +409,7 @@ const OrderPage = () => {
                                     className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
                                     required
                                 />
-                                {phone.trim().length > 2 && (
+                                {phone.trim().length == 13 && (
                                     <span className="absolute right-0 top-9 text-gray-500">
                                         ✓
                                     </span>
@@ -412,7 +428,7 @@ const OrderPage = () => {
                                     className="w-full border-b border-gray-400 p-2 focus:outline-none focus:border-black"
                                     required
                                 />
-                                {email.trim().length > 2 && (
+                                {email.trim().length > 6 && (
                                     <span className="absolute right-0 top-9 text-gray-500">
                                         ✓
                                     </span>

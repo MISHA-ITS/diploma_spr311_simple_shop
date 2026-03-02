@@ -22,3 +22,14 @@ type SettlementDto = {
     warehouse: number;
 }
 
+export type AdvertisementsTab =
+    | "all"
+    | "active"
+    | "waiting"
+    | "inactive"
+    | "rejected";
+
+export interface Props {
+    advertisements: IAdvertisement[];
+}
+
