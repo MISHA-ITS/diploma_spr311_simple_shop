@@ -70,8 +70,7 @@ export const apiAdvertisement = createApi({
                     method: "GET"
                 }
             }
-        })
-    }),
+        }),
         getUserAdvertisements: builder.query<ApiResponse<IAdvertisement[]>, number>({
             query: (Id) => ({
                 url: `/userAdverts/${Id}`,
