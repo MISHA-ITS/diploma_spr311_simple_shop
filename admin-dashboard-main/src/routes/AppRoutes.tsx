@@ -32,6 +32,7 @@ import PrivateRoute from "./PrivateRoute.tsx";
 import CreateAdvertisementPage from "../pages/Advertisement/components/CreateAdvertisementPage.tsx";
 import AdvertisementPreview from "../pages/Advertisement/components/AdvertisementPreview.tsx";
 import {AdvertisementProvider} from "../context/AdvertisementContext.tsx";
+import FavoritesPage from "../pages/favorites/FavoritesPage.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -46,6 +47,7 @@ const AppRoutes : React.FC = () => {
                     <Route path="forgot-password" element={<ForgotPassword />} />
                     <Route path="reset-password" element={<ResetPassword />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/favorites" element={<FavoritesPage />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
                     <Route element={<AdvertisementProvider />}>
                         <Route path="/createAdvertisement" element={<CreateAdvertisementPage />} />

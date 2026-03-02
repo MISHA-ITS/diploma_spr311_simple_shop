@@ -82,7 +82,7 @@ const SimpleHeader: React.FC = () => {
                             </Link>
 
                             <Link
-                                to="/"
+                                to="/favorites"
                                 className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"
                             >
                                 <span className="text-[22px]">

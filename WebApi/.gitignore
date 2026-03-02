@@ -152,15 +152,14 @@ publish/
 # checkin your Azure Web App publish settings, but sensitive information contained
 # in these scripts will be unencrypted
 PublishScripts/
-
 # NuGet Packages
 *.nupkg
 # The packages folder can be ignored because of Package Restore
-**/packages/*
+/packages/*
 # except build/, which is used as an MSBuild target.
-!**/packages/build/
+!/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
-#!**/packages/repositories.config
+#!/packages/repositories.config
 # NuGet v3's project.json files produces more ignoreable files
 *.nuget.props
 *.nuget.targets
@@ -237,11 +236,11 @@ FakesAssemblies/
 *.opt
 
 # Visual Studio LightSwitch build output
-**/*.HTMLClient/GeneratedArtifacts
-**/*.DesktopClient/GeneratedArtifacts
-**/*.DesktopClient/ModelManifest.xml
-**/*.Server/GeneratedArtifacts
-**/*.Server/ModelManifest.xml
+/*.HTMLClient/GeneratedArtifacts
+/*.DesktopClient/GeneratedArtifacts
+/*.DesktopClient/ModelManifest.xml
+/*.Server/GeneratedArtifacts
+/*.Server/ModelManifest.xml
 _Pvt_Extensions
 
 # Paket dependency manager
@@ -259,7 +258,7 @@ paket-files/
 .cr/
 
 # Python Tools for Visual Studio (PTVS)
-__pycache__/
+pycache/
 *.pyc
 
 

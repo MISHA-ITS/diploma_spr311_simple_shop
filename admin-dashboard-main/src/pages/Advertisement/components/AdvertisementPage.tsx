@@ -3,7 +3,9 @@ import LocationIcon from "../../../icons/Location.png";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import {useGetAdvertisementByIdQuery, useGetUserAdvertisementsQuery} from "../../../services/apiAdvertisement.ts";
-import {useGetUserByIdQuery} from "../../../services/apiUser.ts";
+import {
+    useGetUserByIdQuery,
+} from "../../../services/apiUser.ts";
 import AdvertisementGallery from "./AdvertisementGallery.tsx";
 import {createParentDic, findPath} from "../utils/functions.ts";
 import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
@@ -12,11 +14,19 @@ import {useNavigate} from "react-router-dom";
 import {useGetAreaByIdQuery} from "../../../services/apiNewPost.ts";
 import EnvConfig from "../../../config/env.ts";
 import {useEffect, useState} from "react";
+import {
+    useAddToFavoritesMutation,
+    useProfileQuery,
+    useRemoveFromFavoritesMutation
+} from "../../../services/apiAccount.ts";
+import {FaHeart, FaRegHeart} from "react-icons/fa";
 
 const AdvertisementPage: React.FC = () => {
 
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
+    const [addToFavorites, { isLoading: isAdding }] = useAddToFavoritesMutation();
+    const [removeFromFavorites, { isLoading: isRemoving }] = useRemoveFromFavoritesMutation();
     const { data, isLoading, error } = useGetAdvertisementByIdQuery(Number(id));
     const product = data?.payload;
 
@@ -26,11 +36,15 @@ const AdvertisementPage: React.FC = () => {
         product?.settlement?.area ?? "",
         { skip: !product?.settlement?.area },
     );
-    const { data: userData, isLoading: isUserLoading } = useGetUserByIdQuery(
+    const { data: sellerData, isLoading: isSellerLoading } = useGetUserByIdQuery(
         product?.userId ?? 0,
         { skip: !product?.userId }
     );
-    const seller = userData?.payload;
+    const seller = sellerData?.payload;
+    //favorite
+    const {data: profileData} = useProfileQuery()
+    const isFavorite = profileData?.payload?.favoriteAdverts?.some(fav => fav.id === product?.id);
+
     const {data: UserAdverts} = useGetUserAdvertisementsQuery(
         product?.userId ?? 0,
         { skip: !product?.userId });
@@ -79,8 +93,23 @@ const AdvertisementPage: React.FC = () => {
     }, {} as Record<number, string>)
     const namedPath = listIdPath.map(id => categoryNamesDic[id]).join(" / ");
 
-    if (isLoading && isUserLoading) return <div>Завантаження оголошення...</div>;
+    if (isLoading && isSellerLoading) return <div>Завантаження оголошення...</div>;
     if (error || !product) return <div>Оголошення не знайдено</div>;
+
+    const handleFavoriteClick = async () => {
+
+        if (isAdding || isRemoving) return;
+
+        try {
+            if (isFavorite) {
+                await removeFromFavorites(product.id).unwrap();
+            } else {
+                await addToFavorites(product.id).unwrap();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div className="w-full flex justify-center">
@@ -119,11 +148,17 @@ const AdvertisementPage: React.FC = () => {
 
                     {/* PRICE */}
                         <div className="bg-[#dae5f9] rounded-lg p-6 flex flex-col gap-4 relative">
-                            {/* Іконка серця (обране) */}
-                            <div className="absolute top-6 right-6 text-[#002f34] cursor-pointer">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                </svg>
+                            <div
+                                onClick={handleFavoriteClick}
+                                className={`absolute top-6 right-6 cursor-pointer transition-all duration-300 transform 
+                                active:scale-75 hover:scale-110 
+                                ${(isAdding || isRemoving) ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+                            >
+                                {isFavorite ? (
+                                    <FaHeart size={30} />
+                                ) : (
+                                    <FaRegHeart size={30} color="#002f34" />
+                                )}
                             </div>
 
                             {/* Назва */}
@@ -199,7 +234,6 @@ const AdvertisementPage: React.FC = () => {
 
                 {/* AUTHOR ADS */}
                 <div className="mt-10">
-                    {/* ШАПКА: Заголовок зліва, Стрілочки справа */}
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-2xl font-bold text-[#002f34]">
                             Усі оголошення автора

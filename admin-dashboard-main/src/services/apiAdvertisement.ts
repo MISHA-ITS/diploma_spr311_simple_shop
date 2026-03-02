@@ -49,7 +49,6 @@ export const apiAdvertisement = createApi({
             }),
             providesTags: ["Advertisements"]
         }),
-
         getUserAdvertisements: builder.query<ApiResponse<IAdvertisement[]>, number>({
             query: (Id) => ({
                 url: `/userAdverts/${Id}`,

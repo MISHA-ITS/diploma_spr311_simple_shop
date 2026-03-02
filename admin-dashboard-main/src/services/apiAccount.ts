@@ -56,7 +56,29 @@ export const apiAccount = createApi({
             }),
             providesTags: ["Account"]
         }),
+        addToFavorites: builder.mutation<void, number>({
+            query: (advertId) => ({
+                url: `../User/favorites/${advertId}`,
+                method: 'POST',
+            }),
+            invalidatesTags: ["Account"],
+        }),
+
+        removeFromFavorites: builder.mutation<void, number>({
+            query: (advertId) => ({
+                url: `../User/favorites/${advertId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ["Account"],
+        }),
+        removeAllFromFavorites: builder.mutation<void, void>({
+            query: () => ({
+                url: `../User/favorites/all`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ["Account"],
+        })
     }),
 });
 
-export const {useLoginMutation, useRegisterMutation, useProfileQuery } = apiAccount;
+export const {useLoginMutation, useRegisterMutation, useProfileQuery, useAddToFavoritesMutation, useRemoveFromFavoritesMutation, useRemoveAllFromFavoritesMutation } = apiAccount;
