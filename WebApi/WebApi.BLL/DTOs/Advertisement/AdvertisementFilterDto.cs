@@ -10,4 +10,5 @@ public class AdvertisementFilterDto
     public string? order { get; set; } = "asc";
 
     public int pageNumber { get; set; } = 1;
+    public int pageSize { get; set; } = 24;
 }

@@ -155,7 +155,7 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
             // 5.3 (опціонально) Видаляємо старі файли
             if (!string.IsNullOrEmpty(oldImage))
             {
-                imageService.DeleteImageAsync(oldImage, Settings.UsersDir);
+                await imageService.DeleteImageAsync(oldImage, Settings.UsersDir);
             }
         }
         else

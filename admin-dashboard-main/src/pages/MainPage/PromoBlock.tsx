@@ -4,7 +4,9 @@ import AppStoreIcon from "../../icons/AppStore.png";
 
 const PromoBlock: React.FC = () => {
     return (
-        <div className="mt-[100px] w-full flex justify-center bg-[#212121] dark:bg-[#071739] px-6 py-10">
+        <div className="mt-[100px] w-full flex flex-col items-start gap-[10px] px-[354px] py-[42px]
+             bg-[linear-gradient(90deg,#212121,#474956,#E3C39D)]
+             dark:bg-[linear-gradient(90deg,#071739_34.62%,#273048_51.44%,#474956_63.46%,#E3C39D_100%)]">
             <div className="flex w-full max-w-[1209px] justify-between items-center gap-4">
                 <p className="flex-1 min-w-[240px] text-[24px] font-inter text-[#F5F5F5]">
                     Купуй ті речі, які тобі справді потрібні!
