@@ -1,3 +1,5 @@
+import {IAdvertisement} from "../../pages/Advertisement/types.ts";
+
 export interface IUserProfile {
     firstName: string;
     lastName: string;
@@ -7,4 +9,5 @@ export interface IUserProfile {
     image?: string|null;
     dateRegister: string;
     roles: string[];
+    favoriteAdverts: IAdvertisement[];
 }

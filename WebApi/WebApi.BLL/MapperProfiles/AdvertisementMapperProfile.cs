@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using System.Globalization;
 using WebApi.BLL.DTOs.Advertisement;
-using WebApi.BLL.Services.NewPost;
 using WebApi.DAL.Entities;
 
 namespace WebApi.BLL.MapperProfiles;
@@ -18,7 +18,8 @@ public class AdvertisementMapperProfile : Profile
 
         //AdvertisementEntity -> AdvertisementDTO
         CreateMap<AdvertisementEntity, AdvertisementDTO>()
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl)));
+            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl)))
+            .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.ToString("dd MMMM yyyy 'р.'", new CultureInfo("uk-UA"))));
         
         CreateMap<SeederAdvertisementDTO, AdvertisementEntity>()
             .ForMember(dest => dest.Images, opt => opt.Ignore())

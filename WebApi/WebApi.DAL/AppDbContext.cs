@@ -86,8 +86,18 @@ public class AppDbContext
 
         modelBuilder.Entity<AdvertisementImageEntity>()
             .HasOne(ai => ai.Advertisement)
-            .WithMany(a => a.Images)
-            .HasForeignKey(ai => ai.AdvertisementId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(a => a.Images)
+                .HasForeignKey(ai => ai.AdvertisementId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<AdvertisementEntity>()
+            .HasOne(a => a.User) 
+            .WithMany()
+            .HasForeignKey(a => a.UserId);
+
+        modelBuilder.Entity<AdvertisementEntity>()
+            .HasMany(a => a.Users)
+            .WithMany(u => u.Adverts) 
+            .UsingEntity(j => j.ToTable("UserFavoriteAdverts"));
     }
 }

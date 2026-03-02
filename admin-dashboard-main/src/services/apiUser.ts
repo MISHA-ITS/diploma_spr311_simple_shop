@@ -20,7 +20,7 @@ interface ApiResponse<T> {
 export const apiUser = createApi({
     reducerPath: "apiUser",
     baseQuery: createBaseQuery("User"),
-    tagTypes: ["User"],
+    tagTypes: ["User", "Favorites"],
     endpoints: (builder) => ({
         // getAllList: builder.query<IUsersResponse, void>({
         //     query: () => 'GetAll/List',
@@ -105,7 +105,7 @@ export const apiUser = createApi({
                 }
             },
             providesTags: (_, __, id) => [{ type: 'User', id }]
-        })
+        }),
     }),
 });
 
@@ -115,5 +115,5 @@ export const {
     useDeleteUserMutation,
     useLockUserMutation,
     useUnlockUserMutation,
-    useGetUserByIdQuery
+    useGetUserByIdQuery,
 } = apiUser;

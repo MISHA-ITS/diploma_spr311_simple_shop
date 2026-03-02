@@ -10,6 +10,7 @@ export interface IAdvertisement {
     userId: number;
     categoryId: number;
     images: string[];
+    updateDate: string;
     settlement: SettlementDto;
 }
 
@@ -20,5 +21,16 @@ type SettlementDto = {
     region: string;
     area: string;
     warehouse: number;
+}
+
+export type AdvertisementsTab =
+    | "all"
+    | "active"
+    | "waiting"
+    | "inactive"
+    | "rejected";
+
+export interface Props {
+    advertisements: IAdvertisement[];
 }
 

@@ -1,11 +1,19 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
 import {IAdvertisement} from "../pages/Advertisement/types.ts";
 import EnvConfig from "../config/env.ts";
+import {IAdvFilter} from "../pages/AdvCategoryPage/types.ts";
 
 interface ApiResponse<T> {
     isSuccess: boolean;
     message: string;
     payload: T;
+}
+
+interface ApiPageResponce<T> {
+    items: T[];
+    totalCount: number;
+    pageNumber: number;
+    pageSize: number;
 }
 
 export const apiAdvertisement = createApi({
@@ -49,6 +57,27 @@ export const apiAdvertisement = createApi({
             }),
             providesTags: ["Advertisements"]
         }),
+        getAdvertisements: builder.query<ApiResponse<ApiPageResponce<IAdvertisement>>, IAdvFilter>({
+            query: (filter) => {
+                const queryString = new URLSearchParams(
+                    Object.entries(filter)
+                        .filter(([, value]) => value !== null && value !== undefined)
+                        .map(([key, value]) => [key, String(value)])
+                ).toString();
+
+                return {
+                    url: `/list?${queryString}`,
+                    method: "GET"
+                }
+            }
+        }),
+        getUserAdvertisements: builder.query<ApiResponse<IAdvertisement[]>, number>({
+            query: (Id) => ({
+                url: `/userAdverts/${Id}`,
+                method: "GET"
+            }),
+            providesTags: ["Advertisements"]
+        }),
     }),
 })
 
@@ -56,4 +85,6 @@ export const {
     useGetAdvertisementByIdQuery,
     useCreateAdvertisementMutation,
     useGetMyAdvertisementsQuery,
+    useGetAdvertisementsQuery,
+    useGetUserAdvertisementsQuery,
 } = apiAdvertisement

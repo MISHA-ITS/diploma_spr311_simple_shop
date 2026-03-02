@@ -48,8 +48,8 @@ admin-dashboard-main/.env*
 # ===========================
 # ⚙️ ASP.NET backend
 # ===========================
-**/bin/
-**/obj/
+/bin/
+/obj/
 **/Properties/launchSettings.json
 *.db
 *.sqlite
@@ -59,9 +59,6 @@ admin-dashboard-main/.env*
 *.userprefs
 
 # ===========================
-
-# User images (generated)
-WebApi/WebApi/wwwroot/images/users/
 
 # Vite
 .vite/

@@ -2,19 +2,31 @@ import * as React from "react";
 import LocationIcon from "../../../icons/Location.png";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { useParams } from "react-router-dom";
-import {useGetAdvertisementByIdQuery} from "../../../services/apiAdvertisement.ts";
-import {useGetUserByIdQuery} from "../../../services/apiUser.ts";
+import {useGetAdvertisementByIdQuery, useGetUserAdvertisementsQuery} from "../../../services/apiAdvertisement.ts";
+import {
+    useGetUserByIdQuery,
+} from "../../../services/apiUser.ts";
 import AdvertisementGallery from "./AdvertisementGallery.tsx";
 import {createParentDic, findPath} from "../utils/functions.ts";
 import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
 import {useNavigate} from "react-router-dom";
-import { TbTruckDelivery } from "react-icons/tb";
+
 import {useGetAreaByIdQuery} from "../../../services/apiNewPost.ts";
+import EnvConfig from "../../../config/env.ts";
+import {useEffect, useState} from "react";
+import {
+    useAddToFavoritesMutation,
+    useProfileQuery,
+    useRemoveFromFavoritesMutation
+} from "../../../services/apiAccount.ts";
+import {FaHeart, FaRegHeart} from "react-icons/fa";
 
 const AdvertisementPage: React.FC = () => {
 
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
+    const [addToFavorites, { isLoading: isAdding }] = useAddToFavoritesMutation();
+    const [removeFromFavorites, { isLoading: isRemoving }] = useRemoveFromFavoritesMutation();
     const { data, isLoading, error } = useGetAdvertisementByIdQuery(Number(id));
     const product = data?.payload;
 
@@ -24,20 +36,54 @@ const AdvertisementPage: React.FC = () => {
         product?.settlement?.area ?? "",
         { skip: !product?.settlement?.area },
     );
-    const { data: userData, isLoading: isUserLoading } = useGetUserByIdQuery(
+    const { data: sellerData, isLoading: isSellerLoading } = useGetUserByIdQuery(
         product?.userId ?? 0,
         { skip: !product?.userId }
     );
-    const seller = userData?.payload;
+    const seller = sellerData?.payload;
+    //favorite
+    const {data: profileData} = useProfileQuery()
+    const isFavorite = profileData?.payload?.favoriteAdverts?.some(fav => fav.id === product?.id);
+
+    const {data: UserAdverts} = useGetUserAdvertisementsQuery(
+        product?.userId ?? 0,
+        { skip: !product?.userId });
     const { data: Categories, error: CategoriesError  } = useGetAllCategoriesQuery();
+
+    //scroll
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(true);
+
+    const checkScroll = () => {
+        const container = document.getElementById('author-adverts-container');
+        if (container) {
+            const { scrollLeft, scrollWidth, clientWidth } = container;
+            setCanScrollLeft(scrollLeft > 0);
+            // Додаємо 1px похибки для точності браузерів
+            setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
+        }
+    };
+    const scroll = (direction: 'left' | 'right') => {
+        const container = document.getElementById('author-adverts-container');
+        if (container) {
+            const scrollAmount = 1500;
+            container.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+    useEffect(() => {
+        checkScroll();
+    }, [UserAdverts]);
+
+
     if (CategoriesError || !Categories?.payload) {
         return <div>Помилка завантаження категорій</div>;
     }
     if (!product){
         return <div>Помилка завантаження продукта</div>;
     }
-
-    console.log(area);
 
     const parentDictionary = createParentDic(Categories.payload);
     const listIdPath = findPath(product.categoryId, parentDictionary)
@@ -47,8 +93,23 @@ const AdvertisementPage: React.FC = () => {
     }, {} as Record<number, string>)
     const namedPath = listIdPath.map(id => categoryNamesDic[id]).join(" / ");
 
-    if (isLoading && isUserLoading) return <div>Завантаження оголошення...</div>;
+    if (isLoading && isSellerLoading) return <div>Завантаження оголошення...</div>;
     if (error || !product) return <div>Оголошення не знайдено</div>;
+
+    const handleFavoriteClick = async () => {
+
+        if (isAdding || isRemoving) return;
+
+        try {
+            if (isFavorite) {
+                await removeFromFavorites(product.id).unwrap();
+            } else {
+                await addToFavorites(product.id).unwrap();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div className="w-full flex justify-center">
@@ -71,37 +132,73 @@ const AdvertisementPage: React.FC = () => {
                         </span>
 
                         <AdvertisementGallery images={product.images} />
-                    </div>
 
+                        {/* DESCRIPTION */}
+                        <div className="flex flex-col gap-3 mt-5 max-w-[930px]">
+                            <h3 className="text-xl font-semibold">
+                                Опис від продавця
+                            </h3>
+                            <p className="text-[#333]">
+                                {product.description}
+                            </p>
+                        </div>
+                    </div>
                     {/* RIGHT */}
                     <div className="flex flex-col gap-4 flex-[1] mt-[40px]">
 
                     {/* PRICE */}
-                        <div className="bg-[#E0E0E0] rounded-lg p-6 flex flex-col gap-4">
-                            <span className="text-xl font-semibold">
-                                {product.name}
+                        <div className="bg-[#dae5f9] rounded-lg p-6 flex flex-col gap-4 relative">
+                            <div
+                                onClick={handleFavoriteClick}
+                                className={`absolute top-6 right-6 cursor-pointer transition-all duration-300 transform 
+                                active:scale-75 hover:scale-110 
+                                ${(isAdding || isRemoving) ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+                            >
+                                {isFavorite ? (
+                                    <FaHeart size={30} />
+                                ) : (
+                                    <FaRegHeart size={30} color="#002f34" />
+                                )}
+                            </div>
+
+                            {/* Назва */}
+                            <span className="text-2xl font-medium text-[#002f34] pr-10">
+                                {product.name || "Продам кавоварку"}
                             </span>
 
-                            <span className="text-2xl font-bold">
+                            {/* Ціна */}
+                            <span className="text-3xl font-bold text-[#002f34] mb-2">
                                 {product.price} грн
                             </span>
 
-                            <button onClick={() => navigate(`/order/${product.id}`)} className="h-11 bg-white text-[#002f34] border-2 border-[#002f34] rounded-md flex items-center justify-center gap-2 font-bold hover:bg-gray-50 transition-colors">
-                                <TbTruckDelivery size={"25px"}/>
-                                Купити з доставкою
+                            {/* Кнопка Купити */}
+                            <button
+                                onClick={() => navigate(`/order/${product.id}`)}
+                                className="h-12 bg-[#5d87db] text-white rounded-md flex items-center justify-center font-bold hover:bg-[#4a72c2] transition-colors text-lg"
+                            >
+                                Купити
                             </button>
-                            <div className="h-11 px-4 rounded-md border border-gray-300 bg-white flex items-center justify-center text-[#6C6C6C]">
-                                {seller?.phoneNumber || "Номер не вказано"}
+
+                            {/* Номер телефону */}
+                            <div className="h-12 px-4 rounded-md bg-white flex items-center justify-center text-[#002f34] font-medium text-lg">
+                                {seller?.phoneNumber || "(098) XXX XX XX"}
                             </div>
 
-                            <button className="h-11 bg-[#6C6C6C] text-white rounded-md">
+                            {/* Кнопка Повідомлення */}
+                            <button className="h-12 bg-white text-[#002f34] rounded-md flex items-center justify-center font-medium hover:bg-gray-50 transition-colors text-lg">
                                 Повідомлення
                             </button>
                         </div>
 
                         {/* SELLER */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex gap-4">
-                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" />
+                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" >
+                                <img src={seller?.image
+                                    ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
+                                    : `${EnvConfig.API_URL}/images/noimage.jpeg`
+                                    }
+                                />
+                            </div>
                             <div className="text-sm">
                                 <p className="font-semibold">{seller?.lastName} {seller?.firstName}</p>
                                 <p className="text-[#555]">Професійний продавець</p>
@@ -124,7 +221,7 @@ const AdvertisementPage: React.FC = () => {
                                 {/* Текстовий блок */}
                                 <div className="flex flex-col">
                                     <span className="text-xl font-bold text-[#002f34]">
-                                        {product.settlement.description || "Місто"}
+                                        {product.settlement?.description || "Місто"}
                                     </span>
                                     <span className="text-[#406367] text-lg mt-1">
                                         {area?.description ? `${area.description} область` : "Область"}
@@ -135,44 +232,77 @@ const AdvertisementPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* DESCRIPTION */}
-                <div className="flex flex-col gap-3 max-w-[930px]">
-                    <h3 className="text-xl font-semibold">
-                        Опис від продавця
-                    </h3>
-                    <p className="text-[#333]">
-                        {product.description}
-                    </p>
-                </div>
-
                 {/* AUTHOR ADS */}
-                <div>
-                    <h3 className="text-xl font-semibold mb-4">
-                        Усі оголошення автора
-                    </h3>
+                <div className="mt-10">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-2xl font-bold text-[#002f34]">
+                            Усі оголошення автора
+                        </h3>
 
-                    <div className="flex gap-4">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="w-[260px] h-[180px] bg-[#BDBDBD] rounded-lg"
-                            />
-                        ))}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => scroll('left')}
+                                disabled={!canScrollLeft}
+                                className={`p-1 transition-all duration-300 rounded-full ${
+                                    canScrollLeft
+                                        ? "text-[#002f34] cursor-pointer opacity-100 hover:bg-[#dae5f9]"
+                                        : "text-gray-500 cursor-default opacity-30"
+                                }`}
+                            >
+                                <RiArrowLeftSLine size={36} />
+                            </button>
+
+                            <button
+                                onClick={() => scroll('right')}
+                                disabled={!canScrollRight}
+                                className={`p-1 transition-all duration-300 rounded-full rotate-180 ${
+                                    canScrollRight
+                                        ? "text-[#002f34] cursor-pointer opacity-100 hover:bg-[#dae5f9]"
+                                        : "text-gray-500 cursor-default opacity-30"
+                                }`}
+                            >
+                                <RiArrowLeftSLine size={36} />
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                {/* SIMILAR ADS */}
-                <div>
-                    <h3 className="text-xl font-semibold mb-4">
-                        Схожі оголошення
-                    </h3>
-
-                    <div className="flex gap-4">
-                        {Array.from({ length: 5 }).map((_, i) => (
+                    {/* КОНТЕЙНЕР З КАРТКАМИ */}
+                    <div
+                        id="author-adverts-container"
+                        onScroll={checkScroll}
+                        className="flex gap-4 overflow-x-auto pb-4 pt-2 scrollbar-hide snap-x snap-mandatory"
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                        {UserAdverts?.payload?.map((ad) => (
                             <div
-                                key={i}
-                                className="w-[260px] h-[180px] bg-[#BDBDBD] rounded-lg"
-                            />
+                                key={ad.id}
+                                onClick={() => navigate(`/advertisement/${ad.id}`)}
+                                className="min-w-[218px] snap-start hover:scale-102 rounded-lg overflow-hidden transition-all cursor-pointer flex flex-col"
+                            >
+                                <div className="h-[170px] w-fuloverflow-hidden rounded-lg overflow-hidden">
+                                    {ad.images?.[0] ? (
+                                        <img
+                                            src={`${EnvConfig.API_URL}/images/advertisements/1200_${ad.images[0]}`}
+                                            alt={ad.name}
+                                            className="w-full h-full object-cover transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center ">
+                                            Немає фото
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* ІНФО */}
+                                <div className="p-4 flex flex-col gap-2">
+                                <span className="text-[#002f34] font-semibold text-lg truncate">
+                                    {ad.name}
+                                </span>
+                                <span className="text-[#002f34] font-bold text-xl">
+                                    {ad.price} грн
+                                </span>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </div>

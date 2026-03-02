@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.BLL.DTOs.Advertisement;
 
 namespace WebApi.BLL.Models.Account;
 
@@ -17,4 +18,5 @@ public class UserProfileModel
     public string PhoneNumber { get; set; } = string.Empty;
     public string CreatedAt { get; set; } = string.Empty;
     public string[] Roles { get; set; } = null!;
+    public ICollection<AdvertisementDTO>? FavoriteAdverts { get; set; } = new List<AdvertisementDTO>();
 }

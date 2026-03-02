@@ -1,6 +1,12 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {createBaseQuery} from "../utils/createBaseQuery.ts";
-import {OrderCreateDto, OrderResponseDto} from "../pages/Order/types.ts";
+import {IOrder, OrderCreateDto, OrderResponseDto} from "../pages/Order/types.ts";
+
+interface ApiResponse<T> {
+    isSuccess: boolean;
+    message: string;
+    payload: T;
+}
 
 export const apiOrder = createApi({
     reducerPath: "apiOrder",
@@ -21,8 +27,13 @@ export const apiOrder = createApi({
             providesTags: ["Order"],
         }),
 
-        getUserOrders: builder.query<OrderResponseDto[], void>({
-            query: () => "/my",
+        getMySellerOrders: builder.query<ApiResponse<IOrder[]>, void>({
+            query: () => "/seller",
+            providesTags: ["Order"],
+        }),
+
+        getMyBuyerOrders: builder.query<ApiResponse<IOrder[]>, void>({
+            query: () => "/buyer",
             providesTags: ["Order"],
         }),
 
@@ -39,6 +50,7 @@ export const apiOrder = createApi({
 export const {
     useCreateOrderMutation,
     useGetOrderByIdQuery,
-    useGetUserOrdersQuery,
+    useGetMyBuyerOrdersQuery,
+    useGetMySellerOrdersQuery,
     useDeleteOrderMutation,
 } = apiOrder;

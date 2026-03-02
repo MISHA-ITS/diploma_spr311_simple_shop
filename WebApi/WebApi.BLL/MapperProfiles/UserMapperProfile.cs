@@ -32,6 +32,7 @@ public class UserMapperProfile : Profile
 
         //UserEntity -> UserProfileModel
         CreateMap<AppUser, UserProfileModel>()
+            .ForMember(dest => dest.FavoriteAdverts, opt => opt.MapFrom(src => src.Adverts))
             .ForMember(opt => opt.FullName, opt =>
                 opt.MapFrom(x => x.LastName + " " + x.FirstName))
             .ForMember(opt => opt.CreatedAt, opt =>

@@ -1,3 +1,5 @@
+import {IAdvertisement} from "../Advertisement/types.ts";
+
 export interface IUserItem {
     id: number;
     email: string;
@@ -10,6 +12,7 @@ export interface IUserItem {
     dateOnline: string;
     roles: string[];
     lockoutEnd?: string | null;
+    favoriteAdverts: IAdvertisement[];
 }
 
 export interface IUsersResponse {

@@ -22,6 +22,21 @@ namespace WebApi.DAL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AdvertisementEntityAppUser", b =>
+                {
+                    b.Property<long>("AdvertsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UsersId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AdvertsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("UserFavoriteAdverts", (string)null);
+                });
+
             modelBuilder.Entity("WebApi.DAL.Entities.AdvertisementEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -368,83 +383,6 @@ namespace WebApi.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("WebApi.DAL.Entities.Identity.OrderEntity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("AdvertisementId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("BuyerEmail")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("BuyerFirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("BuyerId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("BuyerLastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("BuyerPhone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("City")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DeliveryAddress")
-                        .HasColumnType("text");
-
-                    b.Property<int>("DeliveryMethod")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("NewPostWarehouse")
-                        .HasColumnType("text");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.Property<long>("SellerId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TrackingNumber")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdvertisementId");
-
-                    b.HasIndex("BuyerId");
-
-                    b.HasIndex("SellerId");
-
-                    b.ToTable("Orders");
-                });
-
             modelBuilder.Entity("WebApi.DAL.Entities.NewPostEntities.Area", b =>
                 {
                     b.Property<string>("Ref")
@@ -530,6 +468,98 @@ namespace WebApi.DAL.Migrations
                     b.HasIndex("Region");
 
                     b.ToTable("tbl_Settlements");
+                });
+
+            modelBuilder.Entity("WebApi.DAL.Entities.OrderEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AdvertisementId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BuyerEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BuyerFirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("BuyerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BuyerLastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BuyerPhone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeliveryAddress")
+                        .HasColumnType("text");
+
+                    b.Property<int>("DeliveryMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NewPostWarehouse")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<long>("SellerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TrackingNumber")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertisementId");
+
+                    b.HasIndex("BuyerId");
+
+                    b.HasIndex("SellerId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("AdvertisementEntityAppUser", b =>
+                {
+                    b.HasOne("WebApi.DAL.Entities.AdvertisementEntity", null)
+                        .WithMany()
+                        .HasForeignKey("AdvertsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.DAL.Entities.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.AdvertisementEntity", b =>
@@ -651,7 +681,28 @@ namespace WebApi.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApi.DAL.Entities.Identity.OrderEntity", b =>
+            modelBuilder.Entity("WebApi.DAL.Entities.NewPostEntities.Region", b =>
+                {
+                    b.HasOne("WebApi.DAL.Entities.NewPostEntities.Area", "Area")
+                        .WithMany("Regions")
+                        .HasForeignKey("AreaRef")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Area");
+                });
+
+            modelBuilder.Entity("WebApi.DAL.Entities.NewPostEntities.Settlement", b =>
+                {
+                    b.HasOne("WebApi.DAL.Entities.NewPostEntities.Region", "SettlementRegion")
+                        .WithMany("Settlements")
+                        .HasForeignKey("Region")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SettlementRegion");
+                });
+
+            modelBuilder.Entity("WebApi.DAL.Entities.OrderEntity", b =>
                 {
                     b.HasOne("WebApi.DAL.Entities.AdvertisementEntity", "Advertisement")
                         .WithMany()
@@ -676,27 +727,6 @@ namespace WebApi.DAL.Migrations
                     b.Navigation("Buyer");
 
                     b.Navigation("Seller");
-                });
-
-            modelBuilder.Entity("WebApi.DAL.Entities.NewPostEntities.Region", b =>
-                {
-                    b.HasOne("WebApi.DAL.Entities.NewPostEntities.Area", "Area")
-                        .WithMany("Regions")
-                        .HasForeignKey("AreaRef")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Area");
-                });
-
-            modelBuilder.Entity("WebApi.DAL.Entities.NewPostEntities.Settlement", b =>
-                {
-                    b.HasOne("WebApi.DAL.Entities.NewPostEntities.Region", "SettlementRegion")
-                        .WithMany("Settlements")
-                        .HasForeignKey("Region")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("SettlementRegion");
                 });
 
             modelBuilder.Entity("WebApi.DAL.Entities.AdvertisementEntity", b =>

@@ -155,7 +155,7 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
             // 5.3 (опціонально) Видаляємо старі файли
             if (!string.IsNullOrEmpty(oldImage))
             {
-                imageService.DeleteImageAsync(oldImage, Settings.UsersDir);
+                await imageService.DeleteImageAsync(oldImage, Settings.UsersDir);
             }
         }
         else
@@ -183,6 +183,60 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
         }
 
         return ServiceResponse.Success("Користувача успішно оновлено");
+    }
+
+    public async Task<ServiceResponse?> AddFavoriteAdvert(long userId, long advertId)
+    {
+        var user = await dbContext.Users
+            .Include(u => u.Adverts)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+            return ServiceResponse.Error($"Користувача з Id {userId} не знайдено");
+
+        var advert = await dbContext.Advertisements
+        .FirstOrDefaultAsync(a => a.Id == advertId);
+
+        if (advert == null)
+            return ServiceResponse.Error("Оголошення не знайдено");
+
+        if (user.Adverts.Any(a => a.Id == advertId))
+            return ServiceResponse.Error("Це оголошення вже в обраному");
+
+        user.Adverts.Add(advert);
+        await dbContext.SaveChangesAsync();
+
+        return ServiceResponse.Success($"Оголошення додано до обраного");
+    }
+
+    public async Task<ServiceResponse> RemoveFavoriteAdvert(long userId, long advertId)
+    {
+        var user = await dbContext.Users
+            .Include(u => u.Adverts)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null) return ServiceResponse.Error("Юзера не знайдено");
+
+        var advert = user.Adverts.FirstOrDefault(a => a.Id == advertId);
+        if (advert == null) return ServiceResponse.Error("Оголошення не в обраному");
+
+        user.Adverts.Remove(advert);
+        await dbContext.SaveChangesAsync();
+
+        return ServiceResponse.Success("Видалено з обраного");
+    }
+
+    public async Task<ServiceResponse> RemoveAllFavorites(long userId)
+    {
+        var user = await dbContext.Users
+            .Include(u => u.Adverts)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+
+        user?.Adverts.Clear();
+        await dbContext.SaveChangesAsync();
+
+        return ServiceResponse.Success("Видалено з обраного");
     }
 
     public async Task<ServiceResponse> LockUserAsync(long userId, TimeSpan? duration = null)

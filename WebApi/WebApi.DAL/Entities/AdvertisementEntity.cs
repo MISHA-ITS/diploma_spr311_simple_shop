@@ -32,5 +32,6 @@ namespace WebApi.DAL.Entities
         [ForeignKey("CategoryId")]
         public CategoryEntity? Category { get; set; }
         public ICollection<AdvertisementImageEntity> Images { get; set; } = [];
+        public ICollection<AppUser> Users { get; set; } = [];
     }
 }

@@ -51,6 +51,13 @@ public class AdvertisementController(IAdvertisementService advertisementService)
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
     }
 
+    [HttpGet("userAdverts/{id}")]
+    public async Task<IActionResult> GetAllUserAdverts(long id)
+    {
+        var responce = await advertisementService.GetByUserIdAsync(id);
+        return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
+    }
+
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromForm] UpdateAdvertisementDTO dto)
     {

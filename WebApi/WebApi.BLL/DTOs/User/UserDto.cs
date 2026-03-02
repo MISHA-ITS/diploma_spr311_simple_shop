@@ -1,4 +1,6 @@
-﻿namespace WebApi.BLL.DTOs.User;
+﻿using WebApi.BLL.DTOs.Advertisement;
+
+namespace WebApi.BLL.DTOs.User;
 
 public class UserDTO
 {
@@ -12,4 +14,5 @@ public class UserDTO
     public DateTime DateOnline { get; set; }
     public DateTimeOffset? LockoutEnd { get; set; }
     public string[] Roles { get; set; } = [];
+    public ICollection<AdvertisementDTO>? FavoriteAdverts { get; set; } = new List<AdvertisementDTO>();
 }

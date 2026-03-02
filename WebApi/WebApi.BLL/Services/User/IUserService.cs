@@ -11,4 +11,7 @@ public interface IUserService
     Task<ServiceResponse> GetAllAsync(UserFilterDto filter);
     Task<ServiceResponse> LockUserAsync(long userId, TimeSpan? duration = null);
     Task<ServiceResponse> UnlockUserAsync(long userId);
+    Task<ServiceResponse> AddFavoriteAdvert(long userId,long advertId);
+    Task<ServiceResponse> RemoveFavoriteAdvert(long userId, long advertId);
+    Task<ServiceResponse> RemoveAllFavorites(long userId);
 }
