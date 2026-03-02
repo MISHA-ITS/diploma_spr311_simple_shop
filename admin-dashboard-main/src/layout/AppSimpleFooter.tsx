@@ -5,8 +5,11 @@ import TelegramIcon from "../icons/Telegram.png";
 
 const SimpleFooter: FC = () => {
     return (
-        <footer className="w-full dark:bg-[#071739] bg-[rgb(33,33,33)] text-[#F8FAFF] pt-16 pb-10">
-            <div className="max-w-[1400px] mx-auto px-6">
+        <footer className="w-full dark:bg-[#071739] bg-[rgb(33,33,33)] text-[#F8FAFF] pt-16 pb-10 relative">
+
+            <div className="absolute top-0 left-0 w-full h-[22px] bg-[#E3C39D]"></div>
+
+            <div className="max-w-[1400px] mx-auto px-6 pt-[22px]">
                 <div className="flex justify-between items-center mb-16">
                     <div className="text-2xl font-semibold tracking-wide">
                         SELLIX
@@ -31,6 +34,7 @@ const SimpleFooter: FC = () => {
                     </div>
                 </div>
 
+                {/* решта футера */}
                 <div className="mb-16">
                     <h3 className="text-[20px] font-semibold mb-10">
                         З підпискою доступні спеціальні пропозиції

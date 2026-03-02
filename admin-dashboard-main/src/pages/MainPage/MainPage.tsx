@@ -4,6 +4,7 @@ import SearchBlock from "./SearchBlock.tsx";
 import PromoBlock from "./PromoBlock.tsx";
 import CategoriesBlock from "./CategoriesBlock.tsx";
 import {useGetAllCategoriesQuery} from "../../services/apiCategory.ts";
+import Explore from "./Explore.tsx";
 
 const MainPage : React.FC = () => {
     const { data: categoriesData, isLoading } = useGetAllCategoriesQuery();
@@ -13,12 +14,14 @@ const MainPage : React.FC = () => {
 
     return (
         <>
-            <div className="flex flex-col items-center w-full">
+            <div className="flex flex-col bg-[#F8FAFF] items-center w-full">
                 <SearchBlock />
 
                 <CategoriesBlock categories={categories!} />
 
                 <PromoBlock />
+
+                <Explore />
             </div>
         </>
     )

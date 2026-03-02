@@ -60,8 +60,5 @@ admin-dashboard-main/.env*
 
 # ===========================
 
-# User images (generated)
-WebApi/WebApi/wwwroot/images/users/
-
 # Vite
 .vite/

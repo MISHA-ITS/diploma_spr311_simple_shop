@@ -1,21 +1,19 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.NewPost;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Repositories.Advertisements;
+using WebApi.DAL.Repositories.Category;
 
 namespace WebApi.BLL.Services.Advertisement
 {
     public class AdvertisementService(
         IAdvertisementRepository advertisementRepository, IMapper mapper, IImageService imageService, 
-        ILogger<AdvertisementService> logger, INewPostService newPostService) : IAdvertisementService
+        ILogger<AdvertisementService> logger, INewPostService newPostService, ICategoryRepository categoryRepository) : IAdvertisementService
     {
 
         public async Task<ServiceResponse> CreateAsync(CreateAdvertisementDTO dto, long userId)
@@ -84,30 +82,30 @@ namespace WebApi.BLL.Services.Advertisement
             logger.LogDebug("Retrieving all advertisements with filter {@Filter}", filter);
 
             var entities = advertisementRepository.GetAll();
-            entities = FilterAdvertisements(entities, filter);
 
-            var entityList = await entities.ToListAsync();
+            var (pagedEntities, totalCount) = await FilterAdvertisementsPagedAsync(entities, filter);
 
-            var dtos = mapper.Map<List<AdvertisementDTO>>(entityList);
+            var dtos = mapper.Map<List<AdvertisementDTO>>(pagedEntities);
 
-            var entityDict = entityList.ToDictionary(e => e.Id);
+            foreach (var dto in dtos)
+            {
+                var entity = pagedEntities.First(e => e.Id == dto.Id);
 
-            dtos = (await Task.WhenAll(
-                dtos.Select(async dto =>
-                {
-                    var entity = entityDict[dto.Id];
+                if (!string.IsNullOrEmpty(entity.SettlementRef))
+                    dto.Settlement = await newPostService.GetSettlement(entity.SettlementRef);
+            }
 
-                    dto.Settlement = entity.SettlementRef != null
-                        ? await newPostService.GetSettlement(entity.SettlementRef)
-                        : null;
-
-                    return dto;
-                })
-            )).ToList();
+            var pagedResponse = new PagedResponse<AdvertisementDTO>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = filter.pageNumber,
+                PageSize = filter.pageSize
+            };
 
             logger.LogInformation("Retrieved {Count} advertisements", dtos.Count);
 
-            return ServiceResponse.Success("advertisements retrieved successfully", dtos);
+            return ServiceResponse.Success("advertisements retrieved successfully", pagedResponse);
         }
 
         public async Task<ServiceResponse> GetByIdAsync(long id)
@@ -206,12 +204,14 @@ namespace WebApi.BLL.Services.Advertisement
             }
         }
 
-        private IQueryable<AdvertisementEntity> FilterAdvertisements(IQueryable<AdvertisementEntity> advertisements, AdvertisementFilterDto filter)
+        private async Task<(List<AdvertisementEntity> pagedAds, int totalCount)> FilterAdvertisementsPagedAsync(
+            IQueryable<AdvertisementEntity> advertisements, 
+            AdvertisementFilterDto filter)
         {
             if (filter.categoryId.HasValue)
             {
-                advertisements = advertisements
-                    .Where(p => p.CategoryId == filter.categoryId.Value);
+                var categoryIds = await categoryRepository.GetAllChildCategoryIdsAsync(filter.categoryId.Value);
+                advertisements = advertisements.Where(a => categoryIds.Contains(a.CategoryId));
             }
             if (filter.minPrice.HasValue)
             {
@@ -242,14 +242,14 @@ namespace WebApi.BLL.Services.Advertisement
                 advertisements = advertisements.OrderBy(p => p.Id);
             }
 
-            int pageSize = 4;
+            var totalCount = await advertisements.CountAsync();
+
             int pageNumber = filter.pageNumber <= 0 ? 1 : filter.pageNumber;
+            int skip = (pageNumber - 1) * filter.pageSize;
 
-            int skip = (pageNumber - 1) * pageSize;
+            var pagedList = await advertisements.Skip(skip).Take(filter.pageSize).ToListAsync();
 
-            advertisements = advertisements.Skip(skip).Take(pageSize);
-
-            return advertisements;
+            return (pagedList, totalCount);
         }
     }
 }

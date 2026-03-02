@@ -61,7 +61,7 @@ const AreasDropDown: FC<AreasDropDownProps> = ({areas, settlements, isLoading, s
                     className="w-[21px] h-[26px]"
                 />
 
-                <span className="flex-1 truncate text-[16px] text-[rgba(0,23,72,0.58)]">
+                <span className="flex-1 truncate text-[16px] font-inter text-[rgba(0,23,72,0.58)]">
                     {headerText}
                 </span>
 
@@ -84,7 +84,7 @@ const AreasDropDown: FC<AreasDropDownProps> = ({areas, settlements, isLoading, s
                                     onSelectArea(null);
                                     setIsOpen(false);
                                 }}
-                                className="px-4 py-3 hover:bg-gray-100 cursor-pointer font-medium"
+                                className="px-4 py-3 hover:bg-gray-100 font-inter cursor-pointer font-medium"
                             >
                                 Вся Україна
                             </li>
@@ -93,7 +93,7 @@ const AreasDropDown: FC<AreasDropDownProps> = ({areas, settlements, isLoading, s
                                 <li
                                     key={area.ref}
                                     onClick={() => handleAreaSelect(area)}
-                                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                                    className="px-4 py-3 hover:bg-gray-100 font-inter cursor-pointer flex items-center justify-between"
                                 >
                                     <span>{area.description}</span>
                                     <img
@@ -119,7 +119,7 @@ const AreasDropDown: FC<AreasDropDownProps> = ({areas, settlements, isLoading, s
                             {filteredSettlements.map(settlement => (
                                 <li
                                     key={settlement.ref}
-                                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                                    className="px-4 py-3 hover:bg-gray-100 font-inter cursor-pointer"
                                     onClick={() => handleSettlementSelect(settlement)}
                                 >
                                     {settlement.description}

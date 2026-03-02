@@ -18,7 +18,7 @@ const SearchBlock: FC = () => {
     }
 
     return (
-        <div className="mt-[57px] w-full max-w-[1430px] px-4 flex gap-9 h-[54px]">
+        <div className="mt-[57px] w-full max-w-[1430px] flex gap-9 h-[54px]">
             <div className="flex flex-row items-center gap-4 px-4 w-[981px] h-[48px] rounded-[5px] border-[2px] border-[rgba(0,23,72,0.58)] box-border">
                 <img
                     src={SearchIcon}

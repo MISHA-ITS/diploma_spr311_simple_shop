@@ -10,6 +10,7 @@ export interface IAdvertisement {
     userId: number;
     categoryId: number;
     images: string[];
+    updateDate: string;
     settlement: SettlementDto;
 }
 

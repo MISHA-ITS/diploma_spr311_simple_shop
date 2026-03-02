@@ -37,8 +37,6 @@ const AdvertisementPage: React.FC = () => {
         return <div>Помилка завантаження продукта</div>;
     }
 
-    console.log(area);
-
     const parentDictionary = createParentDic(Categories.payload);
     const listIdPath = findPath(product.categoryId, parentDictionary)
     const categoryNamesDic = Categories.payload.reduce((acc, cat) => {
@@ -124,7 +122,7 @@ const AdvertisementPage: React.FC = () => {
                                 {/* Текстовий блок */}
                                 <div className="flex flex-col">
                                     <span className="text-xl font-bold text-[#002f34]">
-                                        {product.settlement.description || "Місто"}
+                                        {product.settlement?.description || "Місто"}
                                     </span>
                                     <span className="text-[#406367] text-lg mt-1">
                                         {area?.description ? `${area.description} область` : "Область"}

@@ -5,12 +5,20 @@ import {useAppSelector} from "../store";
 import { UserOutlined, BellOutlined, HeartOutlined } from '@ant-design/icons';
 import SelixLogo from "../icons/Sellix.png";
 import {useEffect, useRef, useState} from "react";
+import {useDispatch} from "react-redux";
+import LogoutIconLight from "../icons/Logout.png"
+import LogoutIconDark from "../icons/LogoutGray.png"
+import {logout} from "../store/authSlice.ts";
+import {useNavigate} from "react-router";
 
 const SimpleHeader: React.FC = () => {
     const { user } = useAppSelector(globalState => globalState.auth);
 
     const [isVisible, setIsVisible] = useState(true);
     const lastScrollY = useRef(0);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -34,9 +42,14 @@ const SimpleHeader: React.FC = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate("/");
+    }
+
     return (
         <header
-            className={`fixed top-0 left-0 w-full z-50 bg-[rgb(33,33,33)] h-[91px] 
+            className={`fixed top-0 left-0 w-full z-50 bg-[rgb(33,33,33)] h-[102px] 
             transition-transform duration-300 
             ${isVisible ? "translate-y-0" : "-translate-y-full"}
             dark:bg-[#071739]`}
@@ -101,6 +114,10 @@ const SimpleHeader: React.FC = () => {
                                     Створити оголошення
                                 </span>
                             </Link>
+                            <button onClick={handleLogout} className="inline-flex min-h-[37.42px] items-center justify-center rounded-md bg-gray-200 px-3 py-2 text-sm font-inter text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 gap-2">
+                                <img src={LogoutIconLight} alt="Logout" className="w-5 h-5 object-contain hidden dark:inline-block" />
+                                <img src={LogoutIconDark} alt="Logout" className="w-5 h-5 object-contain dark:hidden " />
+                            </button>
                         </>
                     )}
 
@@ -109,14 +126,13 @@ const SimpleHeader: React.FC = () => {
                     {!user && (
                         <Link
                             to="/signin"
-                            className="rounded-md text-[17px] bg-gray-200 px-6 py-2.5 text-sm font-inter text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                            className="rounded-md bg-gray-200 px-6 py-2.5 text-sm font-inter text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                         >
                             Увійти
                         </Link>
                     )}
                 </div>
             </div>
-
             <div className="w-full h-[22px] bg-[#E3C39D]"></div>
         </header>
     );
