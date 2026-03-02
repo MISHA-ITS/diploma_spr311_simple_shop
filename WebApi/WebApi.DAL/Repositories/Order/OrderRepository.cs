@@ -14,6 +14,7 @@ public class OrderRepository(
     {
         return await _context.Orders
             .Include(o => o.Advertisement)
+                .ThenInclude(a => a.Images)
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
             .OrderByDescending(o => o.CreateDate)
@@ -24,6 +25,7 @@ public class OrderRepository(
     {
         return await _context.Orders
             .Include(o => o.Advertisement)
+                .ThenInclude(a => a.Images)
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
             .FirstOrDefaultAsync(o => o.Id == id);

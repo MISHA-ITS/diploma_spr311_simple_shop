@@ -9,4 +9,6 @@ public abstract class BaseOrderDto
     public decimal Price { get; set; }
     public OrderStatus Status { get; set; }
     public DateTime CreateDate { get; set; }
+
+    public string? AdvertisementImage { get; set; }
 }
