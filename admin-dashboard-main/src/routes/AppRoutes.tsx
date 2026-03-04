@@ -34,6 +34,7 @@ import AdvertisementPreview from "../pages/Advertisement/components/Advertisemen
 import {AdvertisementProvider} from "../context/AdvertisementContext.tsx";
 import FavoritesPage from "../pages/favorites/FavoritesPage.tsx";
 import AdvCategoryPage from "../pages/AdvCategoryPage/AdvCategoryPage.tsx";
+import EditAdvertisementPage from "../pages/Advertisement/components/EditAdvertisementPage.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -52,6 +53,7 @@ const AppRoutes : React.FC = () => {
                     <Route path="/category/:id" element={<AdvCategoryPage />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
                     <Route element={<AdvertisementProvider />}>
+                        <Route path="/edit-advertisement/:id" element={<EditAdvertisementPage />} />
                         <Route path="/createAdvertisement" element={<CreateAdvertisementPage />} />
                         <Route path="/advertpreview" element={<AdvertisementPreview />} />
                     </Route>

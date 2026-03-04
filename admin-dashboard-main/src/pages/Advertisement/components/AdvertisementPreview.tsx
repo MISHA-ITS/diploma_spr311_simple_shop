@@ -4,20 +4,18 @@ import { RiArrowLeftSLine } from "react-icons/ri";
 import LocationIcon from "../../../icons/Location.png";
 import AdvertisementGallery from "./AdvertisementGallery.tsx";
 import {useAdForm} from "../../../context/AdvertisementContext.tsx";
-import {useSelector} from "react-redux";
-import {useGetUserByIdQuery} from "../../../services/apiUser.ts";
 import {toast} from "react-toastify";
 import {useCreateAdvertisementMutation} from "../../../services/apiAdvertisement.ts";
+import {useProfileQuery} from "../../../services/apiAccount.ts";
+import EnvConfig from "../../../config/env.ts";
 
 const AdvertisementPreview: React.FC = () => {
     const navigate = useNavigate();
     const { formData, clearForm } = useAdForm();
     const [createAdvertisement] = useCreateAdvertisementMutation();
-    const currentUser = useSelector((state: any) => state.auth.user);
-    const { data: userResponse } = useGetUserByIdQuery(Number(currentUser?.id), {
-        skip: !currentUser?.id
-    });
-    const author = userResponse?.payload;
+    const { data:profile} = useProfileQuery();
+    if (profile == null) {return}
+    const author = profile.payload;
 
     const handleBack = () => {
         navigate("/createAdvertisement")
@@ -84,11 +82,11 @@ const AdvertisementPreview: React.FC = () => {
                             </span>
 
                             <span className="text-2xl font-bold">
-                                {formData.price}
+                                {formData.price} грн
                             </span>
 
                             <div className="h-11 px-4 rounded-md border border-gray-300 bg-white flex items-center justify-center text-[#6C6C6C]">
-                                {formData.phone || "Номер не вказано"}
+                                {author.phoneNumber || "Номер не вказано"}
                             </div>
 
                             <button className="h-11 bg-[#6C6C6C] text-white rounded-md cursor-not-allowed opacity-80">
@@ -98,11 +96,18 @@ const AdvertisementPreview: React.FC = () => {
 
                         {/* SELLER */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex gap-4">
-                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" />
+                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full overflow-hidden">
+                                <img
+                                    className="w-full h-full object-cover" src={author?.image
+                                    ? `${EnvConfig.API_URL}/images/users/1200_${author.image}`
+                                    : `${EnvConfig.API_URL}/images/noimage.jpeg`
+                                }
+                                />
+                            </div>
                             <div className="text-sm">
-                                <p className="font-semibold">{author?.firstName} {author?.lastName}</p>
-                                <p className="text-[#555]">Ви як продавець</p>
-                                <p className="text-[#555]">⭐ Нове оголошення</p>
+                                <p className="font-semibold">{author?.lastName} {author?.firstName}</p>
+                                <p className="text-[#555]">Професійний продавець</p>
+                                <p className="text-[#555]">⭐ 5 років на сервісі</p>
                             </div>
                         </div>
 

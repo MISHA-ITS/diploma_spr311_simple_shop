@@ -78,6 +78,14 @@ export const apiAdvertisement = createApi({
             }),
             providesTags: ["Advertisements"]
         }),
+        updateAdvertisement: builder.mutation<void, FormData>({
+            query: (formData) => ({
+                url: `/update`,
+                method: 'PUT',
+                body: formData,
+            }),
+            invalidatesTags: ['Advertisements'],
+        }),
     }),
 })
 
@@ -87,4 +95,5 @@ export const {
     useGetMyAdvertisementsQuery,
     useGetAdvertisementsQuery,
     useGetUserAdvertisementsQuery,
+    useUpdateAdvertisementMutation,
 } = apiAdvertisement

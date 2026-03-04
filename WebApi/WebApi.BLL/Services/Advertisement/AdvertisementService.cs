@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Advertisement;
@@ -139,7 +140,7 @@ namespace WebApi.BLL.Services.Advertisement
             return ServiceResponse.Success("advertisement retrieved successfully", entity);
         }
 
-        public async Task<ServiceResponse> UpdateAsync(UpdateAdvertisementDTO dto)
+        public async Task<ServiceResponse> UpdateAsync(UpdateAdvertisementDTO dto, long userId)
         {
             logger.LogInformation("Updating advertisement with Id {advertisementId}", dto.Id);
 
@@ -147,35 +148,31 @@ namespace WebApi.BLL.Services.Advertisement
             if (entity == null)
                 return ServiceResponse.Error($"advertisement with Id {dto.Id} not found");
 
+            if (entity.UserId != userId)
+            {
+                logger.LogWarning("User {userId} tried to edit advertisement {adId} owned by {ownerId}", userId, dto.Id, entity.UserId);
+                return ServiceResponse.Error("You don't have permission to edit this advertisement");
+            }
+
+            var imagesToDelete = entity.Images
+                .Where(img => dto.ExistingImages == null || !dto.ExistingImages.Contains(img.ImageUrl))
+                .ToList();
+
+            foreach (var image in imagesToDelete)
+            {
+                await imageService.DeleteImageAsync(image.ImageUrl, Settings.AdvertisementsDir);
+                entity.Images.Remove(image);
+            }
+
             if (dto.Images != null)
             {
-                foreach (var image in entity.Images)
+                foreach (var file in dto.Images)
                 {
-                    var imageDeleteResult = await TryDeleteImageAsync(image.ImageUrl);
-                    if (imageDeleteResult != null)
+                    string imageName = await imageService.SaveImageAsync(file, Settings.AdvertisementsDir);
+                    if (!string.IsNullOrEmpty(imageName))
                     {
-                        logger.LogError("Failed to delete image {ImageUrl} for advertisement {advertisementId}", image.ImageUrl, dto.Id);
-                        return imageDeleteResult;
+                        entity.Images.Add(new AdvertisementImageEntity { ImageUrl = imageName });
                     }
-                }
-
-                entity.Images = new List<AdvertisementImageEntity>();
-
-                foreach (var image in dto.Images)
-                {
-                    string? imageName = await imageService.SaveImageAsync(image, Settings.AdvertisementsDir);
-
-                    if (string.IsNullOrEmpty(imageName))
-                    {
-                        logger.LogError("Failed to save one of the images for advertisement {advertisementId}", dto.Id);
-                        return ServiceResponse.Error("Failed to save one of the advertisement images");
-                    }
-
-                    entity.Images.Add(new AdvertisementImageEntity
-                    {
-                        ImageUrl = imageName,
-                    });
-                    logger.LogInformation("Saved image {ImageName} for advertisement {advertisementId}", imageName, dto.Id);
                 }
             }
 
