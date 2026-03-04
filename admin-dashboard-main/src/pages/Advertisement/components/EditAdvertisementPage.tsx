@@ -363,7 +363,7 @@ const EditAdvertisementPage: React.FC = () => {
                     </div>
 
                     {/* Номер телефону */}
-                    <div className="space-y-1 border-b-2 border-[#212121] relative">
+                    <div className="space-y-1 border-b-2 border-green-500 relative">
                         <label className="text-sm font-medium text-gray-600">
                             Номер телефону* <span className="text-xs font-normal text-gray-400">(щоб змінити номер телефону перейдіть у профіль)</span>
                         </label>

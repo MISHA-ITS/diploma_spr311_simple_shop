@@ -293,7 +293,7 @@ const CreateAdvertisementPage: React.FC = () => {
                     </div>
 
                     {/* Ціна */}
-                    <div className="space-y-1 relative">
+                    <div className="space-y-1 border-b-2 border-green-500 relative">
                         <label className="text-sm font-medium text-gray-600">Ціна <span className="text-xs font-normal text-gray-400">(грн)</span></label>
                         <div className={`relative border-b-2 transition-colors ${Number(formData.price) > 0 ? "border-green-500" : "border-[#212121]"}`}>
                             <input
