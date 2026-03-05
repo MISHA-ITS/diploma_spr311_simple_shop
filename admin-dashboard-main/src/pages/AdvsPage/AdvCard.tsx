@@ -2,6 +2,13 @@ import {FC, useState} from "react";
 import {IAdvertisement} from "../Advertisement/types.ts";
 import {HeartFilled, HeartOutlined} from "@ant-design/icons";
 import EnvConfig from "../../config/env.ts";
+import {useNavigate} from "react-router";
+import {useAppSelector} from "../../store";
+import {
+    useAddToFavoritesMutation,
+    useGetAllFavoritesQuery,
+    useRemoveFromFavoritesMutation
+} from "../../services/apiAccount.ts";
 
 type AdvCardProps = {
     advertisement: IAdvertisement;
@@ -11,9 +18,28 @@ type AdvCardProps = {
 const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
+    const [addToFavorites] = useAddToFavoritesMutation();
+    const [removeFromFavorites] = useRemoveFromFavoritesMutation();
+
+    const navigate = useNavigate();
+
     const toggleFavorite = () => {
+        if (isFavorite) {
+            removeFromFavorites(advertisement.id);
+        } else {
+            addToFavorites(advertisement.id);
+        }
         setIsFavorite(!isFavorite);
+    };
+
+    const clickHandle = (id: number) => {
+        navigate("/advertisement/" + id)
     }
+
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        toggleFavorite();
+    };
 
     const yearPart = advertisement.updateDate.slice(-7);
     const mainPart = advertisement.updateDate.slice(0, -7);
@@ -22,9 +48,19 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
         advertisement.description :
         advertisement.description.slice(0, 250) + '...';
 
+    const {user} = useAppSelector(globalState => globalState.auth);
+
+    const {data: favAdvsData, isLoading: favAdvsLoad, error: favAdvsError} = useGetAllFavoritesQuery(undefined, {
+        skip: !user
+    });
+
+    if (favAdvsLoad || favAdvsError) return null;
+
+    const favAdvs = favAdvsData? favAdvsData.payload : [];
+
     return viewMode === "grid" ? (
-        <div
-            className="flex flex-row justify-center items-center px-5 gap-2.5 w-[232px] h-[345px] bg-[rgba(217,217,217,0.3)] rounded-[5px] flex-none">
+        <div onClick={() => clickHandle(advertisement.id)}
+            className="flex flex-row justify-center items-center px-5 gap-2.5 w-[232px] h-[345px] bg-[rgba(217,217,217,0.3)] hover:scale-102 transition-all rounded-[5px] flex-none cursor-pointer">
             <div className="flex flex-col justify-center items-center gap-1 w-[203px] h-[317px] flex-none">
                 <img
                     src={
@@ -43,7 +79,7 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
                     </div>
                     <div className="flex flex-col items-start gap-[16px] w-[203px] h-[65px] flex-none">
                         <span className="w-[203px] h-[34px] font-inter font-light text-[14px] leading-[17px] text-[#071739] flex-none self-stretch">
-                            {advertisement.settlement.description} - {mainPart}{" "}
+                            {advertisement.settlement?.description} - {mainPart}{" "}
 
                             <span className="whitespace-nowrap">{yearPart}</span>
                         </span>
@@ -53,8 +89,8 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
                                 {advertisement.price} грн
                             </span>
 
-                            <button onClick={toggleFavorite} className="cursor-pointer">
-                                {isFavorite
+                            <button onClick={handleFavoriteClick} className="cursor-pointer">
+                                {favAdvs.some(fav => fav.id === advertisement.id)
                                     ? <HeartFilled className="text-[22px]"/>
                                     : <HeartOutlined className="text-[22px]"/>
                                 }
@@ -65,7 +101,7 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
             </div>
         </div>
     ) : (
-        <div className="flex flex-col items-start p-[19px_17px] gap-[10px] w-[1428px] h-[176px] bg-[rgba(217,217,217,0.3)] rounded-[5px] flex-none self-stretch">
+        <div onClick={() => clickHandle(advertisement.id)} className="flex flex-col items-start cursor-pointer hover:scale-102 transition-all p-[19px_17px] gap-[10px] w-[1428px] h-[176px] bg-[rgba(217,217,217,0.3)] rounded-[5px] flex-none self-stretch">
             <div className="flex flex-row items-center p-0 gap-[30px] w-[1371px] h-[138px] flex-none">
                 <img
                     src={
@@ -96,12 +132,12 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
 
                     <div className="flex flex-row justify-between items-start p-0 gap-[813px] w-[1137px] h-[17px] flex-none">
                         <span className="w-[300px] h-[17px] font-inter font-light text-[14px] leading-[17px] text-[#071739] flex-none">
-                            {advertisement.settlement.description} - {advertisement.updateDate}
+                            {advertisement.settlement?.description} - {advertisement.updateDate}
                         </span>
 
                         <div className="w-[18px] h-[16px] flex-none">
-                            <button onClick={toggleFavorite} className="cursor-pointer">
-                                {isFavorite
+                            <button onClick={handleFavoriteClick} className="cursor-pointer">
+                                {favAdvs.some(fav => fav.id === advertisement.id)
                                     ? <HeartFilled className="text-[22px]"/>
                                     : <HeartOutlined className="text-[22px]"/>
                                 }

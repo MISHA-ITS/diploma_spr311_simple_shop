@@ -79,8 +79,10 @@ const AdvertisementPage: React.FC = () => {
 
 
     if (CategoriesError || !Categories?.payload) {
-        return <div>Помилка завантаження категорій</div>;
+        return null;
     }
+
+    console.log(product);
     if (!product){
         return <div>Помилка завантаження продукта</div>;
     }
@@ -192,11 +194,13 @@ const AdvertisementPage: React.FC = () => {
 
                         {/* SELLER */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex gap-4">
-                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" >
-                                <img src={seller?.image
-                                    ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
-                                    : `${EnvConfig.API_URL}/images/noimage.jpeg`
-                                    }
+                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-[15px] overflow-hidden">
+                                <img
+                                    src={seller?.image
+                                        ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
+                                        : `${EnvConfig.API_URL}/images/noimage.jpeg`}
+                                    alt="seller"
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
                             <div className="text-sm">

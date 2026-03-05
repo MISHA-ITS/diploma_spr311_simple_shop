@@ -218,6 +218,20 @@ namespace WebApi.BLL.Services.Advertisement
                 advertisements = advertisements
                     .Where(p => p.Price >= filter.minPrice.Value);
             }
+            if (!string.IsNullOrEmpty(filter.settlementRef))
+            {
+                advertisements = advertisements
+                    .Where(a => a.SettlementRef == filter.settlementRef);
+            }
+            if (!string.IsNullOrWhiteSpace(filter.search))
+            {
+                string search = filter.search.ToLower();
+
+                advertisements = advertisements.Where(a =>
+                    a.Name.ToLower().Contains(search) ||
+                    (a.Description != null && a.Description.ToLower().Contains(search))
+                );
+            }
             if (filter.maxPrice.HasValue)
             {
                 advertisements = advertisements
@@ -232,8 +246,8 @@ namespace WebApi.BLL.Services.Advertisement
                         ? advertisements.OrderBy(p => p.Price)
                         : advertisements.OrderByDescending(p => p.Price),
                     "date" => ascending 
-                        ? advertisements.OrderBy(p => p.CreateDate)
-                        : advertisements.OrderByDescending(p => p.CreateDate),
+                        ? advertisements.OrderBy(p => p.UpdateDate)
+                        : advertisements.OrderByDescending(p => p.UpdateDate),
                     _ => advertisements
                 };
             }

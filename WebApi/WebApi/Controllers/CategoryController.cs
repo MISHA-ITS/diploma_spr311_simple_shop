@@ -49,4 +49,11 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
         var responce = await categoryService.UpdateAsync(dto);
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
     }
+
+    [HttpGet("with-adv-count")]
+    public async Task<ActionResult<List<CategoryWithCountDto>>> GetCategoriesWithAdvCount()
+    {
+        var result = await categoryService.GetCategoriesWithCountsAsync();
+        return Ok(result);
+    }
 }

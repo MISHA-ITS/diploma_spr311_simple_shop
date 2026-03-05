@@ -6,7 +6,7 @@ type CardRowProps = {
 };
 
 const CardRow: React.FC<CardRowProps> = ({ categories }) => (
-    <div className="flex w-fit justify-center gap-6 mx-24.5 mb-7">
+    <div className="flex w-fit justify-center gap-6 mx-auto mb-7">
         {categories.map((category, i) => (
             <CardCategory key={i} category={category} />
         ))}

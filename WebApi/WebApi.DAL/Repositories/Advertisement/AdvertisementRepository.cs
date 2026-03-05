@@ -79,5 +79,19 @@ public class AdvertisementRepository(AppDbContext context, ILogger<GenericReposi
             _logger.LogError(ex, "Exception occurred while fetching advertisement with Id {AdvertisementId}", id);
             return null;
         }
+
+    }
+
+    public async Task<Dictionary<long, int>> GetAdvertisementCountsAsync()
+    {
+        return await _context.Advertisements
+            .AsNoTracking()
+            .GroupBy(a => a.CategoryId)
+            .Select(g => new
+            {
+                CategoryId = g.Key,
+                Count = g.Count()
+            })
+            .ToDictionaryAsync(x => x.CategoryId, x => x.Count);
     }
 }

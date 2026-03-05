@@ -10,7 +10,7 @@ type AreasDropDownProps = {
     selectedArea?: IArea | null;
     selectedSettlement?: ISettlement | null;
     onSelectArea: (area: IArea | null) => void;
-    onSelectSettlement: (settlement: ISettlement) => void;
+    onSelectSettlement: (settlement: ISettlement | null) => void;
 };
 
 const AreasDropDown: FC<AreasDropDownProps> = ({areas, settlements, isLoading, selectedArea, selectedSettlement, onSelectArea, onSelectSettlement, }) => {
@@ -34,7 +34,7 @@ const AreasDropDown: FC<AreasDropDownProps> = ({areas, settlements, isLoading, s
         setIsOpen(true);
     };
 
-    const handleSettlementSelect = (settlement: ISettlement) => {
+    const handleSettlementSelect = (settlement: ISettlement | null) => {
         onSelectSettlement(settlement);
         setIsOpen(false);
     };
@@ -82,6 +82,7 @@ const AreasDropDown: FC<AreasDropDownProps> = ({areas, settlements, isLoading, s
                             <li
                                 onClick={() => {
                                     onSelectArea(null);
+                                    onSelectSettlement(null);
                                     setIsOpen(false);
                                 }}
                                 className="px-4 py-3 hover:bg-gray-100 font-inter cursor-pointer font-medium"

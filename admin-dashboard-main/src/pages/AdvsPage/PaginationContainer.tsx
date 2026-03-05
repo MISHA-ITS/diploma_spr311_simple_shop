@@ -24,11 +24,11 @@ const PaginationContainer: FC<PaginationContainerProps> = ({totalCount, adsOnPag
                 <button
                     key={page}
                     onClick={() => onPageChange(page)}
-                    className={
+                    className={`flex justify-center items-center px-[12px] py-[8px] w-[31px] h-[35px] rounded-[5px] ${
                         page === pageNumber
-                            ? "flex justify-center items-center px-[12px] py-[8px] w-[31px] h-[35px] border border-[#071739] rounded-[5px]"
+                            ? "border border-[#071739]"
                             : "text-[16px] font-normal text-[#071739]"
-                    }
+                    }`}
                 >
                     {page}
                 </button>

@@ -11,7 +11,7 @@ const Card: FC<CardProps> = ({ category }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate("/category/" + category.id);
+        navigate("/advertisements/" + category.id);
     }
 
     return (

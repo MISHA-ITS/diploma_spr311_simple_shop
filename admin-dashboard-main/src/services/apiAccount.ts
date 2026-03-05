@@ -6,8 +6,15 @@ import {IUserCreate} from "../types/IUserCreate.ts";
 import {IUserProfile} from "../types/Account/IUserProfile.ts";
 import {serialize} from "object-to-formdata";
 import {ServiceResponse} from "../types/IServiceResponse.ts";
+import {IAdvertisement} from "../pages/Advertisement/types.ts";
 import {IUserProfileUpdate} from "../types/Account/IUserProfileUpdate.ts";
 //import {ILoginRequest, IResponse, IUserCreate} from "../models/account";
+
+interface ApiResponse<T> {
+    isSuccess: boolean;
+    message: string;
+    payload: T;
+}
 
 export const apiAccount = createApi({
     reducerPath: "apiAccount",
@@ -116,6 +123,13 @@ export const apiAccount = createApi({
                 method: 'DELETE',
             }),
             invalidatesTags: ["Account"],
+        }),
+        getAllFavorites: builder.query<ApiResponse<IAdvertisement[]>, void>({
+            query: () => ({
+                url: `../User/favorites`,
+                method: 'GET',
+            }),
+            providesTags: ["Account"],
         })
     }),
 });
@@ -127,5 +141,6 @@ export const {
     useAddToFavoritesMutation,
     useRemoveFromFavoritesMutation,
     useRemoveAllFromFavoritesMutation,
-    useUpdateProfileMutation
+    useGetAllFavoritesQuery,
+    useUpdateProfileMutation,
 } = apiAccount;

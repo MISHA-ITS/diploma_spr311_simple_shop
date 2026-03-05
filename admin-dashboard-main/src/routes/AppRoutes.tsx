@@ -33,7 +33,7 @@ import CreateAdvertisementPage from "../pages/Advertisement/components/CreateAdv
 import AdvertisementPreview from "../pages/Advertisement/components/AdvertisementPreview.tsx";
 import {AdvertisementProvider} from "../context/AdvertisementContext.tsx";
 import FavoritesPage from "../pages/favorites/FavoritesPage.tsx";
-import AdvCategoryPage from "../pages/AdvCategoryPage/AdvCategoryPage.tsx";
+import AdvsPage from "../pages/AdvsPage/AdvsPage.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -49,7 +49,8 @@ const AppRoutes : React.FC = () => {
                     <Route path="reset-password" element={<ResetPassword />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/favorites" element={<FavoritesPage />} />
-                    <Route path="/category/:id" element={<AdvCategoryPage />} />
+                    <Route path="/advertisements" element={<AdvsPage />} />
+                    <Route path="/advertisements/:id" element={<AdvsPage />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
                     <Route element={<AdvertisementProvider />}>
                         <Route path="/createAdvertisement" element={<CreateAdvertisementPage />} />

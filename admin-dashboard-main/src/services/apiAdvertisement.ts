@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
 import {IAdvertisement} from "../pages/Advertisement/types.ts";
 import EnvConfig from "../config/env.ts";
-import {IAdvFilter} from "../pages/AdvCategoryPage/types.ts";
+import {IAdvFilter} from "../pages/AdvsPage/types.ts";
 
 interface ApiResponse<T> {
     isSuccess: boolean;
