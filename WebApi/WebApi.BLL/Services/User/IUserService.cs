@@ -14,4 +14,5 @@ public interface IUserService
     Task<ServiceResponse> AddFavoriteAdvert(long userId,long advertId);
     Task<ServiceResponse> RemoveFavoriteAdvert(long userId, long advertId);
     Task<ServiceResponse> RemoveAllFavorites(long userId);
+    Task<ServiceResponse> GetAllFavoritesAsync(long userId);
 }

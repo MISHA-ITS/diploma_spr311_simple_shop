@@ -12,8 +12,8 @@ const CardSection: React.FC<CardSectionProps> = ({ categories }) => {
 
     const rows = [];
 
-    for (let i = 0; i < parentCategories.length; i += 8) {
-        rows.push(parentCategories.slice(i, i + 8));
+    for (let i = 0; i < parentCategories.length; i += 6) {
+        rows.push(parentCategories.slice(i, i + 6));
     }
 
     return (
