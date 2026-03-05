@@ -9,6 +9,7 @@ using WebApi.BLL.Services.NewPost;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Repositories.Advertisements;
 using WebApi.DAL.Repositories.Category;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebApi.BLL.Services.Advertisement
 {
@@ -205,6 +206,12 @@ namespace WebApi.BLL.Services.Advertisement
             IQueryable<AdvertisementEntity> advertisements, 
             AdvertisementFilterDto filter)
         {
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+            {
+                var search = filter.Name.Trim().ToLower();
+                advertisements = advertisements.Where(a => a.Name.ToLower().Contains(search));
+            }
+
             if (filter.categoryId.HasValue)
             {
                 var categoryIds = await categoryRepository.GetAllChildCategoryIdsAsync(filter.categoryId.Value);
@@ -247,6 +254,32 @@ namespace WebApi.BLL.Services.Advertisement
             var pagedList = await advertisements.Skip(skip).Take(filter.pageSize).ToListAsync();
 
             return (pagedList, totalCount);
+        }
+        public async Task<ServiceResponse> ToggleBlockAsync(long id)
+        {
+            var ad = await advertisementRepository.GetByIdAsync(id);
+            if (ad == null) return ServiceResponse.Error("Оголошення не знайдено");
+
+            // Просто інвертуємо поточний стан
+            ad.isBlocked = !ad.isBlocked;
+
+            // Якщо ми блокуємо, можливо, варто автоматично знімати IsActive
+            if (ad.isBlocked) ad.isActive = false;
+
+            await advertisementRepository.UpdateAsync(ad);
+            return ServiceResponse.Success(ad.isBlocked ? "Заблоковано" : "Розблоковано");
+        }
+
+        public async Task<ServiceResponse> ApproveAsync(long id)
+        {
+            var ad = await advertisementRepository.GetByIdAsync(id);
+            if (ad == null) return ServiceResponse.Error("Оголошення не знайдено");
+
+            ad.isApproved = true;
+            ad.isActive = true;
+
+            await advertisementRepository.UpdateAsync(ad);
+            return ServiceResponse.Success("Підтверджено");
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.Services;
 using WebApi.BLL.Services.Advertisement;
+using WebApi.BLL.Services.User;
 
 namespace WebApi.Controllers;
 
@@ -78,5 +79,18 @@ public class AdvertisementController(IAdvertisementService advertisementService)
         }
         var responce = await advertisementService.UpdateAsync(dto, userId);
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
+    }
+
+    [HttpPost("ToggleBlock/{id}")]
+    public async Task<IActionResult> ToggleBlock(long id)
+    {
+        var response = await advertisementService.ToggleBlockAsync(id);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+    [HttpPost("Approve/{id}")]
+    public async Task<IActionResult> Approve(long id)
+    {
+        var response = await advertisementService.ApproveAsync(id);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 }

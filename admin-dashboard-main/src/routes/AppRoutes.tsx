@@ -35,6 +35,7 @@ import {AdvertisementProvider} from "../context/AdvertisementContext.tsx";
 import FavoritesPage from "../pages/favorites/FavoritesPage.tsx";
 import AdvCategoryPage from "../pages/AdvCategoryPage/AdvCategoryPage.tsx";
 import EditAdvertisementPage from "../pages/Advertisement/components/EditAdvertisementPage.tsx";
+import AdvertisementList from "../pages/Advertisement/components/Admin/AdvertisementList.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -83,6 +84,7 @@ const AppRoutes : React.FC = () => {
                     </Route>
                     <Route path="users-list" element={<UsersList />} />
                     <Route path="categories-list" element={<CategoriesList />} />
+                    <Route path="advertisement-list" element={<AdvertisementList />} />
                     <Route path="calendar" element={<Calendar />} />
                     <Route path="blank" element={<Blank />} />
 

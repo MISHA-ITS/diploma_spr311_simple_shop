@@ -10,5 +10,7 @@ namespace WebApi.BLL.Services.Advertisement
         Task<ServiceResponse> GetByIdAsync(long id);
         Task<ServiceResponse> GetAllAsync(AdvertisementFilterDto filter);
         Task<ServiceResponse> GetByUserIdAsync(long userId);
+        Task<ServiceResponse> ToggleBlockAsync(long id);
+        Task<ServiceResponse> ApproveAsync(long id);
     }
 }
