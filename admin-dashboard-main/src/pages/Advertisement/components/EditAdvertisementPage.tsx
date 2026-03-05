@@ -1,48 +1,82 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {RiArrowLeftSLine} from "react-icons/ri";
-import {TreeSelect} from "antd";
-import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
-import {buildTree} from "../../Categories/utils/functions.ts";
-import {ICategoryTreeNode} from "../../../types/Category/types.ts";
-import {TiDelete} from "react-icons/ti";
-import {MdOutlineInsertPhoto} from "react-icons/md";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { RiArrowLeftSLine } from "react-icons/ri";
+import { TreeSelect } from "antd";
+import { TiDelete } from "react-icons/ti";
+import { MdOutlineInsertPhoto } from "react-icons/md";
+import { toast } from "react-toastify";
+import { useGetAllCategoriesQuery } from "../../../services/apiCategory.ts";
+import { buildTree } from "../../Categories/utils/functions.ts";
+import { ICategoryTreeNode } from "../../../types/Category/types.ts";
 import AreasDropDown from "../../MainPage/AreasDropDown.tsx";
-import {useGetAreasQuery, useGetSettlementsQuery} from "../../../services/apiNewPost.ts";
-import {useAdForm} from "../../../context/AdvertisementContext.tsx";
-import {useCreateAdvertisementMutation} from "../../../services/apiAdvertisement.ts";
-import {toast} from "react-toastify";
+import { useGetAreaByIdQuery, useGetAreasQuery, useGetSettlementsQuery } from "../../../services/apiNewPost.ts";
+import { useGetAdvertisementByIdQuery, useUpdateAdvertisementMutation } from "../../../services/apiAdvertisement.ts";
+import EnvConfig from "../../../config/env.ts";
+import { IArea, ISettlement } from "../../../models/newPost.ts";
+import { useGetUserByIdQuery } from "../../../services/apiUser.ts";
 import {useProfileQuery} from "../../../services/apiAccount.ts";
 
-const CreateAdvertisementPage: React.FC = () => {
+const EditAdvertisementPage: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [createAdvertisement] = useCreateAdvertisementMutation();
-    const { data:profileData} = useProfileQuery();
-    const { data: areas } = useGetAreasQuery();
-    const {data: settlements, isLoading } = useGetSettlementsQuery();
-    const { formData, clearForm, updateFormData } = useAdForm();
-    const [categoryFilterData, setCategoryFilterData] = useState<{
-        categoryTree: ICategoryTreeNode[];
-        excludedFilters: number[];
-    }>({
-        categoryTree: [],
-        excludedFilters: [],
+
+    const [formData, setFormData] = useState({
+        title: "",
+        description: "",
+        price: "",
+        categoryId: null as string | number | null,
+        selectedSettlement: null as ISettlement | null,
+        selectedArea: null as IArea | null,
+        previews: [] as string[],
+        images: [] as File[]
     });
-    const { data: allCategories  } = useGetAllCategoriesQuery();
+
+    const updateFormData = (updates: Partial<typeof formData>) => {
+        setFormData(prev => ({ ...prev, ...updates }));
+    };
+
+    const { data: adData, isSuccess: isAdLoaded, isLoading: isAdLoading } = useGetAdvertisementByIdQuery(Number(id));
+    const { data: sellerData } = useGetUserByIdQuery(Number(adData?.payload?.userId) || 0, {
+        skip: !isAdLoaded || !adData
+    });
+    const [updateAdvertisement, { isLoading: isUpdating }] = useUpdateAdvertisementMutation();
+
+    const { data: areas } = useGetAreasQuery();
+    const { data: settlements, isLoading: isSettlementsLoading } = useGetSettlementsQuery();
+    const areaRef = adData?.payload?.settlement?.area;
+    const { data: areaData } = useGetAreaByIdQuery(areaRef ?? "", { skip: !areaRef });
+    const { data: allCategories } = useGetAllCategoriesQuery();
+    const [categoryFilterData, setCategoryFilterData] = useState<{ categoryTree: ICategoryTreeNode[] }>({ categoryTree: [] });
+
+    const { data: profileData } = useProfileQuery();
+    const User = profileData?.payload;
+    const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        if (isAdLoaded && adData?.payload && User) {
+            // Перевіряємо, чи збігаються ID (приводимо до одного типу)
+            if (String(adData.payload.userId) === String(User.id)) {
+                setIsAuthorized(true);
+            } else {
+                setIsAuthorized(false);
+                toast.error("Ви не можете редагувати чуже оголошення!");
+                navigate(-1); // Викидаємо на головну
+            }
+        }
+    }, [isAdLoaded, adData, User, navigate]);
+
+
 
     //tree
     useEffect(() => {
         const categories = allCategories?.payload ?? [];
-
         if (categories.length === 0) return;
-
         try {
             const tree = buildTree(
                 categories,
                 null,
             );
-
             setCategoryFilterData(prev => ({
                 ...prev,
                 categoryTree: tree,
@@ -52,20 +86,54 @@ const CreateAdvertisementPage: React.FC = () => {
         }
     }, [allCategories]);
 
+    useEffect(() => {
+        if (isAdLoaded && adData?.payload) {
+            const data = adData.payload;
+            const serverPreviews = data.images?.map((img: string) =>
+                `${EnvConfig.API_URL}/images/advertisements/1200_${img}`
+            ) || [];
+
+            updateFormData({
+                title: data.name || "",
+                description: data.description || "",
+                price: String(data.price) || "",
+                categoryId: data.categoryId,
+                selectedSettlement: data.settlement ? {
+                    ref: data.settlement.ref,
+                    description: data.settlement.description,
+                } as ISettlement : null,
+                previews: serverPreviews,
+                images: []
+            });
+        }
+    }, [isAdLoaded, adData]);
+
+    // Оновлення області
+    useEffect(() => {
+        if (areaData) {
+            updateFormData({
+                selectedArea: {
+                    ref: areaData.ref,
+                    description: areaData.description,
+                    regionType: areaData.regionType
+                } as IArea
+            });
+        }
+    }, [areaData]);
+
     const isFormValid =
         formData.title.length < 14 ||
         formData.description.length < 30 ||
         formData.categoryId == null ||
         formData.selectedSettlement == null ||
-        Number(formData.price) < 0 ||
-        formData.price.toString().trim() === "" ||
-        formData.images.length === 0;
+        Number(formData.price) <= 0 ||
+        formData.price?.toString().trim() === "" ||
+        formData.previews.length === 0;
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const selectedFiles = Array.from(e.target.files);
             const newPreviews = selectedFiles.map(file => URL.createObjectURL(file));
-
             updateFormData({
                 images: [...formData.images, ...selectedFiles],
                 previews: [...formData.previews, ...newPreviews]
@@ -74,60 +142,78 @@ const CreateAdvertisementPage: React.FC = () => {
     };
 
     const removeImage = (index: number) => {
-        URL.revokeObjectURL(formData.previews[index]);
-
-        updateFormData({
-            images: formData.images.filter((_, i) => i !== index),
-            previews: formData.previews.filter((_, i) => i !== index)
-        });
+        const urlToRemove = formData.previews[index];
+        if (urlToRemove.startsWith('blob:')) {
+            URL.revokeObjectURL(urlToRemove);
+            const blobPreviews = formData.previews.filter(p => p.startsWith('blob:'));
+            const blobIndex = blobPreviews.indexOf(urlToRemove);
+            if (blobIndex !== -1) {
+                const newImages = [...formData.images];
+                newImages.splice(blobIndex, 1);
+                updateFormData({ images: newImages });
+            }
+        }
+        updateFormData({ previews: formData.previews.filter((_, i) => i !== index) });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!formData.selectedSettlement) {
-            return;
-        }
         try {
             const data = new FormData();
+            data.append("Id", String(id));
             data.append("Name", formData.title);
             data.append("Description", formData.description);
-            data.append("Price", formData.price.toString());
-            // data.append("Phone", formData.phone);
+            data.append("Price", String(formData.price));
             data.append("CategoryId", String(formData.categoryId));
-            data.append("SettlementRef", formData.selectedSettlement.ref);
 
-            if (formData.images.length > 0) {
-                formData.images.forEach((file) => {
-                    data.append("Images", file);
-                });
+            if (formData.selectedSettlement?.ref) {
+                data.append("SettlementRef", formData.selectedSettlement.ref);
             }
 
-            await createAdvertisement(data).unwrap();
-            toast.success("Оголошення успішно опубліковано!");
-            clearForm();
-            navigate("/");
+            formData.previews.forEach((url) => {
+                if (!url.startsWith("blob:")) {
+                    const fileName = url.split('/').pop()?.replace("1200_", "");
+                    if (fileName) {
+                        data.append("ExistingImages", fileName);
+                    }
+                }
+            });
+
+            formData.images.forEach((file) => {
+                data.append("Images", file);
+            });
+
+            await updateAdvertisement(data).unwrap();
+            toast.success("Оголошення оновлено!");
+            navigate(`/advertisement/${id}`);
         } catch (error) {
-            console.error("Помилка публікації:", error);
-            toast.error("Не вдалося опублікувати оголошення");
+            toast.error("Помилка при збереженні");
+            console.error(error);
         }
     };
+    if (isAdLoading || isAuthorized === null) {
+        return <div className="text-center py-20">Перевірка доступу...</div>;
+    }
+    if (!isAdLoaded || !adData || !sellerData?.payload) return null;
+
+    const seller = sellerData.payload;
 
     return (
         <div className="max-w-4xl mx-auto p-6 font-sans text-gray-800">
             <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate(-1)}
                 className="w-fit flex items-center text-sm text-gray-600 hover:text-black transition-colors mb-4"
             >
-                <RiArrowLeftSLine /> Повернутись до покупок
+                <RiArrowLeftSLine /> Назад
             </button>
 
-            <h1 className="text-2xl font-bold text-center mb-8">Створити оголошення</h1>
+            <h1 className="text-2xl font-bold text-center mb-8">Редагувати оголошення</h1>
 
             <section className="space-y-8">
                 <h2 className="text-lg font-semibold">Опишіть у подробицях</h2>
 
-                <div className="space-y-1 relative"> {/* Додано relative */}
+                {/* Назва */}
+                <div className="space-y-1 relative">
                     <label className="text-sm font-medium">Вкажіть назву*</label>
                     <div className="relative">
                         <input
@@ -144,7 +230,7 @@ const CreateAdvertisementPage: React.FC = () => {
                         )}
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span className={formData.title.length >= 0 && formData.title.length < 14 ? "text-red-500" : "text-gray-500"}>
+                        <span className={formData.title.length > 0 && formData.title.length < 14 ? "text-red-500" : "text-gray-500"}>
                             {"Назва має містити не менше 14 символів"}
                         </span>
                         <span className="text-gray-500">{formData.title.length}/60</span>
@@ -156,7 +242,7 @@ const CreateAdvertisementPage: React.FC = () => {
                     <label className="text-sm font-medium">Категорія*</label>
                     <div className={`relative border-b-2 transition-colors ${formData.categoryId ? "border-green-500" : "border-[#212121]"}`}>
                         <TreeSelect
-                            style={{width: '100%', height: '50px'}}
+                            style={{ width: '100%', height: '50px' }}
                             value={formData.categoryId}
                             allowClear
                             showSearch
@@ -172,17 +258,16 @@ const CreateAdvertisementPage: React.FC = () => {
                     </div>
                 </div>
 
+                {/* Фото */}
                 <div className="space-y-3 relative">
                     <label className="text-sm font-medium flex justify-between items-center">
                         Фото*
-                        {formData.images.length > 0 && (
+                        {formData.previews.length > 0 && (
                             <span className="text-green-600 font-bold animate-in fade-in duration-300">✓</span>
                         )}
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-
-                        {/* Кнопка "Додати фото" */}
-                        {formData.images.length < 8 && (
+                        {formData.previews.length < 8 && (
                             <label className="aspect-square border-2 border-dashed border-amber-200 bg-amber-50 flex flex-col items-center justify-center cursor-pointer text-xs hover:bg-amber-100 transition-colors">
                                 <input
                                     type="file"
@@ -195,7 +280,6 @@ const CreateAdvertisementPage: React.FC = () => {
                             </label>
                         )}
 
-                        {/* Відображення прев'ю */}
                         {formData.previews.map((url, index) => (
                             <div key={url} className="aspect-square relative group">
                                 <img
@@ -222,9 +306,9 @@ const CreateAdvertisementPage: React.FC = () => {
                             </div>
                         ))}
                     </div>
-                    <p className={`text-[10px] ${formData.images.length === 0 ? "text-red-500" : "text-gray-400"}`}>
-                        {formData.images.length === 0
-                            ? "Будь ласка, додайте хоча б одне фото"
+                    <p className={`text-[10px] ${formData.previews.length === 0 ? "text-red-500" : "text-gray-400"}`}>
+                        {formData.previews.length === 0
+                            ? "Будь ласка, залиште або додайте хоча б одне фото"
                             : "Перше фото буде на обкладинці. Ви можете додати до 8 зображень."}
                     </p>
                 </div>
@@ -233,22 +317,21 @@ const CreateAdvertisementPage: React.FC = () => {
                 <div className="space-y-1 relative">
                     <label className="text-sm font-medium">Опис*</label>
                     <div className="relative">
-                    <textarea
-                        rows={6}
-                        placeholder="Подумайте, що б ви хотіли дізнатись побачивши це оголошення..."
-                        value={formData.description}
-                        onChange={(e) => updateFormData({ description: e.target.value })}
-                        className={`w-full border-2 p-3 rounded-md outline-none resize-none transition-colors ${
-                            formData.description.length >= 30 ? "border-green-500" : "border-[#212121]"
-                        }`}
-                    />
+                        <textarea
+                            rows={6}
+                            placeholder="Подумайте, що б ви хотіли дізнатись побачивши це оголошення..."
+                            value={formData.description}
+                            onChange={(e) => updateFormData({ description: e.target.value })}
+                            className={`w-full border-2 p-3 rounded-md outline-none resize-none transition-colors ${
+                                formData.description.length >= 30 ? "border-green-500" : "border-[#212121]"
+                            }`}
+                        />
                         {formData.description.length >= 30 && (
                             <span className="absolute right-3 top-3 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
                         )}
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span
-                            className={formData.description.length >= 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
+                        <span className={formData.description.length > 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
                             Внесіть сюди щонайменше 30 символів
                         </span>
                         <span className="text-gray-500">{formData.description.length}/10 000</span>
@@ -266,7 +349,7 @@ const CreateAdvertisementPage: React.FC = () => {
                                 <AreasDropDown
                                     areas={areas}
                                     settlements={settlements!}
-                                    isLoading={isLoading}
+                                    isLoading={isSettlementsLoading}
                                     selectedArea={formData.selectedArea}
                                     selectedSettlement={formData.selectedSettlement}
                                     onSelectArea={(area) => updateFormData({ selectedArea: area, selectedSettlement: null })}
@@ -280,48 +363,51 @@ const CreateAdvertisementPage: React.FC = () => {
                     </div>
 
                     {/* Номер телефону */}
-                    <div className="space-y-1 border-b-2 border-green-500">
+                    <div className="space-y-1 border-b-2 border-green-500 relative">
                         <label className="text-sm font-medium text-gray-600">
                             Номер телефону* <span className="text-xs font-normal text-gray-400">(щоб змінити номер телефону перейдіть у профіль)</span>
                         </label>
                         <input
                             type="tel"
                             readOnly={true}
-                            value={profileData?.payload.phoneNumber || "+380987654321"}
+                            value={seller.phoneNumber ?? ""}
                             className="w-full py-2 outline-none bg-transparent text-gray-800 cursor-not-allowed"
                         />
+                        {seller.phoneNumber && (
+                            <span className="absolute right-0 bottom-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                        )}
                     </div>
 
                     {/* Ціна */}
-                    <div className="space-y-1 border-b-2 relative">
+                    <div className="space-y-1 relative">
                         <label className="text-sm font-medium text-gray-600">Ціна <span className="text-xs font-normal text-gray-400">(грн)</span></label>
                         <div className={`relative border-b-2 transition-colors ${Number(formData.price) > 0 ? "border-green-500" : "border-[#212121]"}`}>
                             <input
                                 type="number"
                                 min="1"
                                 placeholder="000"
-                                value={formData.price}
-                                onChange={(e) => updateFormData({ price: e.target.value })}
+                                value={formData.price ?? ""}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    updateFormData({ price: val });
+                                }}
                                 className="w-full py-2 outline-none bg-transparent"
                             />
                             {Number(formData.price) > 0 && (
-                                <span className="absolute right-5 top-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                                <span className="absolute right-5 bottom-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
                             )}
                         </div>
                     </div>
                 </div>
 
                 {/* Кнопки */}
-                <div className="flex flex-col sm:flex-row justify-end gap-4 pt-10">
-                    <button onClick={() => navigate("/advertpreview")} disabled={isFormValid} className="px-6 py-2 border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
-                        Попередній перегляд
-                    </button>
+                <div className="flex justify-end gap-4 pt-10">
                     <button
                         onClick={handleSubmit}
-                        disabled={isFormValid}
+                        disabled={isFormValid || isUpdating}
                         className="px-8 py-2 bg-[#212121] text-white rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black transition-colors"
                     >
-                        Опублікувати
+                        {isUpdating ? "Збереження..." : "Зберегти зміни"}
                     </button>
                 </div>
             </section>
@@ -329,4 +415,4 @@ const CreateAdvertisementPage: React.FC = () => {
     );
 };
 
-export default CreateAdvertisementPage;
+export default EditAdvertisementPage;

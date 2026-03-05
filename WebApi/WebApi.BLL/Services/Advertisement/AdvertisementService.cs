@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApi.BLL.DTOs.Advertisement;
@@ -8,6 +9,7 @@ using WebApi.BLL.Services.NewPost;
 using WebApi.DAL.Entities;
 using WebApi.DAL.Repositories.Advertisements;
 using WebApi.DAL.Repositories.Category;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebApi.BLL.Services.Advertisement
 {
@@ -139,7 +141,7 @@ namespace WebApi.BLL.Services.Advertisement
             return ServiceResponse.Success("advertisement retrieved successfully", entity);
         }
 
-        public async Task<ServiceResponse> UpdateAsync(UpdateAdvertisementDTO dto)
+        public async Task<ServiceResponse> UpdateAsync(UpdateAdvertisementDTO dto, long userId)
         {
             logger.LogInformation("Updating advertisement with Id {advertisementId}", dto.Id);
 
@@ -147,35 +149,31 @@ namespace WebApi.BLL.Services.Advertisement
             if (entity == null)
                 return ServiceResponse.Error($"advertisement with Id {dto.Id} not found");
 
+            if (entity.UserId != userId)
+            {
+                logger.LogWarning("User {userId} tried to edit advertisement {adId} owned by {ownerId}", userId, dto.Id, entity.UserId);
+                return ServiceResponse.Error("You don't have permission to edit this advertisement");
+            }
+
+            var imagesToDelete = entity.Images
+                .Where(img => dto.ExistingImages == null || !dto.ExistingImages.Contains(img.ImageUrl))
+                .ToList();
+
+            foreach (var image in imagesToDelete)
+            {
+                await imageService.DeleteImageAsync(image.ImageUrl, Settings.AdvertisementsDir);
+                entity.Images.Remove(image);
+            }
+
             if (dto.Images != null)
             {
-                foreach (var image in entity.Images)
+                foreach (var file in dto.Images)
                 {
-                    var imageDeleteResult = await TryDeleteImageAsync(image.ImageUrl);
-                    if (imageDeleteResult != null)
+                    string imageName = await imageService.SaveImageAsync(file, Settings.AdvertisementsDir);
+                    if (!string.IsNullOrEmpty(imageName))
                     {
-                        logger.LogError("Failed to delete image {ImageUrl} for advertisement {advertisementId}", image.ImageUrl, dto.Id);
-                        return imageDeleteResult;
+                        entity.Images.Add(new AdvertisementImageEntity { ImageUrl = imageName });
                     }
-                }
-
-                entity.Images = new List<AdvertisementImageEntity>();
-
-                foreach (var image in dto.Images)
-                {
-                    string? imageName = await imageService.SaveImageAsync(image, Settings.AdvertisementsDir);
-
-                    if (string.IsNullOrEmpty(imageName))
-                    {
-                        logger.LogError("Failed to save one of the images for advertisement {advertisementId}", dto.Id);
-                        return ServiceResponse.Error("Failed to save one of the advertisement images");
-                    }
-
-                    entity.Images.Add(new AdvertisementImageEntity
-                    {
-                        ImageUrl = imageName,
-                    });
-                    logger.LogInformation("Saved image {ImageName} for advertisement {advertisementId}", imageName, dto.Id);
                 }
             }
 
@@ -208,6 +206,12 @@ namespace WebApi.BLL.Services.Advertisement
             IQueryable<AdvertisementEntity> advertisements, 
             AdvertisementFilterDto filter)
         {
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+            {
+                var search = filter.Name.Trim().ToLower();
+                advertisements = advertisements.Where(a => a.Name.ToLower().Contains(search));
+            }
+
             if (filter.categoryId.HasValue)
             {
                 var categoryIds = await categoryRepository.GetAllChildCategoryIdsAsync(filter.categoryId.Value);
@@ -264,6 +268,32 @@ namespace WebApi.BLL.Services.Advertisement
             var pagedList = await advertisements.Skip(skip).Take(filter.pageSize).ToListAsync();
 
             return (pagedList, totalCount);
+        }
+        public async Task<ServiceResponse> ToggleBlockAsync(long id)
+        {
+            var ad = await advertisementRepository.GetByIdAsync(id);
+            if (ad == null) return ServiceResponse.Error("Оголошення не знайдено");
+
+            // Просто інвертуємо поточний стан
+            ad.isBlocked = !ad.isBlocked;
+
+            // Якщо ми блокуємо, можливо, варто автоматично знімати IsActive
+            if (ad.isBlocked) ad.isActive = false;
+
+            await advertisementRepository.UpdateAsync(ad);
+            return ServiceResponse.Success(ad.isBlocked ? "Заблоковано" : "Розблоковано");
+        }
+
+        public async Task<ServiceResponse> ApproveAsync(long id)
+        {
+            var ad = await advertisementRepository.GetByIdAsync(id);
+            if (ad == null) return ServiceResponse.Error("Оголошення не знайдено");
+
+            ad.isApproved = true;
+            ad.isActive = true;
+
+            await advertisementRepository.UpdateAsync(ad);
+            return ServiceResponse.Success("Підтверджено");
         }
     }
 }

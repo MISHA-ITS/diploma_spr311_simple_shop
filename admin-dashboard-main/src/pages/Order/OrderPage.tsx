@@ -11,11 +11,14 @@ import {DeliveryType, OrderCreateDto, PaymentMethod} from "./types.ts";
 import { useParams } from "react-router-dom";
 import {useGetAdvertisementByIdQuery} from "../../services/apiAdvertisement.ts";
 import EnvConfig from "../../config/env.ts";
+import { useNavigate } from "react-router-dom";
 
 type DeliveryMethod = "nova_poshta" | "courier";
 
 const OrderPage = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+
 
     const advertisementId = useMemo(() => {
         return id ? Number(id) : 0;
@@ -196,6 +199,7 @@ const OrderPage = () => {
         try {
             await createOrder(orderPayload).unwrap();
             alert("Замовлення створено успішно!");
+            navigate(`/advertisement/${advertisementId}`);
         } catch (error) {
             console.error(error);
             alert("Помилка при створенні замовлення");

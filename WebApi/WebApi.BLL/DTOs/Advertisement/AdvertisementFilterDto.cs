@@ -2,6 +2,7 @@
 
 public class AdvertisementFilterDto
 {
+    public string? Name { get; set; }
     public long? categoryId { get; set; }
     public string? settlementRef { get; set; }
     public decimal? minPrice { get; set; }

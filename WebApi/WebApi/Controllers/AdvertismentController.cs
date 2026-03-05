@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using WebApi.BLL.DTOs.Advertisement;
+using WebApi.BLL.Services;
 using WebApi.BLL.Services.Advertisement;
+using WebApi.BLL.Services.User;
 
 namespace WebApi.Controllers;
 
@@ -58,10 +61,36 @@ public class AdvertisementController(IAdvertisementService advertisementService)
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
     }
 
+    [Authorize]
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromForm] UpdateAdvertisementDTO dto)
     {
-        var responce = await advertisementService.UpdateAsync(dto);
+        var userIdClaim = User.FindFirst("id")?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim))
+        {
+            // Про всяк випадок перевіряємо стандартний NameIdentifier
+            userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
+        if (!long.TryParse(userIdClaim, out long userId))
+        {
+            return Unauthorized(new { message = "Користувача не ідентифіковано. Перелогіньтеся." });
+        }
+        var responce = await advertisementService.UpdateAsync(dto, userId);
         return responce.IsSuccess ? Ok(responce) : BadRequest(responce);
+    }
+
+    [HttpPost("ToggleBlock/{id}")]
+    public async Task<IActionResult> ToggleBlock(long id)
+    {
+        var response = await advertisementService.ToggleBlockAsync(id);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+    [HttpPost("Approve/{id}")]
+    public async Task<IActionResult> Approve(long id)
+    {
+        var response = await advertisementService.ApproveAsync(id);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 }

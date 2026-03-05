@@ -17,6 +17,7 @@ import {
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import * as React from "react";
+import {RiAdvertisementLine} from "react-icons/ri";
 //import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
@@ -50,6 +51,11 @@ const navItems: NavItem[] = [
     icon: <BiCategory />,
     name: "Категорії",
     path: "categories-list",
+  },
+  {
+    icon: <RiAdvertisementLine />,
+    name: "Оголошення",
+    path: "advertisement-list",
   },
   // {
   //   name: "Forms",

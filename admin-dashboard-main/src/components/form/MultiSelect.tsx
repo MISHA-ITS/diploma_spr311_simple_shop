@@ -67,6 +67,8 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
       ? selectedOptions.filter((v) => v !== optionValue)
       : [...selectedOptions, optionValue];
     updateSelection(newSelected);
+
+    setIsOpen(false);
   };
 
   const removeOption = (optionValue: string) => {

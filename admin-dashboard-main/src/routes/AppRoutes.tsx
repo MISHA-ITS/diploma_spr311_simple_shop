@@ -33,6 +33,8 @@ import CreateAdvertisementPage from "../pages/Advertisement/components/CreateAdv
 import AdvertisementPreview from "../pages/Advertisement/components/AdvertisementPreview.tsx";
 import {AdvertisementProvider} from "../context/AdvertisementContext.tsx";
 import FavoritesPage from "../pages/favorites/FavoritesPage.tsx";
+import EditAdvertisementPage from "../pages/Advertisement/components/EditAdvertisementPage.tsx";
+import AdvertisementList from "../pages/Advertisement/components/Admin/AdvertisementList.tsx";
 import AdvsPage from "../pages/AdvsPage/AdvsPage.tsx";
 
 const AppRoutes : React.FC = () => {
@@ -53,6 +55,7 @@ const AppRoutes : React.FC = () => {
                     <Route path="/advertisements/:id" element={<AdvsPage />} />
                     <Route path="/advertisement/:id" element={<AdvertisementPage />} />
                     <Route element={<AdvertisementProvider />}>
+                        <Route path="/edit-advertisement/:id" element={<EditAdvertisementPage />} />
                         <Route path="/createAdvertisement" element={<CreateAdvertisementPage />} />
                         <Route path="/advertpreview" element={<AdvertisementPreview />} />
                     </Route>
@@ -82,6 +85,7 @@ const AppRoutes : React.FC = () => {
                     </Route>
                     <Route path="users-list" element={<UsersList />} />
                     <Route path="categories-list" element={<CategoriesList />} />
+                    <Route path="advertisement-list" element={<AdvertisementList />} />
                     <Route path="calendar" element={<Calendar />} />
                     <Route path="blank" element={<Blank />} />
 

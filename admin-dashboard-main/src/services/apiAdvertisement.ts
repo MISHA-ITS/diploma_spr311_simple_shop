@@ -69,7 +69,8 @@ export const apiAdvertisement = createApi({
                     url: `/list?${queryString}`,
                     method: "GET"
                 }
-            }
+            },
+            providesTags: ["Advertisements"]
         }),
         getUserAdvertisements: builder.query<ApiResponse<IAdvertisement[]>, number>({
             query: (Id) => ({
@@ -77,6 +78,35 @@ export const apiAdvertisement = createApi({
                 method: "GET"
             }),
             providesTags: ["Advertisements"]
+        }),
+        updateAdvertisement: builder.mutation<void, FormData>({
+            query: (formData) => ({
+                url: `/update`,
+                method: 'PUT',
+                body: formData,
+            }),
+            invalidatesTags: ['Advertisements'],
+        }),
+        deleteAdvertisement: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/delete/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['Advertisements',/* 'CategoriesPage'*/],
+        }),
+        toggleBlock: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/ToggleBlock/${id}`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Advertisements'],
+        }),
+        approve: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/Approve/${id}`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Advertisements'],
         }),
     }),
 })
@@ -87,4 +117,8 @@ export const {
     useGetMyAdvertisementsQuery,
     useGetAdvertisementsQuery,
     useGetUserAdvertisementsQuery,
+    useUpdateAdvertisementMutation,
+    useDeleteAdvertisementMutation,
+    useToggleBlockMutation,
+    useApproveMutation,
 } = apiAdvertisement
