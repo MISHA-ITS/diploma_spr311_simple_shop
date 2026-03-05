@@ -13,4 +13,5 @@ public interface IAccountService
     public Task<ServiceResponse> ValidateResetTokenAsync(ValidateResetTokenDto dto);
     public Task<ServiceResponse> ResetPasswordAsync(ResetPasswordDto dto);
     public Task<long> GetUserIdAsync();
+    Task<ServiceResponse> UpdateProfileAsync(long userId, UpdateProfileDto dto);
 }

@@ -5,6 +5,7 @@ import { useGetMyBuyerOrdersQuery, useGetMySellerOrdersQuery } from "../services
 import { useState } from "react";
 import AdvertisementsSection from "./Advertisement/components/AdvertisementsSection.tsx";
 import DeliverySection from "./Order/DeliverySection.tsx";
+import ProfileSection from "./ProfileSection.tsx";
 
 const Profile = () => {
     const { data: profileData, isLoading: profileLoading } = useProfileQuery();
@@ -12,10 +13,12 @@ const Profile = () => {
     const { data: buyerOrders } = useGetMyBuyerOrdersQuery();
     const { data: sellerOrders } = useGetMySellerOrdersQuery();
 
-    const [mainTab, setMainTab] = useState<"ads" | "delivery">("ads");
+    const [mainTab, setMainTab] = useState<"ads" | "delivery" | "myProfile">("ads");
 
     if (profileLoading) return <div className="p-10">Завантаження...</div>;
     if (!profileData?.payload) return <div className="p-10">Помилка профілю</div>;
+    const user = profileData.payload;
+    console.log(user);
 
     return (
         <>
@@ -26,7 +29,7 @@ const Profile = () => {
                 {/* HEADER */}
                 <div className="text-center mb-10">
                     <h1 className="text-3xl font-semibold">
-                        Привіт {profileData.payload.firstName}!
+                        Привіт {user.firstName}!
                     </h1>
                     <p className="text-gray-500 mt-2">
                         {profileData.payload.phoneNumber}
@@ -48,6 +51,17 @@ const Profile = () => {
                     >
                         Sellix Доставка
                     </button>
+
+                    <button
+                        onClick={() => setMainTab("myProfile")}
+                        className={
+                            mainTab === "myProfile"
+                                ? "text-black border-b-2 border-black pb-1 font-medium"
+                                : "hover:text-black"
+                        }
+                    >
+                        Мій профіль
+                    </button>
                 </div>
 
                 {mainTab === "ads" && (
@@ -59,6 +73,10 @@ const Profile = () => {
                         buyerOrders={buyerOrders?.payload ?? []}
                         sellerOrders={sellerOrders?.payload ?? []}
                     />
+                )}
+
+                {mainTab === "myProfile" && (
+                    <ProfileSection user={user} />
                 )}
             </div>
         </>

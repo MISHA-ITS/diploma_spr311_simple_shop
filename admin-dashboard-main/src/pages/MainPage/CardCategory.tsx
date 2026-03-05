@@ -22,7 +22,7 @@ const Card: FC<CardProps> = ({ category }) => {
             <img
                 src={
                     category.imageUrl
-                        ? `${EnvConfig.API_URL}/images/categories/800_${category.imageUrl}`
+                        ? `${EnvConfig.API_URL}/images/800_${category.imageUrl}`
                         : `${EnvConfig.API_URL}/images/noimage.jpeg`
                 }
                 alt={category.name}

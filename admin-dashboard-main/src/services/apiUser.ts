@@ -76,6 +76,7 @@ export const apiUser = createApi({
             },
             invalidatesTags: ['User'],
         }),
+
         deleteUser: builder.mutation<{ isSuccess: boolean; message: string }, number>({
             query: (id) => ({
                 url: `?id=${id}`,
