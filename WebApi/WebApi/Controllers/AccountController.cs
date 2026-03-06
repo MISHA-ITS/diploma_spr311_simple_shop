@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApi.BLL.DTOs.Account;
 using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Account;
 using WebApi.BLL.Services.User;
+using WebApi.DAL.Entities.Identity;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/account")]
-public class AccountController(IAccountService accountService, IUserService userService) : ControllerBase
+public class AccountController(IAccountService accountService, IUserService userService, UserManager<AppUser> userManager) : ControllerBase
 {
 
     [HttpPost("register")]
@@ -88,6 +91,20 @@ public class AccountController(IAccountService accountService, IUserService user
     {         
         var userId = await accountService.GetUserIdAsync();
         var response = await userService.GetByIdAsync(userId);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [HttpPut("profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto dto)
+    {
+        var user = await userManager.GetUserAsync(User);
+
+        if (user == null)
+            return Unauthorized();
+
+        var response = await accountService.UpdateProfileAsync(user.Id, dto);
+
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 }

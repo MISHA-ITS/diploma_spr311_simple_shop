@@ -1,4 +1,5 @@
-﻿using WebApi.DAL.Entities;
+﻿using WebApi.DAL.Dtos.Categoty;
+using WebApi.DAL.Entities;
 
 namespace WebApi.DAL.Repositories.Category
 {
@@ -6,5 +7,6 @@ namespace WebApi.DAL.Repositories.Category
     {
         Task<bool> CreateRangeAsync(IEnumerable<CategoryEntity> categories);
         Task<List<long>> GetAllChildCategoryIdsAsync(long parentId);
+        Task<List<CategoryFlatDto>> GetAllFlatAsync();
     }
 }

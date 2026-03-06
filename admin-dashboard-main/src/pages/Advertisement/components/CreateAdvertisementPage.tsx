@@ -13,10 +13,12 @@ import {useGetAreasQuery, useGetSettlementsQuery} from "../../../services/apiNew
 import {useAdForm} from "../../../context/AdvertisementContext.tsx";
 import {useCreateAdvertisementMutation} from "../../../services/apiAdvertisement.ts";
 import {toast} from "react-toastify";
+import {useProfileQuery} from "../../../services/apiAccount.ts";
 
 const CreateAdvertisementPage: React.FC = () => {
     const navigate = useNavigate();
     const [createAdvertisement] = useCreateAdvertisementMutation();
+    const { data:profileData} = useProfileQuery();
     const { data: areas } = useGetAreasQuery();
     const {data: settlements, isLoading } = useGetSettlementsQuery();
     const { formData, clearForm, updateFormData } = useAdForm();
@@ -50,6 +52,15 @@ const CreateAdvertisementPage: React.FC = () => {
         }
     }, [allCategories]);
 
+    const isFormValid =
+        formData.title.length < 14 ||
+        formData.description.length < 30 ||
+        formData.categoryId == null ||
+        formData.selectedSettlement == null ||
+        Number(formData.price) < 0 ||
+        formData.price.toString().trim() === "" ||
+        formData.images.length === 0;
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const selectedFiles = Array.from(e.target.files);
@@ -74,7 +85,7 @@ const CreateAdvertisementPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (formData.title.length < 14 || formData.description.length < 30 || !formData.categoryId || !formData.selectedSettlement) {
+        if (!formData.selectedSettlement) {
             return;
         }
         try {
@@ -82,7 +93,7 @@ const CreateAdvertisementPage: React.FC = () => {
             data.append("Name", formData.title);
             data.append("Description", formData.description);
             data.append("Price", formData.price.toString());
-            data.append("Phone", formData.phone);
+            // data.append("Phone", formData.phone);
             data.append("CategoryId", String(formData.categoryId));
             data.append("SettlementRef", formData.selectedSettlement.ref);
 
@@ -116,46 +127,58 @@ const CreateAdvertisementPage: React.FC = () => {
             <section className="space-y-8">
                 <h2 className="text-lg font-semibold">Опишіть у подробицях</h2>
 
-                {/* Назва */}
-                <div className="space-y-1">
+                <div className="space-y-1 relative"> {/* Додано relative */}
                     <label className="text-sm font-medium">Вкажіть назву*</label>
-                    <input
-                        type="text"
-                        placeholder="Назва"
-                        value={formData.title}
-                        onChange={(e) => updateFormData({ title: e.target.value })}
-                        className="w-full border-b-2 border-[#212121] py-2 focus:border-blue-500 outline-none transition-colors bg-transparent"
-                    />
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Назва"
+                            value={formData.title}
+                            onChange={(e) => updateFormData({ title: e.target.value })}
+                            className={`w-full border-b-2 py-2 focus:border-blue-500 outline-none transition-colors bg-transparent ${
+                                formData.title.length >= 14 ? "border-green-500" : "border-[#212121]"
+                            }`}
+                        />
+                        {formData.title.length >= 14 && (
+                            <span className="absolute right-0 top-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                        )}
+                    </div>
                     <div className="flex justify-between text-xs">
-                        <span className={formData.title.length > 0 && formData.title.length < 14 ? "text-red-500" : "text-gray-500"}>
-                            {formData.title.length < 14 ? "Назва має містити не менше 14 символів" : "Назва валідна"}
+                        <span className={formData.title.length >= 0 && formData.title.length < 14 ? "text-red-500" : "text-gray-500"}>
+                            {"Назва має містити не менше 14 символів"}
                         </span>
                         <span className="text-gray-500">{formData.title.length}/60</span>
                     </div>
                 </div>
 
                 {/* Категорія */}
-                <div className="space-y-1">
+                <div className="space-y-1 relative">
                     <label className="text-sm font-medium">Категорія*</label>
-                    <div className="border-b-2 border-[#212121]">
+                    <div className={`relative border-b-2 transition-colors ${formData.categoryId ? "border-green-500" : "border-[#212121]"}`}>
                         <TreeSelect
                             style={{width: '100%', height: '50px'}}
                             value={formData.categoryId}
                             allowClear
                             showSearch
                             treeNodeFilterProp="title"
-                            size="small"
                             variant="borderless"
-                            className="flex-1"
                             treeData={categoryFilterData.categoryTree}
                             placeholder={'Відсутня'}
                             onChange={(val) => updateFormData({ categoryId: val })}
                         />
+                        {formData.categoryId && (
+                            <span className="absolute right-0 top-3 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                        )}
                     </div>
                 </div>
 
-                <div className="space-y-3">
-                    <label className="text-sm font-medium">Фото*</label>
+                <div className="space-y-3 relative">
+                    <label className="text-sm font-medium flex justify-between items-center">
+                        Фото*
+                        {formData.images.length > 0 && (
+                            <span className="text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                        )}
+                    </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
 
                         {/* Кнопка "Додати фото" */}
@@ -199,26 +222,33 @@ const CreateAdvertisementPage: React.FC = () => {
                             </div>
                         ))}
                     </div>
-                    <p className="text-[10px] text-gray-400">
-                        Перше фото буде на обкладинці. Ви можете додати до 8 зображень.
+                    <p className={`text-[10px] ${formData.images.length === 0 ? "text-red-500" : "text-gray-400"}`}>
+                        {formData.images.length === 0
+                            ? "Будь ласка, додайте хоча б одне фото"
+                            : "Перше фото буде на обкладинці. Ви можете додати до 8 зображень."}
                     </p>
                 </div>
 
                 {/* Опис */}
-                <div className="space-y-1">
+                <div className="space-y-1 relative">
                     <label className="text-sm font-medium">Опис*</label>
+                    <div className="relative">
                     <textarea
                         rows={6}
-                        placeholder="Подумайте, що б ви хотіли дізнатись побачивши це оголошення. І додайте сюди"
+                        placeholder="Подумайте, що б ви хотіли дізнатись побачивши це оголошення..."
                         value={formData.description}
                         onChange={(e) => updateFormData({ description: e.target.value })}
                         className={`w-full border-2 p-3 rounded-md outline-none resize-none transition-colors ${
-                            formData.description.length > 0 && formData.description.length < 30 ? "border-red-500" : "border-[#212121]"
+                            formData.description.length >= 30 ? "border-green-500" : "border-[#212121]"
                         }`}
                     />
+                        {formData.description.length >= 30 && (
+                            <span className="absolute right-3 top-3 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                        )}
+                    </div>
                     <div className="flex justify-between text-xs">
                         <span
-                            className={formData.description.length > 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
+                            className={formData.description.length >= 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
                             Внесіть сюди щонайменше 30 символів
                         </span>
                         <span className="text-gray-500">{formData.description.length}/10 000</span>
@@ -229,37 +259,43 @@ const CreateAdvertisementPage: React.FC = () => {
                 <div className="flex flex-col space-y-6 pt-4 max-w-md">
 
                     {/* Місцезнаходження */}
-                    <div className="space-y-1">
+                    <div className="space-y-1 relative">
                         <label className="text-sm font-medium text-gray-600">Місцезнаходження*</label>
-                        {areas && (
-                            <AreasDropDown
-                                areas={areas}
-                                settlements={settlements!}
-                                isLoading={isLoading}
-                                selectedArea={formData.selectedArea}
-                                selectedSettlement={formData.selectedSettlement}
-                                onSelectArea={(area) => updateFormData({ selectedArea: area, selectedSettlement: null })}
-                                onSelectSettlement={(settlement) => updateFormData({ selectedSettlement: settlement })}
-                            />
-                        )}
+                        <div className="relative">
+                            {areas && (
+                                <AreasDropDown
+                                    areas={areas}
+                                    settlements={settlements!}
+                                    isLoading={isLoading}
+                                    selectedArea={formData.selectedArea}
+                                    selectedSettlement={formData.selectedSettlement}
+                                    onSelectArea={(area) => updateFormData({ selectedArea: area, selectedSettlement: null })}
+                                    onSelectSettlement={(settlement) => updateFormData({ selectedSettlement: settlement })}
+                                />
+                            )}
+                            {formData.selectedSettlement && (
+                                <span className="absolute right-0 top-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                            )}
+                        </div>
                     </div>
 
                     {/* Номер телефону */}
-                    <div className="space-y-1 border-b-2 border-[#212121]">
-                        <label className="text-sm font-medium text-gray-600">Номер телефону*</label>
+                    <div className="space-y-1 border-b-2 border-green-500">
+                        <label className="text-sm font-medium text-gray-600">
+                            Номер телефону* <span className="text-xs font-normal text-gray-400">(щоб змінити номер телефону перейдіть у профіль)</span>
+                        </label>
                         <input
                             type="tel"
-                            placeholder="098 000 00 00"
-                            value={formData.phone}
-                            onChange={(e) => updateFormData({phone: e.target.value})}
-                            className="w-full py-2 outline-none bg-transparent"
+                            readOnly={true}
+                            value={profileData?.payload.phoneNumber || "+380987654321"}
+                            className="w-full py-2 outline-none bg-transparent text-gray-800 cursor-not-allowed"
                         />
                     </div>
 
                     {/* Ціна */}
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-600">Ціна</label>
-                        <div className="flex items-center border-b-2 border-[#212121]">
+                    <div className="space-y-1 border-b-2 relative">
+                        <label className="text-sm font-medium text-gray-600">Ціна <span className="text-xs font-normal text-gray-400">(грн)</span></label>
+                        <div className={`relative border-b-2 transition-colors ${Number(formData.price) > 0 ? "border-green-500" : "border-[#212121]"}`}>
                             <input
                                 type="number"
                                 min="1"
@@ -268,18 +304,21 @@ const CreateAdvertisementPage: React.FC = () => {
                                 onChange={(e) => updateFormData({ price: e.target.value })}
                                 className="w-full py-2 outline-none bg-transparent"
                             />
+                            {Number(formData.price) > 0 && (
+                                <span className="absolute right-5 top-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Кнопки */}
                 <div className="flex flex-col sm:flex-row justify-end gap-4 pt-10">
-                    <button onClick={() => navigate("/advertpreview")} disabled={formData.title.length < 14 || formData.description.length < 30} className="px-6 py-2 border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
+                    <button onClick={() => navigate("/advertpreview")} disabled={isFormValid} className="px-6 py-2 border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
                         Попередній перегляд
                     </button>
                     <button
                         onClick={handleSubmit}
-                        disabled={formData.title.length < 14 || formData.description.length < 30}
+                        disabled={isFormValid}
                         className="px-8 py-2 bg-[#212121] text-white rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black transition-colors"
                     >
                         Опублікувати

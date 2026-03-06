@@ -6,7 +6,15 @@ import {IUserCreate} from "../types/IUserCreate.ts";
 import {IUserProfile} from "../types/Account/IUserProfile.ts";
 import {serialize} from "object-to-formdata";
 import {ServiceResponse} from "../types/IServiceResponse.ts";
+import {IAdvertisement} from "../pages/Advertisement/types.ts";
+import {IUserProfileUpdate} from "../types/Account/IUserProfileUpdate.ts";
 //import {ILoginRequest, IResponse, IUserCreate} from "../models/account";
+
+interface ApiResponse<T> {
+    isSuccess: boolean;
+    message: string;
+    payload: T;
+}
 
 export const apiAccount = createApi({
     reducerPath: "apiAccount",
@@ -22,6 +30,7 @@ export const apiAccount = createApi({
                 }
             }
         }),
+
         register: builder.mutation<IResponse, IUserCreate>({
             query: (user) => {
                 const formData = serialize(user);
@@ -49,6 +58,7 @@ export const apiAccount = createApi({
                 };
             },
         }),
+
         profile: builder.query<ServiceResponse<IUserProfile>, void>({
             query: () => ({
                 url: "profile",
@@ -56,6 +66,42 @@ export const apiAccount = createApi({
             }),
             providesTags: ["Account"]
         }),
+
+        updateProfile: builder.mutation<ServiceResponse<IUserProfile>, IUserProfileUpdate>({
+            query: (data) => {
+                const formData = new FormData();
+                formData.append("FirstName", data.firstName);
+                formData.append("LastName", data.lastName);
+                if (data.phoneNumber) formData.append("PhoneNumber", data.phoneNumber);
+                if (data.imageFile) formData.append("Image", data.imageFile);
+
+                return {
+                    url: "profile",
+                    method: "PUT",
+                    body: formData,
+                };
+            },
+            invalidatesTags: ["Account"],
+        }),
+
+        // updateProfile: builder.mutation<IUserProfile, IUserProfileUpdate>({
+        //     query: (data) => {
+        //         const formData = new FormData();
+        //         formData.append("FirstName", data.firstName);
+        //         formData.append("LastName", data.lastName);
+        //         if (data.phoneNumber)
+        //             formData.append("PhoneNumber", data.phoneNumber);
+        //         if (data.imageFile)
+        //             formData.append("Image", data.imageFile);
+        //
+        //         return {
+        //             url: 'profile',
+        //             method: 'PUT',
+        //             body: formData
+        //         }
+        //     },
+        // }),
+
         addToFavorites: builder.mutation<void, number>({
             query: (advertId) => ({
                 url: `../User/favorites/${advertId}`,
@@ -77,8 +123,24 @@ export const apiAccount = createApi({
                 method: 'DELETE',
             }),
             invalidatesTags: ["Account"],
+        }),
+        getAllFavorites: builder.query<ApiResponse<IAdvertisement[]>, void>({
+            query: () => ({
+                url: `../User/favorites`,
+                method: 'GET',
+            }),
+            providesTags: ["Account"],
         })
     }),
 });
 
-export const {useLoginMutation, useRegisterMutation, useProfileQuery, useAddToFavoritesMutation, useRemoveFromFavoritesMutation, useRemoveAllFromFavoritesMutation } = apiAccount;
+export const {
+    useLoginMutation,
+    useRegisterMutation,
+    useProfileQuery,
+    useAddToFavoritesMutation,
+    useRemoveFromFavoritesMutation,
+    useRemoveAllFromFavoritesMutation,
+    useGetAllFavoritesQuery,
+    useUpdateProfileMutation,
+} = apiAccount;

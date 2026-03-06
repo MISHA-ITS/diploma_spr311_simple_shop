@@ -209,10 +209,32 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                 </div>
 
                 <div className="mt-7">
-                  <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                    Особиста інформація
-                  </h5>
+                  {/* HEADER + ROLES */}
+                  <div className="flex items-center justify-between mb-5 lg:mb-6">
+                    <h5 className="text-lg font-medium text-gray-800 dark:text-white/90">
+                      Особиста інформація
+                    </h5>
 
+                    <div className="w-[220px]">
+                      {/*<Label>Ролі</Label>*/}
+                      <MultiSelect
+                          label="Ролі"
+                          options={[
+                            { value: "Admin", text: "Admin" },
+                            { value: "User", text: "User" }
+                          ]}
+                          value={formData.roles}
+                          onChange={(selected) =>
+                              setFormData(prev => ({
+                                ...prev,
+                                roles: selected
+                              }))
+                          }
+                      />
+                    </div>
+                  </div>
+
+                  {/* INPUTS */}
                   <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                     <div className="col-span-2 lg:col-span-1">
                       <Label>Ім'я</Label>
@@ -244,24 +266,6 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                       <Input
                           value={formData.phoneNumber ?? ""}
                           onChange={e => handleChange("phoneNumber", e.target.value)}
-                      />
-                    </div>
-
-                    <div className="col-span-2">
-                      <Label>Ролі</Label>
-                      <MultiSelect
-                          label="Ролі"
-                          options={[
-                            { value: "Admin", text: "Admin" },
-                            { value: "User", text: "User" }
-                          ]}
-                          value={formData.roles}
-                          onChange={(selected) =>
-                              setFormData(prev => ({
-                                ...prev,
-                                roles: selected
-                              }))
-                          }
                       />
                     </div>
                   </div>

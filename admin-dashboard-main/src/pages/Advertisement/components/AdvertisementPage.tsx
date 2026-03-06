@@ -19,7 +19,7 @@ import {
     useProfileQuery,
     useRemoveFromFavoritesMutation
 } from "../../../services/apiAccount.ts";
-import {FaHeart, FaRegHeart} from "react-icons/fa";
+import {FaHeart, FaPen, FaRegHeart} from "react-icons/fa";
 
 const AdvertisementPage: React.FC = () => {
 
@@ -29,8 +29,8 @@ const AdvertisementPage: React.FC = () => {
     const [removeFromFavorites, { isLoading: isRemoving }] = useRemoveFromFavoritesMutation();
     const { data, isLoading, error } = useGetAdvertisementByIdQuery(Number(id));
     const product = data?.payload;
-
-    console.log(product);
+    const { data: profile } = useProfileQuery();
+    const User = profile?.payload;
 
     const { data: area } = useGetAreaByIdQuery(
         product?.settlement?.area ?? "",
@@ -41,6 +41,8 @@ const AdvertisementPage: React.FC = () => {
         { skip: !product?.userId }
     );
     const seller = sellerData?.payload;
+
+    const isSeller = User && product && User.id === product.userId;
     //favorite
     const {data: profileData} = useProfileQuery()
     const isFavorite = profileData?.payload?.favoriteAdverts?.some(fav => fav.id === product?.id);
@@ -79,8 +81,10 @@ const AdvertisementPage: React.FC = () => {
 
 
     if (CategoriesError || !Categories?.payload) {
-        return <div>Помилка завантаження категорій</div>;
+        return null;
     }
+
+    console.log(product);
     if (!product){
         return <div>Помилка завантаження продукта</div>;
     }
@@ -148,21 +152,36 @@ const AdvertisementPage: React.FC = () => {
 
                     {/* PRICE */}
                         <div className="bg-[#dae5f9] rounded-lg p-6 flex flex-col gap-4 relative">
-                            <div
-                                onClick={handleFavoriteClick}
-                                className={`absolute top-6 right-6 cursor-pointer transition-all duration-300 transform 
-                                active:scale-75 hover:scale-110 
-                                ${(isAdding || isRemoving) ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
-                            >
-                                {isFavorite ? (
-                                    <FaHeart size={30} />
-                                ) : (
-                                    <FaRegHeart size={30} color="#002f34" />
+
+                            {/* Контейнер для іконок дій (справа зверху) */}
+                            <div className="absolute top-6 right-6 flex items-center gap-4">
+
+                                {/* РЕДАГУВАННЯ: Показуємо тільки власнику */}
+                                {isSeller && (
+                                    <div
+                                        onClick={() => navigate(`/edit-advertisement/${product.id}`)}
+                                        className="cursor-pointer transition-all duration-300 transformtext-[#002f34] opacity-80 hover:opacity-100"
+                                    >
+                                        <FaPen size={28} color="#002f34" />
+                                    </div>
                                 )}
+
+                                {/* Сердечко */}
+                                <div
+                                    onClick={handleFavoriteClick}
+                                    className={`cursor-pointer transition-all duration-300 transform  hover:scale-105 
+                                    ${(isAdding || isRemoving) ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+                                >
+                                    {isFavorite ? (
+                                        <FaHeart size={30} />
+                                    ) : (
+                                        <FaRegHeart size={30} color="#002f34" />
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Назва */}
-                            <span className="text-2xl font-medium text-[#002f34] pr-10">
+                            {/* Назва (збільшив відступ pr-14, щоб текст не наліз на іконки) */}
+                            <span className="text-2xl font-medium text-[#002f34] pr-14">
                                 {product.name || "Продам кавоварку"}
                             </span>
 
@@ -192,8 +211,9 @@ const AdvertisementPage: React.FC = () => {
 
                         {/* SELLER */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex gap-4">
-                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full" >
-                                <img src={seller?.image
+                            <div className="w-12 h-12 bg-[#BDBDBD] rounded-full overflow-hidden">
+                                <img
+                                    className="w-full h-full object-cover" src={seller?.image
                                     ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
                                     : `${EnvConfig.API_URL}/images/noimage.jpeg`
                                     }
@@ -277,9 +297,10 @@ const AdvertisementPage: React.FC = () => {
                             <div
                                 key={ad.id}
                                 onClick={() => navigate(`/advertisement/${ad.id}`)}
-                                className="min-w-[218px] snap-start hover:scale-102 rounded-lg overflow-hidden transition-all cursor-pointer flex flex-col"
+                                // ДОДАНО: w-[218px] та flex-shrink-0
+                                className="w-[218px] flex-shrink-0 snap-start hover:scale-102 rounded-lg overflow-hidden transition-all cursor-pointer flex flex-col"
                             >
-                                <div className="h-[170px] w-fuloverflow-hidden rounded-lg overflow-hidden">
+                                <div className="h-[170px] w-full overflow-hidden rounded-lg">
                                     {ad.images?.[0] ? (
                                         <img
                                             src={`${EnvConfig.API_URL}/images/advertisements/1200_${ad.images[0]}`}
@@ -287,7 +308,7 @@ const AdvertisementPage: React.FC = () => {
                                             className="w-full h-full object-cover transition-transform duration-500"
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center ">
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
                                             Немає фото
                                         </div>
                                     )}
@@ -295,12 +316,12 @@ const AdvertisementPage: React.FC = () => {
 
                                 {/* ІНФО */}
                                 <div className="p-4 flex flex-col gap-2">
-                                <span className="text-[#002f34] font-semibold text-lg truncate">
-                                    {ad.name}
-                                </span>
-                                <span className="text-[#002f34] font-bold text-xl">
-                                    {ad.price} грн
-                                </span>
+                                    <span className="text-[#002f34] font-semibold text-lg truncate">
+                                        {ad.name}
+                                    </span>
+                                    <span className="text-[#002f34] font-bold text-xl">
+                                        {ad.price} грн
+                                    </span>
                                 </div>
                             </div>
                         ))}

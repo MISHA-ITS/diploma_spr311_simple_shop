@@ -26,3 +26,10 @@ export interface Props {
     onCreate?: () => void;
     onRefresh?: () => void;
 }
+
+export interface ICategoryWithCount {
+    id: number;
+    name: string;
+    advCount: number;
+    childs: ICategoryWithCount[];
+}

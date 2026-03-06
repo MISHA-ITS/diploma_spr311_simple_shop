@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BLL.Constatnts;
 using WebApi.BLL.DTOs;
+using WebApi.BLL.DTOs.Advertisement;
 using WebApi.BLL.DTOs.User;
 using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Image;
@@ -315,5 +316,19 @@ public class UserService(AppDbContext dbContext, UserManager<AppUser> userManage
         }
 
         return users.OrderBy(u => u.Id);
+    }
+
+    public async Task<ServiceResponse> GetAllFavoritesAsync(long userId)
+    {
+        var favoriteAdverts = await dbContext.Users
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.Adverts)
+            .ProjectTo<AdvertisementDTO>(mapper.ConfigurationProvider)
+            .ToListAsync();
+
+        return ServiceResponse.Success(
+            "Улюблені оголошення отримано",
+            favoriteAdverts
+        );
     }
 }

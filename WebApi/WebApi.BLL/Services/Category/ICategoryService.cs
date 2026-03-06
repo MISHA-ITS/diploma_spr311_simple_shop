@@ -10,5 +10,6 @@ namespace WebApi.BLL.Services.Category
         Task<ServiceResponse> GetByIdAsync(long id);
         Task<ServiceResponse> GetAllAsync();
         Task<ServiceResponse> GetPageAsync(int page, int size, string? searchName = "", string? parentName = "");
+        Task<ServiceResponse> GetCategoriesWithCountsAsync();
     }
 }

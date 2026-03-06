@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import OrderTabs from "./OrderTabs";
 import OrderCard from "./OrderCard";
-import {IOrder, OrderStatus} from "./types.ts";
+import { IOrder, OrderStatus } from "./types.ts";
 
 interface Props {
     buyerOrders: IOrder[];
@@ -25,14 +25,22 @@ const DeliverySection = ({ buyerOrders, sellerOrders }: Props) => {
             <div className="flex gap-6 mb-6">
                 <button
                     onClick={() => setOrderType("buyer")}
-                    className={orderType === "buyer" ? "font-semibold border-b-2 border-black pb-1" : ""}
+                    className={
+                        orderType === "buyer"
+                            ? "font-semibold border-b-2 border-black pb-1"
+                            : ""
+                    }
                 >
                     Мої покупки
                 </button>
 
                 <button
                     onClick={() => setOrderType("seller")}
-                    className={orderType === "seller" ? "font-semibold border-b-2 border-black pb-1" : ""}
+                    className={
+                        orderType === "seller"
+                            ? "font-semibold border-b-2 border-black pb-1"
+                            : ""
+                    }
                 >
                     Мої продажі
                 </button>
@@ -49,7 +57,7 @@ const DeliverySection = ({ buyerOrders, sellerOrders }: Props) => {
                     Замовлень немає
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-2">
                     {filteredOrders.map(order => (
                         <OrderCard key={order.id} order={order} />
                     ))}
