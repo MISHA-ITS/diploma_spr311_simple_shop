@@ -46,7 +46,15 @@ export default function UserDropdown() {
         )}
 
 
-        <span className="block mr-1 font-medium text-theme-sm">{user ? user.fullName : "Гість"}</span>
+        {/*<span className="block mr-1 font-medium text-theme-sm">{user ? user.fullName : "Гість"}</span>*/}
+        <div>
+          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+            {user ? user.fullName : "Гість"}
+          </span>
+          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
+            {user ? user.email : "Гість"}
+          </span>
+        </div>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -71,17 +79,8 @@ export default function UserDropdown() {
         <Dropdown
             isOpen={isOpen}
             onClose={closeDropdown}
-            className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+            className="absolute right-0 mt-[17px] flex w-[160px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
         >
-            <div>
-        <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-          {user.fullName}
-        </span>
-                <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-          {user.email}
-        </span>
-            </div>
-
             <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
                 <li>
                     <DropdownItem
@@ -105,7 +104,7 @@ export default function UserDropdown() {
                                 fill=""
                             />
                         </svg>
-                        Edit profile
+                        Профіль
                     </DropdownItem>
                 </li>
                 {/*<li>*/}
@@ -178,7 +177,7 @@ export default function UserDropdown() {
                         fill=""
                     />
                 </svg>
-                Sign out
+                Вийти
             </button>
         </Dropdown>
       )}

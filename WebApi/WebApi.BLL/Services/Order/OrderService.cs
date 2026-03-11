@@ -175,7 +175,7 @@ public class OrderService(
 
     public async Task<ServiceResponse> GetByIdAsync(long id, long userId)
     {
-        var order = await orderRepository.GetByIdAsync(id);
+        var order = await orderRepository.GetByIdWithDetailsAsync(id);
 
         if (order == null)
             return ServiceResponse.Error("Замовлення не знайдено");
@@ -183,32 +183,36 @@ public class OrderService(
         if (order.BuyerId != userId && order.SellerId != userId)
             return ServiceResponse.Error("Немає доступу");
 
-        var dto = mapper.Map<OrderResponseDto>(order);
+        var dto = mapper.Map<OrderDetailsDto>(order);
 
         return ServiceResponse.Success("Замовлення з Id {OrderId} успішно отримано", dto);
     }
 
-    public async Task<ServiceResponse> UpdateStatusAsync(long orderId, UpdateOrderStatusDto dto, long userId)
+    public async Task<ServiceResponse> UpdateStatusAsync(
+        long orderId,
+        UpdateOrderStatusDto dto,
+        long userId)
     {
         var order = await orderRepository.GetByIdAsync(orderId);
 
         if (order == null)
             return ServiceResponse.Error("Замовлення не знайдено");
 
-        if (order.SellerId != userId)
-            return ServiceResponse.Error("Лише продавець може змінити статус");
-
         if (!IsValidStatusTransition(order.Status, dto.Status))
-            return ServiceResponse.Error(
-                $"Неможливо змінити статус з {order.Status} на {dto.Status}");
+            return ServiceResponse.Error("Недопустимий перехід статусу");
+
+        if (dto.Status == OrderStatus.Accepted && order.SellerId != userId)
+            return ServiceResponse.Error("Тільки продавець може підтвердити");
+
+        if (dto.Status == OrderStatus.Shipped && order.SellerId != userId)
+            return ServiceResponse.Error("Тільки продавець може відправити");
+
+        if (dto.Status == OrderStatus.Completed && order.BuyerId != userId)
+            return ServiceResponse.Error("Тільки покупець може підтвердити отримання");
 
         order.Status = dto.Status;
-        order.UpdatedAt = DateTime.UtcNow;
 
-        var updated = await orderRepository.UpdateAsync(order);
-
-        if (!updated)
-            return ServiceResponse.Error("Не вдалося оновити замовлення");
+        await orderRepository.UpdateAsync(order);
 
         return ServiceResponse.Success("Статус оновлено");
     }
@@ -272,20 +276,27 @@ public class OrderService(
         return ServiceResponse.Success("Замовлення скасовано");
     }
 
-
     private bool IsValidStatusTransition(OrderStatus current, OrderStatus next)
     {
         return current switch
         {
-            OrderStatus.Pending => next == OrderStatus.Accepted
-                                   || next == OrderStatus.Canceled,
+            OrderStatus.Pending =>
+                next == OrderStatus.Accepted ||
+                next == OrderStatus.Rejected ||
+                next == OrderStatus.Canceled,
 
-            OrderStatus.Accepted => next == OrderStatus.Completed
-                                     || next == OrderStatus.Canceled,
+            OrderStatus.Accepted =>
+                next == OrderStatus.Shipped ||
+                next == OrderStatus.Canceled,
 
-            OrderStatus.Completed => false, // фінальний статус
+            OrderStatus.Shipped =>
+                next == OrderStatus.Completed,
 
-            OrderStatus.Canceled => false, // фінальний статус
+            OrderStatus.Rejected => false,
+
+            OrderStatus.Completed => false,
+
+            OrderStatus.Canceled => false,
 
             _ => false
         };
