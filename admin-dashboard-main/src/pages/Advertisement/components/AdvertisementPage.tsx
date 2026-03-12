@@ -81,8 +81,10 @@ const AdvertisementPage: React.FC = () => {
 
 
     if (CategoriesError || !Categories?.payload) {
-        return <div>Помилка завантаження категорій</div>;
+        return null;
     }
+
+    console.log(product);
     if (!product){
         return <div>Помилка завантаження продукта</div>;
     }
@@ -172,7 +174,7 @@ const AdvertisementPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Назва (збільшив відступ pr-14, щоб текст не наліз на іконки) */}
+                            {/* Назва */}
                             <span className="text-2xl font-medium text-[#002f34] pr-14">
                                 {product.name || "Продам кавоварку"}
                             </span>
@@ -313,7 +315,7 @@ const AdvertisementPage: React.FC = () => {
                                         )}
                                     </div>
 
-                                    {/* ІНФО (Зберігаємо твій дизайн) */}
+                                    {/* ІНФО */}
                                     <div className="p-4 flex flex-col gap-2">
                                         <span className="text-[#002f34] font-semibold text-lg truncate">
                                             {ad.name}

@@ -13,6 +13,7 @@ using WebApi.BLL.Models.Account;
 using WebApi.BLL.Services.Email;
 using WebApi.BLL.Services.Image;
 using WebApi.BLL.Services.JwtToken;
+using WebApi.BLL.Services.Role;
 using WebApi.DAL.Entities.Identity;
 
 namespace WebApi.BLL.Services.Account;
@@ -183,6 +184,14 @@ public class AccountService(UserManager<AppUser> userManager,
             logger.LogWarning("Login failed. Invalid password. UserId: {UserId}, Email: {Email}", 
                 user.Id, user.Email);
             return ServiceResponse.Error($"Неправильний пароль!");
+        }
+
+        // ✅ Перевірка підтвердження email
+        if (!user.EmailConfirmed) // або IsEmailVerified, залежить від поля у твоїй моделі
+        {
+            logger.LogWarning("Login failed. Email not verified. UserId: {UserId}, Email: {Email}",
+                user.Id, user.Email);
+            return ServiceResponse.Error("Вхід можливий лише після підтвердження електронної пошти.");
         }
 
         string jwtToken = await jwtTokenService.GenerateTokenAsync(user);
@@ -496,6 +505,32 @@ public class AccountService(UserManager<AppUser> userManager,
         var user = await userManager.FindByEmailAsync(email);
 
         return user.Id;
+    }
+
+    public async Task<ServiceResponse> UpdateProfileAsync(long userId, UpdateProfileDto dto)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            return ServiceResponse.Error("User not found");
+
+        user.FirstName = dto.FirstName;
+        user.LastName = dto.LastName;
+        user.PhoneNumber = dto.PhoneNumber;
+
+        // якщо є картинка
+        if (dto.Image != null)
+        {
+            var imageUrl = await imageService.SaveImageAsync(dto.Image, Settings.UsersDir);
+            user.Image = imageUrl;
+        }
+
+        var result = await userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+            return ServiceResponse.Error("Failed to update profile");
+
+        return ServiceResponse.Success("Profile updated", user);
     }
 
     public sealed class GoogleAccountDto

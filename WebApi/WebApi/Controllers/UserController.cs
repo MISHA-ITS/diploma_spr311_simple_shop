@@ -86,4 +86,14 @@ public class UserController(IUserService userService, IAccountService accountSer
         var result = await userService.RemoveAllFavorites(userId);
         return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
+
+    [Authorize]
+    [HttpGet("favorites")]
+    public async Task<IActionResult> GetAllFavorites()
+    {
+        var userId = await accountService.GetUserIdAsync();
+
+        var result = await userService.GetAllFavoritesAsync(userId);
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
+    }
 }

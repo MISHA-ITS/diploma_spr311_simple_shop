@@ -2,6 +2,7 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
 import { ICategory, ICategoryPageRequest } from "../models/category.ts"
 import { PageResponse } from "../models/category.ts"
 import EnvConfig from "../config/env.ts";
+import {ICategoryWithCount} from "../types/Category/types.ts";
 
 interface ApiResponse<T> {
     isSuccess: boolean;
@@ -68,6 +69,16 @@ export const apiCategory = createApi({
             }),
             invalidatesTags: ['Categories', 'CategoriesPage'],
         }),
+        getCategoriesWithCounts: builder.query<
+            ApiResponse<ICategoryWithCount[]>,
+            void
+        >({
+            query: () => ({
+                url: `/with-adv-count`,
+                method: "GET",
+            }),
+            providesTags: ["Categories"]
+        }),
     }),
 })
 
@@ -77,5 +88,6 @@ export const {
     useGetCategoryByIdQuery,
     useCreateCategoryMutation,
     useUpdateCategoryMutation,
-    useDeleteCategoryMutation
+    useDeleteCategoryMutation,
+    useGetCategoriesWithCountsQuery
 } = apiCategory

@@ -88,7 +88,6 @@ const CreateAdvertisementPage: React.FC = () => {
             data.append("CategoryId", String(formData.categoryId));
             data.append("SettlementRef", formData.selectedSettlement.ref);
 
-            // ЯВНО ДОДАЄМО ІНДЕКС ПЕРШОГО ФОТО
             data.append("MainImageIndex", "0");
 
             if (formData.images.length > 0) {
@@ -188,7 +187,6 @@ const CreateAdvertisementPage: React.FC = () => {
                                 <img
                                     src={url}
                                     className={`w-full h-full object-cover rounded-md border transition-all ${
-                                        // ФІКС: Сіра рамка для головного фото
                                         index === 0 ? 'border-gray-300 shadow-sm' : 'border-gray-200'
                                     }`}
                                 />
@@ -199,7 +197,6 @@ const CreateAdvertisementPage: React.FC = () => {
                                     <TiDelete size={'100%'} />
                                 </button>
 
-                                {/* ФІКС: Сіра плашка "Головне фото" */}
                                 {index === 0 && (
                                     <div className="absolute bottom-0 left-0 right-0 bg-gray-700/80 text-white text-[10px] text-center py-1 rounded-b-md">
                                         Головне фото

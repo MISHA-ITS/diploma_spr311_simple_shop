@@ -6,12 +6,14 @@ using WebApi.BLL.DTOs.Category;
 using WebApi.BLL.Extensions;
 using WebApi.BLL.Services.Image;
 using WebApi.DAL.Entities;
+using WebApi.DAL.Repositories.Advertisements;
 using WebApi.DAL.Repositories.Category;
 
 namespace WebApi.BLL.Services.Category
 {
     public class CategoryService(ICategoryRepository categoryRepository,
-        IMapper mapper, IImageService imageService, ILogger<CategoryService> logger) : ICategoryService
+        IMapper mapper, IImageService imageService, IAdvertisementRepository advertisementRepository, 
+        ILogger<CategoryService> logger) : ICategoryService
     {
         public async Task<ServiceResponse> CreateAsync(CreateCategoryDTO dto)
         {
@@ -216,6 +218,54 @@ namespace WebApi.BLL.Services.Category
                 "Categories retrieved successfully",
                 result
             );
+        }
+
+        public async Task<ServiceResponse> GetCategoriesWithCountsAsync()
+        {
+            var categories = await categoryRepository.GetAllFlatAsync();
+
+            var advCounts = await advertisementRepository.GetAdvertisementCountsAsync();
+
+            var categoryDict = categories.ToDictionary(
+                c => c.Id,
+                c => new CategoryWithCountDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    AdvCount = advCounts.TryGetValue(c.Id, out var count) ? count : 0,
+                    Childs = new List<CategoryWithCountDto>()
+                });
+
+            foreach (var category in categories)
+            {
+                if (category.ParentId.HasValue)
+                {
+                    var parent = categoryDict[category.ParentId.Value];
+                    parent.Childs.Add(categoryDict[category.Id]);
+                }
+            }
+
+            int CalculateTotal(CategoryWithCountDto category)
+            {
+                foreach (var child in category.Childs)
+                {
+                    category.AdvCount += CalculateTotal(child);
+                }
+
+                return category.AdvCount;
+            }
+
+            var roots = categories
+                .Where(c => c.ParentId == null)
+                .Select(c => categoryDict[c.Id])
+                .ToList();
+
+            foreach (var root in roots)
+            {
+                CalculateTotal(root);
+            }
+
+            return ServiceResponse.Success("Категорії отримано успішно", roots);
         }
     }
 }

@@ -2,7 +2,8 @@ import {Link} from "react-router-dom";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import * as React from "react";
 import {useAppSelector} from "../store";
-import { UserOutlined, BellOutlined, HeartOutlined } from '@ant-design/icons';
+import { UserOutlined, HeartOutlined } from '@ant-design/icons';
+//import { BellOutlined } from '@ant-design/icons';
 import SelixLogo from "../icons/Sellix.png";
 import {useEffect, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
@@ -70,17 +71,17 @@ const SimpleHeader: React.FC = () => {
                 <div className="flex items-center gap-3">
                     {user && (
                         <>
-                            <Link
-                                to="/"
-                                className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"
-                            >
-                                <span className="text-[22px]">
-                                    <BellOutlined />
-                                </span>
-                                <span className="text-[15px] font-inter">
-                                    Сповіщення
-                                </span>
-                            </Link>
+                            {/*<Link*/}
+                            {/*    to="/"*/}
+                            {/*    className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"*/}
+                            {/*>*/}
+                            {/*    <span className="text-[22px]">*/}
+                            {/*        <BellOutlined />*/}
+                            {/*    </span>*/}
+                            {/*    <span className="text-[15px] font-inter">*/}
+                            {/*        Сповіщення*/}
+                            {/*    </span>*/}
+                            {/*</Link>*/}
 
                             <Link
                                 to="profile/"

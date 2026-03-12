@@ -8,7 +8,7 @@ export interface IUserProfile {
     email: string;
     phoneNumber: string;
     image?: string|null;
-    dateRegister: string;
+    createdAt: string;
     roles: string[];
     favoriteAdverts: IAdvertisement[];
 }
