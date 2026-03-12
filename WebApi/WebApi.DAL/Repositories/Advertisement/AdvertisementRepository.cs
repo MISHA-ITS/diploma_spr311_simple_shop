@@ -86,6 +86,7 @@ public class AdvertisementRepository(AppDbContext context, ILogger<GenericReposi
     {
         return await _context.Advertisements
             .AsNoTracking()
+            .Where(a => a.isActive && !a.isBlocked)
             .GroupBy(a => a.CategoryId)
             .Select(g => new
             {

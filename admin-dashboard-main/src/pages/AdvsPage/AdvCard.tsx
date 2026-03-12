@@ -50,13 +50,11 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
 
     const {user} = useAppSelector(globalState => globalState.auth);
 
-    const {data: favAdvsData, isLoading: favAdvsLoad, error: favAdvsError} = useGetAllFavoritesQuery(undefined, {
+    const {data: favAdvsData } = useGetAllFavoritesQuery(undefined, {
         skip: !user
     });
 
-    if (favAdvsLoad || favAdvsError) return null;
-
-    const favAdvs = favAdvsData? favAdvsData.payload : [];
+    const favAdvs = favAdvsData?.payload ?? [];
 
     return viewMode === "grid" ? (
         <div onClick={() => clickHandle(advertisement.id)}

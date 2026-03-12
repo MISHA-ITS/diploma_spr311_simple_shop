@@ -8,6 +8,7 @@ import {
     useRemoveFromFavoritesMutation
 } from "../../services/apiAccount.ts";
 import {IoStatsChart} from "react-icons/io5";
+import Loader from "../../components/Loader.tsx";
 
 const FavoritesPage: React.FC = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const FavoritesPage: React.FC = () => {
     const [removeFromFavorites] = useRemoveFromFavoritesMutation();
     const [remoceAllFavorites] = useRemoveAllFromFavoritesMutation();
 
-    if (isLoading) return <div className="p-10 text-center">Завантаження...</div>;
+    if (isLoading) return <Loader />;
 
     console.log("FavoritesPage", userData);
 
