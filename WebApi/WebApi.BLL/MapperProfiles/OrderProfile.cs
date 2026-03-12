@@ -56,10 +56,6 @@ public class OrderProfile : Profile
         // List
         CreateMap<OrderEntity, OrderResponseDto>()
             .IncludeBase<OrderEntity, BaseOrderDto>()
-            .ForMember(d => d.BuyerId,
-                o => o.MapFrom(s => s.BuyerId))
-            .ForMember(d => d.SellerId,
-                o => o.MapFrom(s => s.SellerId))
             .ForMember(d => d.AdvertisementId,
                 o => o.MapFrom(s => s.AdvertisementId))
             .ForMember(d => d.BuyerFullName,

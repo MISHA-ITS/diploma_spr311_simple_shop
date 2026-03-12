@@ -2,7 +2,7 @@ import {Link} from "react-router-dom";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import * as React from "react";
 import {useAppSelector} from "../store";
-import { UserOutlined, HeartOutlined } from '@ant-design/icons';
+import { HeartOutlined } from '@ant-design/icons';
 //import { BellOutlined } from '@ant-design/icons';
 import SelixLogo from "../icons/Sellix.png";
 import {useEffect, useRef, useState} from "react";
@@ -10,7 +10,8 @@ import {useDispatch} from "react-redux";
 import LogoutIconLight from "../icons/Logout.png"
 import LogoutIconDark from "../icons/LogoutGray.png"
 import {logout} from "../store/authSlice.ts";
-import {useNavigate} from "react-router";
+import {useLocation, useNavigate} from "react-router";
+import EnvConfig from "../config/env.ts";
 
 const SimpleHeader: React.FC = () => {
     const { user } = useAppSelector(globalState => globalState.auth);
@@ -20,6 +21,7 @@ const SimpleHeader: React.FC = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -47,6 +49,13 @@ const SimpleHeader: React.FC = () => {
         dispatch(logout());
         navigate("/");
     }
+
+    const currentPage: 'profile' | 'favorites' | null =
+        location.pathname.startsWith("/profile")
+            ? "profile"
+            : location.pathname.startsWith("/favorites")
+                ? "favorites"
+                : null;
 
     return (
         <header
@@ -87,10 +96,12 @@ const SimpleHeader: React.FC = () => {
                                 to="profile/"
                                 className="flex items-center mr-5 gap-2 text-[rgb(245,245,245)] hover:opacity-80"
                             >
-                                <span className="text-[22px]">
-                                    <UserOutlined />
-                                </span>
-                                <span className="text-[15px] font-inter">
+                                <img
+                                    src={`${EnvConfig.API_URL}/images/users/50_${user.image}`}
+                                    alt="profile"
+                                    className="w-[22px] h-[22px] rounded-full object-cover"
+                                />
+                                <span className={`text-[15px] font-inter transition-all duration-200 ${currentPage === 'profile' ? 'font-semibold' : ''}`}>
                                     Профіль
                                 </span>
                             </Link>
@@ -102,7 +113,7 @@ const SimpleHeader: React.FC = () => {
                                 <span className="text-[22px]">
                                     <HeartOutlined />
                                 </span>
-                                <span className="text-[15px] font-inter">
+                                <span className={`text-[15px] font-inter transition-all duration-200 ${currentPage === 'favorites' ? 'font-semibold' : ''}`}>
                                     Вподобані
                                 </span>
                             </Link>

@@ -16,6 +16,7 @@ import {
     useGetAdvertisementsQuery, useToggleBlockMutation,
 } from "../../../../services/apiAdvertisement.ts";
 import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
+import {IAdvFilter} from "../../../AdvsPage/types.ts";
 
 const AdvertisementsList: React.FC = () => {
     const [deleteAd] = useDeleteAdvertisementMutation();
@@ -24,13 +25,20 @@ const AdvertisementsList: React.FC = () => {
 
     // --- Оновлені фільтри  ---
     const [searchParams, setSearchParams] = useSearchParams();
-    const [filters, setFilters] = useState({
-        name: searchParams.get("name") || "",
+
+    const sortByParam = searchParams.get("sortBy");
+    const orderParam = searchParams.get("order");
+
+    const [filters, setFilters] = useState<IAdvFilter>({
         categoryId: searchParams.get("categoryId") ? Number(searchParams.get("categoryId")) : null,
         minPrice: searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : null,
         maxPrice: searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : null,
-        sortBy: searchParams.get("sortBy") || "",
-        order: searchParams.get("order") || "",
+        sortBy: sortByParam === "date" || sortByParam === "price" ? sortByParam : null,
+        order: orderParam === "asc" || orderParam === "desc" ? orderParam : null,
+        date: null,
+        settlementRef: null,
+        search: null,
+        active: null,
         pageNumber: Number(searchParams.get("pageNumber") || 1),
         pageSize: Number(searchParams.get("pageSize") || 10),
     });
@@ -53,12 +61,13 @@ const AdvertisementsList: React.FC = () => {
     // Синхронізація URL
     useEffect(() => {
         const params: Record<string, string> = {};
-        if (filters.name) params.name = filters.name;
+        if (filters.search) params.name = filters.search;
         if (filters.categoryId) params.categoryId = String(filters.categoryId);
         if (filters.minPrice) params.minPrice = String(filters.minPrice);
         if (filters.maxPrice) params.maxPrice = String(filters.maxPrice);
         if (filters.sortBy) params.sortBy = filters.sortBy;
         if (filters.order) params.order = filters.order;
+        if (filters.date) params.date = filters.date;
         params.pageNumber = String(filters.pageNumber);
         params.pageSize = String(filters.pageSize);
 
@@ -131,7 +140,7 @@ const AdvertisementsList: React.FC = () => {
                                     {isSearchVisible && (
                                         <input
                                             autoFocus
-                                            value={filters.name}
+                                            value={filters.search ?? ""}
                                             onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value, pageNumber: 1 }))}
                                             placeholder="Шукати оголошення..."
                                             className="w-full bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-normal normal-case text-gray-900 dark:text-gray-100"

@@ -107,4 +107,15 @@ public class AccountController(IAccountService accountService, IUserService user
 
         return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
+
+    [Authorize]
+    [HttpDelete("delete")]
+    public async Task<IActionResult> DeleteProfile()
+    {
+        var userId = long.Parse(User.FindFirst("id")!.Value);
+
+        await accountService.DeleteUserAsync(userId);
+
+        return Ok(new { message = "Профіль видалено" });
+    }
 }

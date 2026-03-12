@@ -206,16 +206,14 @@ namespace WebApi.BLL.Services.Advertisement
             IQueryable<AdvertisementEntity> advertisements, 
             AdvertisementFilterDto filter)
         {
-            if (!string.IsNullOrWhiteSpace(filter.Name))
-            {
-                var search = filter.Name.Trim().ToLower();
-                advertisements = advertisements.Where(a => a.Name.ToLower().Contains(search));
-            }
-
             if (filter.categoryId.HasValue)
             {
                 var categoryIds = await categoryRepository.GetAllChildCategoryIdsAsync(filter.categoryId.Value);
                 advertisements = advertisements.Where(a => categoryIds.Contains(a.CategoryId));
+            }
+            if (filter.active.HasValue)
+            {
+                advertisements = advertisements.Where(a => a.isActive == filter.active.Value);
             }
             if (filter.minPrice.HasValue)
             {
@@ -226,6 +224,27 @@ namespace WebApi.BLL.Services.Advertisement
             {
                 advertisements = advertisements
                     .Where(a => a.SettlementRef == filter.settlementRef);
+            }
+            if (!string.IsNullOrEmpty(filter.date))
+            {
+                DateTime fromDate = DateTime.UtcNow;
+                
+                switch (filter.date.ToLower())
+                {
+                    case "today":
+                        fromDate = DateTime.UtcNow.Date;
+                        break;
+
+                    case "week":
+                        fromDate = DateTime.UtcNow.AddDays(-7);
+                        break;
+
+                    case "month":
+                        fromDate = DateTime.UtcNow.AddMonths(-1);
+                        break;
+                }
+
+                advertisements = advertisements.Where(a => a.UpdateDate >= fromDate);
             }
             if (!string.IsNullOrWhiteSpace(filter.search))
             {

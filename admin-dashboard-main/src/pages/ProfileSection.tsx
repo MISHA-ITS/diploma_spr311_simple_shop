@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { IUserProfile } from "../types/Account/IUserProfile";
 import { IUserUpdate } from "./Users/types";
 import EnvConfig from "../config/env";
-import {useUpdateProfileMutation} from "../services/apiAccount.ts";
+import {useDeleteProfileMutation, useUpdateProfileMutation} from "../services/apiAccount.ts";
 
 interface Props {
     user: IUserProfile;
@@ -12,6 +12,7 @@ interface Props {
 const ProfileSection = ({ user, refetch }: Props) => {
     const [isEditing, setIsEditing] = useState(false);
     const [updateUser, { isLoading }] = useUpdateProfileMutation();
+    const [deleteProfile] = useDeleteProfileMutation();
 
     const [formState, setFormState] = useState<IUserUpdate>({
         id: user.id,
@@ -92,6 +93,27 @@ const ProfileSection = ({ user, refetch }: Props) => {
         return new Date(`${year}-${month}-${day}`).toLocaleDateString("uk-UA");
     };
 
+    const handleDeleteProfile = async () => {
+        const confirmDelete = window.confirm(
+            "Ви впевнені, що хочете видалити профіль? Це неможливо відмінити."
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            await deleteProfile().unwrap();
+
+            alert("Профіль видалено");
+
+            localStorage.removeItem("token");
+
+            window.location.href = "/";
+        } catch (error) {
+            console.error(error);
+            alert("Помилка видалення профілю");
+        }
+    };
+
     return (
         <div className="max-w-md mx-auto border rounded-xl p-8 shadow-sm bg-white min-h-[500px] flex flex-col justify-between">
             {!isEditing ? (
@@ -127,6 +149,13 @@ const ProfileSection = ({ user, refetch }: Props) => {
                         className="px-6 py-2 border rounded-lg hover:bg-gray-100"
                     >
                         Редагувати профіль
+                    </button>
+
+                    <button
+                        onClick={handleDeleteProfile}
+                        className="px-6 py-2 border-3 border-red-500 text-red-500 rounded-lg hover:bg-red-50"
+                    >
+                        Видалити профіль
                     </button>
                 </div>
             ) : (

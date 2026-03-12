@@ -533,6 +533,19 @@ public class AccountService(UserManager<AppUser> userManager,
         return ServiceResponse.Success("Profile updated", user);
     }
 
+    public async Task DeleteUserAsync(long userId)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            throw new Exception("Користувача не знайдено");
+
+        var result = await userManager.DeleteAsync(user);
+
+        if (!result.Succeeded)
+            throw new Exception("Помилка при видаленні користувача");
+    }
+
     public sealed class GoogleAccountDto
     {
         public string? Sub { get; set; }

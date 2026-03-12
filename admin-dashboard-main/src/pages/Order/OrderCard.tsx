@@ -2,7 +2,7 @@ import { useState } from "react";
 import { apiOrder } from "../../services/apiOrder";
 import { OrderStatus, OrderResponseDto } from "./types";
 import EnvConfig from "../../config/env";
-//import {useAppSelector} from "../../store";
+import {useAppSelector} from "../../store";
 
 interface OrderCardProps {
     order: OrderResponseDto;
@@ -32,12 +32,23 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         skip: !isExpanded,
     });
     const orderDetails = fullOrder?.payload;
-    console.log("Order details", orderDetails);
+    console.log("Order details", order);
 
-    // const currentUserId = useAppSelector(state => state.auth.user?.id);
+    const currentUserId = useAppSelector(state => state.auth.user?.id);
 
-    // const isBuyer = Number(currentUserId) === order.buyerId;
-    // const isSeller = Number(currentUserId) === order.sellerId;
+    const userId = Number(currentUserId);
+
+    const isBuyer = userId === order.buyerId;
+    const isSeller = userId === order.sellerId;
+
+    console.log({
+        user: currentUserId,
+        buyer: order.buyerId,
+        seller: order.sellerId,
+        isBuyer,
+        isSeller,
+        status: order.status
+    });
 
     const [cancelOrder] = apiOrder.useCancelOrderMutation();
     const [updateStatus] = apiOrder.useUpdateOrderStatusMutation();
@@ -93,79 +104,93 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
     };
 
     const renderActions = () => {
-        // if (order.status === OrderStatus.Pending && isSeller) {
-        //     return (
-        //         <>
-        //             <button onClick={() => handleStatusChange(OrderStatus.Accepted)}>
-        //                 Підтвердити продаж
-        //             </button>
-        //
-        //             <button onClick={() => handleStatusChange(OrderStatus.Rejected)}>
-        //                 Відхилити
-        //             </button>
-        //         </>
-        //     );
-        // }
-        //
-        // if (order.status === OrderStatus.Accepted && isSeller) {
-        //     return (
-        //         <button onClick={() => handleStatusChange(OrderStatus.Shipped)}>
-        //             Підтвердити відправку
-        //         </button>
-        //     );
-        // }
-        //
-        // if (order.status === OrderStatus.Shipped && isBuyer) {
-        //     return (
-        //         <button onClick={() => handleStatusChange(OrderStatus.Completed)}>
-        //             Підтвердити отримання
-        //         </button>
-        //     );
-        // }
-        switch (order.status) {
-
-            case OrderStatus.Pending:
-                return (
-                    <>
-                        <button
-                            onClick={() => handleStatusChange(OrderStatus.Accepted)}
-                            className="px-3 py-1 text-sm border rounded-md bg-green-50 text-green-600"
-                        >
-                            Підтвердити продаж
-                        </button>
-
-                        <button
-                            onClick={() => handleStatusChange(OrderStatus.Rejected)}
-                            className="px-3 py-1 text-sm border rounded-md bg-red-50 text-red-600"
-                        >
-                            Відхилити
-                        </button>
-                    </>
-                );
-
-            case OrderStatus.Accepted:
-                return (
+        if (order.status === OrderStatus.Pending && isSeller) {
+            return (
+                <>
                     <button
-                        onClick={() => handleStatusChange(OrderStatus.Shipped)}
-                        className="px-3 py-1 text-sm border rounded-md bg-blue-50 text-blue-600"
+                        onClick={() => handleStatusChange(OrderStatus.Accepted)}
+                        className="px-3 py-1 text-sm border rounded-md hover:bg-green-50"
                     >
-                        Підтвердити відправку
+                        Підтвердити продаж
                     </button>
-                );
 
-            case OrderStatus.Shipped:
-                return (
                     <button
-                        onClick={() => handleStatusChange(OrderStatus.Completed)}
-                        className="px-3 py-1 text-sm border rounded-md bg-green-50 text-green-600"
+                        onClick={() => handleStatusChange(OrderStatus.Rejected)}
+                        className="px-3 py-1 text-sm border rounded-md hover:bg-red-50"
                     >
-                        Підтвердити отримання
+                        Відхилити
                     </button>
-                );
-
-            default:
-                return null;
+                </>
+            );
         }
+
+        if (order.status === OrderStatus.Accepted && isSeller) {
+            return (
+                <button
+                    onClick={() => handleStatusChange(OrderStatus.Shipped)}
+                    className="px-3 py-1 text-sm border rounded-md hover:bg-blue-50"
+                >
+                    Підтвердити відправку
+                </button>
+            );
+        }
+
+        if (order.status === OrderStatus.Shipped && isBuyer) {
+            return (
+                <button
+                    onClick={() => handleStatusChange(OrderStatus.Completed)}
+                    className="px-3 py-1 text-sm border rounded-md hover:bg-green-50"
+                >
+                    Підтвердити отримання
+                </button>
+            );
+        }
+
+        return null;
+
+        // switch (order.status) {
+        //     case OrderStatus.Pending:
+        //         return (
+        //             <>
+        //                 <button
+        //                     onClick={() => handleStatusChange(OrderStatus.Accepted)}
+        //                     className="px-3 py-1 text-sm border rounded-md bg-green-50 text-green-600"
+        //                 >
+        //                     Підтвердити продаж
+        //                 </button>
+        //
+        //                 <button
+        //                     onClick={() => handleStatusChange(OrderStatus.Rejected)}
+        //                     className="px-3 py-1 text-sm border rounded-md bg-red-50 text-red-600"
+        //                 >
+        //                     Відхилити
+        //                 </button>
+        //             </>
+        //         );
+        //
+        //     case OrderStatus.Accepted:
+        //         return (
+        //             <button
+        //                 onClick={() => handleStatusChange(OrderStatus.Shipped)}
+        //                 className="px-3 py-1 text-sm border rounded-md bg-blue-50 text-blue-600"
+        //             >
+        //                 Підтвердити відправку
+        //             </button>
+        //         );
+        //
+        //     case OrderStatus.Shipped:
+        //         return (
+        //             <button
+        //                 onClick={() => handleStatusChange(OrderStatus.Completed)}
+        //                 className="px-3 py-1 text-sm border rounded-md bg-green-50 text-green-600"
+        //             >
+        //                 Підтвердити отримання
+        //             </button>
+        //         );
+        //
+        //     default:
+        //         return null;
+        // }
     };
 
     const handleStatusChange = async (status: OrderStatus) => {
@@ -238,12 +263,17 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
 
                     {renderActions()}
 
-                    <button
-                        onClick={handleCancel}
-                        className="px-3 py-1 text-sm border rounded-md hover:bg-red-50 text-red-600 transition"
-                    >
-                        Скасувати
-                    </button>
+                    {order.status !== OrderStatus.Completed &&
+                        order.status !== OrderStatus.Canceled &&
+                        order.status !== OrderStatus.Rejected && (
+                            <button
+                                onClick={handleCancel}
+                                className="px-3 py-1 text-sm border rounded-md hover:bg-red-50 text-red-600 transition"
+                            >
+                                Скасувати
+                            </button>
+                        )}
+
                 </div>
             </div>
 

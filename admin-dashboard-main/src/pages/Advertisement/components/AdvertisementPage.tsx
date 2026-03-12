@@ -7,7 +7,6 @@ import {
     useGetUserByIdQuery,
 } from "../../../services/apiUser.ts";
 import AdvertisementGallery from "./AdvertisementGallery.tsx";
-import {createParentDic, findPath} from "../utils/functions.ts";
 import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
 import {useNavigate} from "react-router-dom";
 
@@ -20,6 +19,7 @@ import {
     useRemoveFromFavoritesMutation
 } from "../../../services/apiAccount.ts";
 import {FaHeart, FaPen, FaRegHeart} from "react-icons/fa";
+import CategoryPath from "../../AdvsPage/CategoryPath.tsx";
 
 const AdvertisementPage: React.FC = () => {
 
@@ -89,14 +89,6 @@ const AdvertisementPage: React.FC = () => {
         return <div>Помилка завантаження продукта</div>;
     }
 
-    const parentDictionary = createParentDic(Categories.payload);
-    const listIdPath = findPath(product.categoryId, parentDictionary)
-    const categoryNamesDic = Categories.payload.reduce((acc, cat) => {
-        acc[cat.id] = cat.name;
-        return acc;
-    }, {} as Record<number, string>)
-    const namedPath = listIdPath.map(id => categoryNamesDic[id]).join(" / ");
-
     if (isLoading && isSellerLoading) return <div>Завантаження оголошення...</div>;
     if (error || !product) return <div>Оголошення не знайдено</div>;
 
@@ -131,8 +123,8 @@ const AdvertisementPage: React.FC = () => {
                 <div className="flex gap-8">
                     <div className="flex flex-col gap-4 flex-[2]">
                         {/* BREADCRUMBS */}
-                        <span className="text-sm  h-[24px] flex items-center">
-                            {namedPath}
+                        <span className="text-sm font-light font-inter h-[24px] flex items-center">
+                            <CategoryPath categories={Categories.payload} targetId={product.categoryId} />
                         </span>
 
                         <AdvertisementGallery images={product.images} />
@@ -217,6 +209,7 @@ const AdvertisementPage: React.FC = () => {
                                     ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
                                     : `${EnvConfig.API_URL}/images/noimage.jpeg`
                                     }
+                                    alt={seller?.firstName}
                                 />
                             </div>
                             <div className="text-sm">
