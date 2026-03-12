@@ -9,6 +9,7 @@ namespace WebApi.DAL.Entities
         [Key]
         public override long Id { get; set; }
         public string? ImageUrl { get; set; }
+        public bool IsMain { get; set; }
 
         public long AdvertisementId { get; set; }
         public AdvertisementEntity? Advertisement { get; set; }

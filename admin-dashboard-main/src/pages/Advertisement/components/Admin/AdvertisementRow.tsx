@@ -14,6 +14,7 @@ interface Props {
     onDelete: (id: number) => void;
     onToggleBlock: (id: number) => void;
     onApprove: (id: number) => void;
+
 }
 
 const AdvertisementRow: React.FC<Props> = ({ advertisement, onDelete, onToggleBlock, onApprove }) => {
@@ -25,8 +26,8 @@ const AdvertisementRow: React.FC<Props> = ({ advertisement, onDelete, onToggleBl
         e.currentTarget.src = noImageUrl;
     };
 
-    // Беремо перше фото з масиву (якщо масив є)
-    const firstImage = advertisement.images?.[0] || advertisement.images?.[0] || null;
+    const images = advertisement.images;
+    const mainImg = images?.find(img => img.isMain)?.imageUrl || images?.[0]?.imageUrl;
 
     const blocked = advertisement.isBlocked;
     const approved = advertisement.isApproved;
@@ -42,12 +43,7 @@ const AdvertisementRow: React.FC<Props> = ({ advertisement, onDelete, onToggleBl
                         <Link
                             to={`/advertisement/${advertisement.id}`}>
                             <img
-                                className="h-full w-full object-cover"
-                                src={firstImage
-                                    ? (firstImage.startsWith("http") ? firstImage : `${urlAdImage}200_${firstImage}`)
-                                    : noImageUrl
-                                }
-                                alt={advertisement.name}
+                                src={`${urlAdImage}1200_${mainImg}`}
                                 onError={handleImgError}
                             />
                         </Link>

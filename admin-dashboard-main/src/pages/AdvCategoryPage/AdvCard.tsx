@@ -1,5 +1,5 @@
 import {FC, useState} from "react";
-import {IAdvertisement} from "../Advertisement/types.ts";
+import {IAdvertisement, IAdvertisementImage} from "../Advertisement/types.ts";
 import {HeartFilled, HeartOutlined} from "@ant-design/icons";
 import EnvConfig from "../../config/env.ts";
 
@@ -22,14 +22,18 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
         advertisement.description :
         advertisement.description.slice(0, 250) + '...';
 
+    //Фото
+    const images = advertisement.images as IAdvertisementImage[];
+    const mainImg = images?.find(img => img.isMain)?.imageUrl || images?.[0]?.imageUrl;
+
     return viewMode === "grid" ? (
         <div
             className="flex flex-row justify-center items-center px-5 gap-2.5 w-[232px] h-[345px] bg-[rgba(217,217,217,0.3)] rounded-[5px] flex-none">
             <div className="flex flex-col justify-center items-center gap-1 w-[203px] h-[317px] flex-none">
                 <img
                     src={
-                        advertisement.images?.length
-                            ? `${EnvConfig.API_URL}/images/advertisements/800_${advertisement.images[0]}`
+                        mainImg
+                            ? `${EnvConfig.API_URL}/images/advertisements/800_${mainImg}`
                             : `${EnvConfig.API_URL}/images/noimage.jpeg`
                     }
                     alt={advertisement.name}
@@ -69,8 +73,8 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
             <div className="flex flex-row items-center p-0 gap-[30px] w-[1371px] h-[138px] flex-none">
                 <img
                     src={
-                        advertisement.images?.length
-                            ? `${EnvConfig.API_URL}/images/advertisements/800_${advertisement.images[0]}`
+                        mainImg
+                            ? `${EnvConfig.API_URL}/images/advertisements/800_${mainImg}`
                             : `${EnvConfig.API_URL}/images/noimage.jpeg`
                     }
                     alt={advertisement.name}

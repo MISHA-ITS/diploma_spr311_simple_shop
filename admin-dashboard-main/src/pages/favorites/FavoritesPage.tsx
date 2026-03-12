@@ -19,8 +19,6 @@ const FavoritesPage: React.FC = () => {
 
     if (isLoading) return <div className="p-10 text-center">Завантаження...</div>;
 
-    console.log("FavoritesPage", userData);
-
     const handleDeleteFavorite = async (id:number) => {
         try {
             await removeFromFavorites(id).unwrap();
@@ -58,37 +56,47 @@ const FavoritesPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {favorites.map((ad) => (
-                        <div key={ad.id} className="bg-white rounded-lg overflow-hidden flex flex-col shadow-sm">
-                            {/* Фото та інфо */}
-                            <div className="p-3 flex flex-col gap-2 cursor-pointer" onClick={() => navigate(`/advertisement/${ad.id}`)}>
-                                <div className="h-32 rounded-md overflow-hidden bg-gray-100">
-                                    <img
-                                        src={`${EnvConfig.API_URL}/images/advertisements/1200_${ad.images?.[0]}`}
-                                        className="w-full h-full object-cover"
-                                        alt={ad.name}
-                                    />
-                                </div>
-                                <p className="text-xs text-gray-500 truncate">{ad.name}</p>
-                                <p className="text-sm font-bold text-[#002f34]">{ad.price.toLocaleString()} грн</p>
-                            </div>
+                    {favorites.map((ad) => {
+                        const mainImgUrl = ad.images?.find(img => img.isMain)?.imageUrl;
 
-                            <div className="mt-auto border-t border-gray-100">
-                                <button onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/order/${ad.id}`);
-                                }} className="w-full py-2.5 px-4 flex justify-between items-center text-blue-500 text-xs font-medium hover:bg-blue-50 border-b border-gray-100">
-                                    Купити товар <RiArrowRightLine />
-                                </button>
-                                <button onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteFavorite(ad.id);
-                                }} className="w-full py-2.5 px-4 flex justify-between items-center text-red-500 text-xs font-medium hover:bg-red-50">
-                                    Видалити товар <span className="text-lg">×</span>
-                                </button>
+                        return (
+                            <div key={ad.id} className="bg-white rounded-lg overflow-hidden flex flex-col shadow-sm">
+                                {/* Фото та інфо */}
+                                <div className="p-3 flex flex-col gap-2 cursor-pointer" onClick={() => navigate(`/advertisement/${ad.id}`)}>
+                                    <div className="h-32 rounded-md overflow-hidden bg-gray-100">
+                                        {mainImgUrl ? (
+                                            <img
+                                                src={`${EnvConfig.API_URL}/images/advertisements/1200_${mainImgUrl}`}
+                                                className="w-full h-full object-cover"
+                                                alt={ad.name}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-[10px]">
+                                                Немає фото
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 truncate">{ad.name}</p>
+                                    <p className="text-sm font-bold text-[#002f34]">{ad.price.toLocaleString()} грн</p>
+                                </div>
+
+                                <div className="mt-auto border-t border-gray-100">
+                                    <button onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/order/${ad.id}`);
+                                    }} className="w-full py-2.5 px-4 flex justify-between items-center text-blue-500 text-xs font-medium hover:bg-blue-50 border-b border-gray-100 transition-colors">
+                                        Купити товар <RiArrowRightLine />
+                                    </button>
+                                    <button onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteFavorite(ad.id);
+                                    }} className="w-full py-2.5 px-4 flex justify-between items-center text-red-500 text-xs font-medium hover:bg-red-50 transition-colors">
+                                        Видалити товар <span className="text-lg">×</span>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {favorites.length === 0 && (

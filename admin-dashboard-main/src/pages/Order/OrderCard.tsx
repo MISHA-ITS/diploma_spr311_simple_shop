@@ -16,7 +16,7 @@ const OrderCard = ({ order }: { order: IOrder }) => {
                 className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                 {order.advertisementImage ? (
                     <img
-                        src={`${urlAdImage}/400_${order.advertisementImage}`}
+                        src={`${urlAdImage}/1200_${order.advertisementImage}`}
                         alt={order.advertisementName ?? ""}
                         className="w-full h-full object-cover"
                     />
