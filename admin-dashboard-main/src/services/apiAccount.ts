@@ -7,7 +7,7 @@ import {IUserProfile} from "../types/Account/IUserProfile.ts";
 import {serialize} from "object-to-formdata";
 import {ServiceResponse} from "../types/IServiceResponse.ts";
 import {IAdvertisement} from "../pages/Advertisement/types.ts";
-import {IUserProfileUpdate} from "../types/Account/IUserProfileUpdate.ts";
+import {IUserUpdate} from "../pages/Users/types.ts";
 //import {ILoginRequest, IResponse, IUserCreate} from "../models/account";
 
 interface ApiResponse<T> {
@@ -67,13 +67,23 @@ export const apiAccount = createApi({
             providesTags: ["Account"]
         }),
 
-        updateProfile: builder.mutation<ServiceResponse<IUserProfile>, IUserProfileUpdate>({
+        updateProfile: builder.mutation<ServiceResponse<IUserProfile>, IUserUpdate>({
             query: (data) => {
                 const formData = new FormData();
+
+                formData.append("Email", data.email);
                 formData.append("FirstName", data.firstName);
                 formData.append("LastName", data.lastName);
-                if (data.phoneNumber) formData.append("PhoneNumber", data.phoneNumber);
-                if (data.imageFile) formData.append("Image", data.imageFile);
+
+                if (data.phoneNumber)
+                    formData.append("PhoneNumber", data.phoneNumber);
+
+                data.roles.forEach(role =>
+                    formData.append("Roles", role)
+                );
+
+                if (data.imageFile)
+                    formData.append("Image", data.imageFile);
 
                 return {
                     url: "profile",

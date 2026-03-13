@@ -21,6 +21,8 @@ import {
 import {FaHeart, FaPen, FaRegHeart} from "react-icons/fa";
 import CategoryPath from "../../AdvsPage/CategoryPath.tsx";
 import Loader from "../../../components/Loader.tsx";
+import {IAdvertisement} from "../types.ts";
+import {toast, ToastContainer} from "react-toastify";
 
 const AdvertisementPage: React.FC = () => {
 
@@ -80,6 +82,24 @@ const AdvertisementPage: React.FC = () => {
         checkScroll();
     }, [UserAdverts]);
 
+    useEffect(() => {
+        if (product) {
+            const stored = localStorage.getItem('recentlyViewed');
+            let list: IAdvertisement[] = stored ? JSON.parse(stored) : [];
+
+            // Видаляємо дублікат, якщо він уже був
+            list = list.filter(item => item.id !== product.id);
+
+            // Додаємо новий товар на початок списку
+            list.unshift(product);
+
+            // Залишаємо лише останні, наприклад, 10-20 переглядів
+            list = list.slice(0, 20);
+
+            localStorage.setItem('recentlyViewed', JSON.stringify(list));
+        }
+    }, [product]);
+
 
     if (CategoriesError || !Categories?.payload) {
         return null;
@@ -89,6 +109,10 @@ const AdvertisementPage: React.FC = () => {
     if (error || !product) return null;
 
     const handleFavoriteClick = async () => {
+        if (!User) {
+            toast.info("Будь ласка, увійдіть в акаунт, щоб додати товар у вибрані", {});
+            return;
+        }
 
         if (isAdding || isRemoving) return;
 
@@ -151,11 +175,12 @@ const AdvertisementPage: React.FC = () => {
                                 )}
                                 <div
                                     onClick={handleFavoriteClick}
-                                    className={`cursor-pointer transition-all duration-300 transform  hover:scale-105 
-                                    ${(isAdding || isRemoving) ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+                                    className={`cursor-pointer transition-all duration-300 transform hover:scale-105 
+                                    ${(isAdding || isRemoving) ? 'opacity-50 pointer-events-none' : 'opacity-100'}
+                                    ${!User ? 'grayscale-[0.5]' : ''}`}
                                 >
                                     {isFavorite ? (
-                                        <FaHeart size={30} />
+                                        <FaHeart size={30} color="#ff4f4f" />
                                     ) : (
                                         <FaRegHeart size={30} color="#002f34" />
                                     )}
@@ -184,11 +209,6 @@ const AdvertisementPage: React.FC = () => {
                             <div className="h-12 px-4 rounded-md bg-white flex items-center justify-center text-[#002f34] font-medium text-lg">
                                 {seller?.phoneNumber || "(098) XXX XX XX"}
                             </div>
-
-                            {/* Кнопка Повідомлення */}
-                            <button className="h-12 bg-white text-[#002f34] rounded-md flex items-center justify-center font-medium hover:bg-gray-50 transition-colors text-lg">
-                                Повідомлення
-                            </button>
                         </div>
 
                         {/* SELLER */}
@@ -316,6 +336,7 @@ const AdvertisementPage: React.FC = () => {
                                 </div>
                             );
                         })}
+                        <ToastContainer position="bottom-right" autoClose={3000} />
                     </div>
                 </div>
             </div>

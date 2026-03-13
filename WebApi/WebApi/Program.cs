@@ -185,7 +185,11 @@ app.UseCors(opt =>
     opt.AllowAnyHeader()
        .AllowAnyMethod()
        .AllowCredentials()
-       .WithOrigins(builder.Configuration["ClientAppUrl"]!);
+       .WithOrigins(
+           "http://www.sellix.somee.com",
+           "http://sellix.somee.com",
+           "http://localhost:5173"
+       );
 });
 
 // Configure the HTTP request pipeline.
