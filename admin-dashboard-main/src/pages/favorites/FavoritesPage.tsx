@@ -140,17 +140,11 @@ const FavoritesPage: React.FC = () => {
                     })}
                 </div>
 
-                {/* EMPTY STATE */}
-                {displayItems.length === 0 && (
+                {((activeTab === 'favorites' && favorites.length === 0) ||
+                    (activeTab === 'recent' && recentViewed.length === 0)) && (
                     <div className="flex flex-col items-center mt-20 text-gray-400">
-                        <div className="opacity-20 mb-4"><IoStatsChart size={100}/></div>
-                        <p className="text-lg font-medium">Тут порожньо :(</p>
-                        <button
-                            onClick={() => navigate('/')}
-                            className="mt-4 text-blue-500 hover:underline text-sm"
-                        >
-                            Перейти до покупок
-                        </button>
+                        <div className="text-6xl mb-4"><IoStatsChart size={100} /></div>
+                        <p className="text-lg">Тут порожньо :(</p>
                     </div>
                 )}
             </div>
