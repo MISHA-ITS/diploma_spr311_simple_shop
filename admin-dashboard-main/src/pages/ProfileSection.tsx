@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 interface Props {
     user: IUserProfile;
-    refetch: () => void;
 }
 
 const confirmDeleteToast = (onConfirm: () => void) => {
@@ -46,9 +45,9 @@ const confirmDeleteToast = (onConfirm: () => void) => {
     );
 };
 
-const ProfileSection = ({ user, refetch }: Props) => {
+const ProfileSection = ({ user }: Props) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [updateUser, { isLoading }] = useUpdateProfileMutation();
+    const [updateProfile, { isLoading }] = useUpdateProfileMutation();
     const [deleteProfile] = useDeleteProfileMutation();
 
     const [formState, setFormState] = useState<IUserUpdate>({
@@ -99,26 +98,13 @@ const ProfileSection = ({ user, refetch }: Props) => {
 
     const handleSave = async () => {
         try {
-            const data = new FormData();
+            await updateProfile({
+                firstName: formState.firstName,
+                lastName: formState.lastName,
+                phoneNumber: formState.phoneNumber,
+                imageFile: formState.imageFile
+            }).unwrap();
 
-            // ⚠ Назви повинні співпадати з DTO бекенду
-            data.append("Email", formState.email);
-            data.append("FirstName", formState.firstName);
-            data.append("LastName", formState.lastName);
-            data.append("PhoneNumber", formState.phoneNumber ?? "");
-
-            formState.roles.forEach(role =>
-                data.append("Roles", role)
-            );
-
-            if (formState.imageFile) {
-                data.append("Image", formState.imageFile);
-            }
-
-            await updateUser(data).unwrap();
-
-            refetch();
-            setIsEditing(false);
         } catch (error) {
             console.error("Update error:", error);
         }
