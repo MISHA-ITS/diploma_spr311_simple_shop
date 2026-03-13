@@ -13,8 +13,6 @@ type AdvListProps = {
 };
 
 export const AdvList: FC<AdvListProps> = ({ viewMode, advs, filter, totalCount, onPageChange }) => {
-    console.log(viewMode, advs, filter, totalCount, onPageChange)
-
     return (
         <>
             <AdvSection viewMode={viewMode} advertisements={advs}/>
@@ -26,6 +24,4 @@ export const AdvList: FC<AdvListProps> = ({ viewMode, advs, filter, totalCount, 
             />
         </>
         )
-
-
 };
