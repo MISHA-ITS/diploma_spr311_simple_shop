@@ -20,6 +20,7 @@ const AdvsPage: FC = () => {
         const saved = getLocalStorage("advsViewMode");
         return saved === "list" ? "list" : "grid";
     });
+    const [isSearchLoading, setIsSearchLoading] = useState(false);
 
     // Запити
     const { data: categoryData, isLoading: categoryLoad, error: categoryError } = useGetCategoryByIdQuery(categoryId ?? "", {
@@ -42,9 +43,8 @@ const AdvsPage: FC = () => {
     };
 
     if (categoryError || advError || allCategoriesError) return <Navigate to="/" replace />;
-    if (categoryLoad || advLoad || allCategoriesLoading) return <Loader />;
 
-    console.log(advs)
+    const shouldShowLoader = allCategoriesLoading || isSearchLoading || categoryLoad || advLoad;
 
     return (
         <>
@@ -54,44 +54,52 @@ const AdvsPage: FC = () => {
                     onSearchChange={(searchWords) => updateFilter({ search: searchWords }, { resetPage: true })}
                     settlementRef={filter.settlementRef}
                     onSettlementChange={(settlement) => updateFilter({ settlementRef: settlement ? settlement.ref : null }, { resetPage: true })}
+                    onLoadingChange={setIsSearchLoading}
                 />
-
-                {!isOpenFilters && (
-                    <AdvsHeader
-                        filter={filter}
-                        allCategories={allCategories}
-                    />
-                )}
-
-                <AdvFilterBar
-                    countAdvs={advData?.payload.totalCount ?? 0}
-                    viewMode={viewMode}
-                    onViewModeChange={handleViewModeChange}
-                    isOpenFilters={isOpenFilters}
-                    onToggleFilters={() => setIsOpenFilters(prev => !prev)}
-                    category={category}
-                    onCategoryChange={(childId) => updateFilter({ categoryId: childId }, { resetPage: true, navigateCategory: true})}
-                    dateFrom={filter.date}
-                    onDateChange={(fromDate) => updateFilter({ date: fromDate }, { resetPage: true})}
-                />
-
-                {isOpenFilters ? (
-                    <FiltersWindow
-                        filter={filter}
-                        onApply={updateFilter}
-                    />
+                {shouldShowLoader ? (
+                    <div className="flex justify-center items-center w-full mt-10">
+                        <Loader />
+                    </div>
                 ) : (
+                    <>
+                        {!isOpenFilters && (
+                            <AdvsHeader
+                                filter={filter}
+                                allCategories={allCategories}
+                            />
+                        )}
 
-                    <AdvList
-                        viewMode={viewMode}
-                        advs={advs}
-                        filter={filter}
-                        totalCount={advData?.payload.totalCount ?? 0}
-                        onPageChange={(page) => {
-                            updateFilter({ pageNumber: page });
-                            window.scrollTo({ top: 0, behavior: "auto"});
-                        }}
-                    />
+                        <AdvFilterBar
+                            countAdvs={advData?.payload.totalCount ?? 0}
+                            viewMode={viewMode}
+                            onViewModeChange={handleViewModeChange}
+                            isOpenFilters={isOpenFilters}
+                            onToggleFilters={() => setIsOpenFilters(prev => !prev)}
+                            category={category}
+                            onCategoryChange={(childId) => updateFilter({ categoryId: childId }, { resetPage: true, navigateCategory: true})}
+                            dateFrom={filter.date}
+                            onDateChange={(fromDate) => updateFilter({ date: fromDate }, { resetPage: true})}
+                        />
+
+                        {isOpenFilters ? (
+                            <FiltersWindow
+                                filter={filter}
+                                onApply={updateFilter}
+                            />
+                        ) : (
+
+                            <AdvList
+                                viewMode={viewMode}
+                                advs={advs}
+                                filter={filter}
+                                totalCount={advData?.payload.totalCount ?? 0}
+                                onPageChange={(page) => {
+                                    updateFilter({ pageNumber: page });
+                                    window.scrollTo({ top: 0, behavior: "auto"});
+                                }}
+                            />
+                        )}
+                    </>
                 )}
             </div>
         </>

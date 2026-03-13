@@ -20,6 +20,7 @@ import {
 } from "../../../services/apiAccount.ts";
 import {FaHeart, FaPen, FaRegHeart} from "react-icons/fa";
 import CategoryPath from "../../AdvsPage/CategoryPath.tsx";
+import Loader from "../../../components/Loader.tsx";
 
 const AdvertisementPage: React.FC = () => {
 
@@ -84,13 +85,8 @@ const AdvertisementPage: React.FC = () => {
         return null;
     }
 
-    console.log(product);
-    if (!product){
-        return <div>Помилка завантаження продукта</div>;
-    }
-
-    if (isLoading && isSellerLoading) return <div>Завантаження оголошення...</div>;
-    if (error || !product) return <div>Оголошення не знайдено</div>;
+    if (isLoading && isSellerLoading) return <Loader />;
+    if (error || !product) return null;
 
     const handleFavoriteClick = async () => {
 
