@@ -47,7 +47,7 @@ const confirmDeleteToast = (onConfirm: () => void) => {
 
 const ProfileSection = ({ user }: Props) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [updateUser, { isLoading }] = useUpdateProfileMutation();
+    const [updateProfile, { isLoading }] = useUpdateProfileMutation();
     const [deleteProfile] = useDeleteProfileMutation();
 
     const [formState, setFormState] = useState<IUserUpdate>({
