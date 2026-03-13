@@ -1,10 +1,13 @@
-import {FC} from "react";
+import {FC, useState} from "react";
 import rowsDisable from "../../icons/RowsDisable.png"
 import blockEnable from "../../icons/BlocksEnable.png"
 import blockDisable from "../../icons/BlocksDisable.png"
 import rowsEnable from "../../icons/RowsEnable.png"
-import moreIcon from "../../icons/More.png"
 import FiltersToggleButton from "./FiltersToggleButton.tsx";
+import CategoryChildsDropDown from "./CategoryChildsDropDown.tsx";
+import {ICategory} from "../../models/category.ts";
+import DateDropDown from "./DateDropDown.tsx";
+import {DateFilter} from "./types.ts";
 
 type AdvFilterBarProps = {
     countAdvs: number;
@@ -12,10 +15,15 @@ type AdvFilterBarProps = {
     onViewModeChange: (mode: 'grid' | 'list') => void;
     isOpenFilters: boolean;
     onToggleFilters: () => void;
-
+    category: ICategory | null;
+    onCategoryChange: (childCategory: number | null) => void;
+    dateFrom?: DateFilter | null;
+    onDateChange: (dateFrom: DateFilter | null) => void;
 }
 
-const AdvFilterBar: FC<AdvFilterBarProps> = ({countAdvs, viewMode, onViewModeChange, onToggleFilters, isOpenFilters}) => {
+const AdvFilterBar: FC<AdvFilterBarProps> = ({countAdvs, viewMode, onViewModeChange, onToggleFilters, isOpenFilters, category, onCategoryChange, dateFrom, onDateChange}) => {
+    const [openDropdown, setOpenDropdown] = useState<"date" | "category" | null>(null);
+
     return (
         <div className="flex flex-col gap-8 w-full max-w-[1428px] mt-5">
             {!isOpenFilters &&
@@ -27,26 +35,24 @@ const AdvFilterBar: FC<AdvFilterBarProps> = ({countAdvs, viewMode, onViewModeCha
             }
 
             <div className="flex items-center justify-between w-full max-w-[1428px] h-[48px]">
-                <div className="flex items-center gap-[40px] w-[547px] h-[48px] shrink-0">
+                <div className="flex items-center justify-between gap-[35px] h-[48px] shrink-0">
                     <FiltersToggleButton onToggle={onToggleFilters} isOpen={isOpenFilters} />
 
                     {!isOpenFilters && (
                         <>
-                            <button className="flex justify-center items-center px-3 py-3 gap-6 w-[146px] h-[48px] border-2 border-[rgba(0,23,72,0.58)] rounded-[5px]">
-                                <span className="font-inter font-normal text-[16px] leading-[19px] text-[rgba(7,23,57,0.5)]">
-                                    Категорія
-                                </span>
+                            <CategoryChildsDropDown
+                                category={category}
+                                isOpen={openDropdown === "date"}
+                                onToggle={() => setOpenDropdown(prev => prev === "date" ? null : "date")}
+                                onChangeCategory={onCategoryChange}
+                            />
 
-                                <img src={moreIcon} alt="More" />
-                            </button>
-
-                            <button className="flex justify-center items-center px-4 py-3 gap-6 w-[181px] h-[48px] border-2 border-[rgba(0,23,72,0.58)] rounded-[5px]">
-                                <span className="font-inter font-normal text-[16px] leading-[19px] text-[rgba(7,23,57,0.5)] shrink-0">
-                                    Час публікації
-                                </span>
-
-                                <img src={moreIcon} alt="More" />
-                            </button>
+                            <DateDropDown
+                                date={dateFrom}
+                                isOpen={openDropdown === "category"}
+                                onToggle={() => setOpenDropdown(prev => prev === "category" ? null : "category")}
+                                onDateChange={onDateChange}
+                            />
                         </>
                     )}
                 </div>

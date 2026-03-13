@@ -40,6 +40,14 @@ export const apiUser = createApi({
             }),
             providesTags: ['User']
         }),
+        updateUserRole: builder.mutation<void, { userId: number; role: string }>({
+            query: ({ userId, role }) => ({
+                url: `/users/${userId}/role`,
+                method: "PUT",
+                body: { role }
+            }),
+            invalidatesTags: ["User"]
+        }),
 
         // updateUser: builder.mutation<IUserProfile, FormData>({
         //     query: (data) => ({
@@ -117,4 +125,5 @@ export const {
     useLockUserMutation,
     useUnlockUserMutation,
     useGetUserByIdQuery,
+    useUpdateUserRoleMutation,
 } = apiUser;

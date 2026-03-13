@@ -2,16 +2,54 @@ import { useEffect, useState } from "react";
 import { IUserProfile } from "../types/Account/IUserProfile";
 import { IUserUpdate } from "./Users/types";
 import EnvConfig from "../config/env";
-import {useUpdateProfileMutation} from "../services/apiAccount.ts";
+import {useDeleteProfileMutation, useUpdateProfileMutation} from "../services/apiAccount.ts";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Props {
     user: IUserProfile;
     refetch: () => void;
 }
 
+const confirmDeleteToast = (onConfirm: () => void) => {
+    toast(
+        ({ closeToast }) => (
+            <div className="flex flex-col gap-3">
+                <p className="font-medium">
+                    Ви впевнені що хочете видалити профіль?
+                </p>
+
+                <div className="flex gap-2 justify-end">
+                    <button
+                        className="px-3 py-1 bg-gray-200 rounded"
+                        onClick={closeToast}
+                    >
+                        Скасувати
+                    </button>
+
+                    <button
+                        className="px-3 py-1 bg-red-600 text-white rounded"
+                        onClick={() => {
+                            closeToast?.();
+                            onConfirm();
+                        }}
+                    >
+                        Видалити
+                    </button>
+                </div>
+            </div>
+        ),
+        {
+            autoClose: false,
+            closeOnClick: false
+        }
+    );
+};
+
 const ProfileSection = ({ user, refetch }: Props) => {
     const [isEditing, setIsEditing] = useState(false);
     const [updateUser, { isLoading }] = useUpdateProfileMutation();
+    const [deleteProfile] = useDeleteProfileMutation();
 
     const [formState, setFormState] = useState<IUserUpdate>({
         id: user.id,
@@ -92,6 +130,25 @@ const ProfileSection = ({ user, refetch }: Props) => {
         return new Date(`${year}-${month}-${day}`).toLocaleDateString("uk-UA");
     };
 
+    const handleDeleteProfile = () => {
+
+        confirmDeleteToast(async () => {
+            try {
+                await deleteProfile().unwrap();
+
+                toast.success("Профіль видалено");
+
+                localStorage.removeItem("token");
+
+                window.location.href = "/";
+            } catch (error) {
+                console.error(error);
+                toast.error("Помилка видалення профілю");
+            }
+        });
+
+    };
+
     return (
         <div className="max-w-md mx-auto border rounded-xl p-8 shadow-sm bg-white min-h-[500px] flex flex-col justify-between">
             {!isEditing ? (
@@ -127,6 +184,13 @@ const ProfileSection = ({ user, refetch }: Props) => {
                         className="px-6 py-2 border rounded-lg hover:bg-gray-100"
                     >
                         Редагувати профіль
+                    </button>
+
+                    <button
+                        onClick={handleDeleteProfile}
+                        className="px-6 py-2 border-3 border-red-500 text-red-500 rounded-lg hover:bg-red-50"
+                    >
+                        Видалити профіль
                     </button>
                 </div>
             ) : (
@@ -227,6 +291,18 @@ const ProfileSection = ({ user, refetch }: Props) => {
                     </form>
                 </>
             )}
+            <ToastContainer
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 };

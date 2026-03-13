@@ -12,6 +12,8 @@ import {loginSuccess} from "../../store/authSlice.ts";
 import {useDispatch} from "react-redux";
 import {useAppSelector} from "../../store";
 import {IUserCreate} from "../../types/IUserCreate.ts";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 //import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
 
 const userInitState: IUserCreate = {
@@ -78,6 +80,7 @@ export default function SignUpForm() {
 
       if (res.isSuccess) {
           dispatch(loginSuccess(res.payload));
+          toast.success("Підтвердьте email");
           navigate("/signin");
       } else {
           setError(res.message);
@@ -85,6 +88,7 @@ export default function SignUpForm() {
 
     } catch {
           setError("Помилка реєстрації");
+          toast.error("Помилка реєстрації");
     }
   };
 
@@ -503,6 +507,18 @@ export default function SignUpForm() {
             </div>
           </div>
         </div>
+        <ToastContainer
+            position="bottom-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+        />
       </div>
     );
 }

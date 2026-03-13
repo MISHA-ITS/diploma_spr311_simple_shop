@@ -8,7 +8,8 @@ import {
     useGetAllListQuery,
     useDeleteUserMutation,
     useLockUserMutation,
-    useUnlockUserMutation
+    useUnlockUserMutation,
+    useUpdateUserMutation
 } from "../../services/apiUser";
 
 import { IUserItem } from "./types";
@@ -44,7 +45,7 @@ const UsersList: React.FC = () => {
     const [deleteUser] = useDeleteUserMutation();
     const [lockUser] = useLockUserMutation();
     const [unlockUser] = useUnlockUserMutation();
-
+    const [updateUser] = useUpdateUserMutation();
 
     const handleToggleLock = async (user: IUserItem) => {
         const isLocked =
@@ -57,22 +58,44 @@ const UsersList: React.FC = () => {
                 await lockUser(user.id).unwrap();
             }
 
-            alert(
-                `Користувача ${
-                    user.fullName ?? `${user.firstName} ${user.lastName}`
-                } ${isLocked ? "розблоковано" : "заблоковано"}`
-            );
+            // alert(
+            //     `Користувача ${
+            //         user.fullName ?? `${user.firstName} ${user.lastName}`
+            //     } ${isLocked ? "розблоковано" : "заблоковано"}`
+            // );
         } catch {
-            alert("Помилка при зміні статусу");
+            // alert("Помилка при зміні статусу");
         }
     };
 
     const handleDeleteUser = async (id: number) => {
-        if (!confirm("Видалити користувача?")) return;
+        // if (!confirm("Видалити користувача?")) return;
         try {
             await deleteUser(id).unwrap();
         } catch {
-            alert("Помилка при видаленні");
+            // alert("Помилка при видаленні");
+        }
+    };
+
+    const handleChangeRole = async (user: IUserItem, role: string) => {
+
+        // const ok = confirm(`Змінити роль користувача на ${role}?`);
+        // if (!ok) return;
+
+        try {
+
+            await updateUser({
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                roles: [role],
+                imageFile: null
+            }).unwrap();
+
+        } catch {
+            alert("Помилка зміни ролі");
         }
     };
 
@@ -134,6 +157,7 @@ const UsersList: React.FC = () => {
                                 }
                                 onDeleteUser={handleDeleteUser}
                                 onToggleLock={handleToggleLock}
+                                onChangeRole={handleChangeRole}
                             />
                         ))}
                         </tbody>
@@ -153,6 +177,7 @@ const UsersList: React.FC = () => {
                             }
                             onDeleteUser={handleDeleteUser}
                             onToggleLock={handleToggleLock}
+                            onChangeRole={handleChangeRole}
                         />
                     ))}
                 </UsersCard>

@@ -7,7 +7,6 @@ import {
     useGetUserByIdQuery,
 } from "../../../services/apiUser.ts";
 import AdvertisementGallery from "./AdvertisementGallery.tsx";
-import {createParentDic, findPath} from "../utils/functions.ts";
 import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
 import {useNavigate} from "react-router-dom";
 
@@ -20,6 +19,7 @@ import {
     useRemoveFromFavoritesMutation
 } from "../../../services/apiAccount.ts";
 import {FaHeart, FaPen, FaRegHeart} from "react-icons/fa";
+import CategoryPath from "../../AdvsPage/CategoryPath.tsx";
 
 const AdvertisementPage: React.FC = () => {
 
@@ -89,14 +89,6 @@ const AdvertisementPage: React.FC = () => {
         return <div>Помилка завантаження продукта</div>;
     }
 
-    const parentDictionary = createParentDic(Categories.payload);
-    const listIdPath = findPath(product.categoryId, parentDictionary)
-    const categoryNamesDic = Categories.payload.reduce((acc, cat) => {
-        acc[cat.id] = cat.name;
-        return acc;
-    }, {} as Record<number, string>)
-    const namedPath = listIdPath.map(id => categoryNamesDic[id]).join(" / ");
-
     if (isLoading && isSellerLoading) return <div>Завантаження оголошення...</div>;
     if (error || !product) return <div>Оголошення не знайдено</div>;
 
@@ -131,8 +123,8 @@ const AdvertisementPage: React.FC = () => {
                 <div className="flex gap-8">
                     <div className="flex flex-col gap-4 flex-[2]">
                         {/* BREADCRUMBS */}
-                        <span className="text-sm  h-[24px] flex items-center">
-                            {namedPath}
+                        <span className="text-sm font-light font-inter h-[24px] flex items-center">
+                            <CategoryPath categories={Categories.payload} targetId={product.categoryId} />
                         </span>
 
                         <AdvertisementGallery images={product.images} />
@@ -152,11 +144,7 @@ const AdvertisementPage: React.FC = () => {
 
                     {/* PRICE */}
                         <div className="bg-[#dae5f9] rounded-lg p-6 flex flex-col gap-4 relative">
-
-                            {/* Контейнер для іконок дій (справа зверху) */}
                             <div className="absolute top-6 right-6 flex items-center gap-4">
-
-                                {/* РЕДАГУВАННЯ: Показуємо тільки власнику */}
                                 {isSeller && (
                                     <div
                                         onClick={() => navigate(`/edit-advertisement/${product.id}`)}
@@ -165,8 +153,6 @@ const AdvertisementPage: React.FC = () => {
                                         <FaPen size={28} color="#002f34" />
                                     </div>
                                 )}
-
-                                {/* Сердечко */}
                                 <div
                                     onClick={handleFavoriteClick}
                                     className={`cursor-pointer transition-all duration-300 transform  hover:scale-105 
@@ -180,7 +166,7 @@ const AdvertisementPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Назва (збільшив відступ pr-14, щоб текст не наліз на іконки) */}
+                            {/* Назва */}
                             <span className="text-2xl font-medium text-[#002f34] pr-14">
                                 {product.name || "Продам кавоварку"}
                             </span>
@@ -217,6 +203,7 @@ const AdvertisementPage: React.FC = () => {
                                     ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
                                     : `${EnvConfig.API_URL}/images/noimage.jpeg`
                                     }
+                                    alt={seller?.firstName}
                                 />
                             </div>
                             <div className="text-sm">
@@ -293,38 +280,46 @@ const AdvertisementPage: React.FC = () => {
                         className="flex gap-4 overflow-x-auto pb-4 pt-2 scrollbar-hide snap-x snap-mandatory"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                        {UserAdverts?.payload?.map((ad) => (
-                            <div
-                                key={ad.id}
-                                onClick={() => navigate(`/advertisement/${ad.id}`)}
-                                // ДОДАНО: w-[218px] та flex-shrink-0
-                                className="w-[218px] flex-shrink-0 snap-start hover:scale-102 rounded-lg overflow-hidden transition-all cursor-pointer flex flex-col"
-                            >
-                                <div className="h-[170px] w-full overflow-hidden rounded-lg">
-                                    {ad.images?.[0] ? (
-                                        <img
-                                            src={`${EnvConfig.API_URL}/images/advertisements/1200_${ad.images[0]}`}
-                                            alt={ad.name}
-                                            className="w-full h-full object-cover transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                                            Немає фото
-                                        </div>
-                                    )}
-                                </div>
+                        {UserAdverts?.payload?.map((ad) => {
+                            // Знаходимо головне фото або беремо перше з масиву
+                            const mainImgUrl = ad.images.find(img => img.isMain)?.imageUrl || ad.images[0]?.imageUrl;
 
-                                {/* ІНФО */}
-                                <div className="p-4 flex flex-col gap-2">
-                                    <span className="text-[#002f34] font-semibold text-lg truncate">
-                                        {ad.name}
-                                    </span>
-                                    <span className="text-[#002f34] font-bold text-xl">
-                                        {ad.price} грн
-                                    </span>
+                            return (
+                                <div
+                                    key={ad.id}
+                                    onClick={() => {
+                                        navigate(`/advertisement/${ad.id}`);
+                                        window.scrollTo(0, 0); // Щоб сторінка відкрилася зверху
+                                    }}
+                                    className="w-[218px] flex-shrink-0 snap-start hover:scale-102 rounded-lg overflow-hidden transition-all cursor-pointer flex flex-col group"
+                                >
+                                    {/* ФОТО */}
+                                    <div className="h-[170px] w-full overflow-hidden rounded-lg bg-gray-100">
+                                        {mainImgUrl ? (
+                                            <img
+                                                src={`${EnvConfig.API_URL}/images/advertisements/1200_${mainImgUrl}`}
+                                                alt={ad.name}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                                                Немає фото
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* ІНФО */}
+                                    <div className="p-4 flex flex-col gap-2">
+                                        <span className="text-[#002f34] font-semibold text-lg truncate">
+                                            {ad.name}
+                                        </span>
+                                        <span className="text-[#002f34] font-bold text-xl">
+                                            {ad.price} грн
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>

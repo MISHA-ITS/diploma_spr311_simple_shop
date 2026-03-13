@@ -4,6 +4,9 @@ export interface IAdvFilter {
     search: string | null;
     minPrice: number | null;
     maxPrice: number | null;
+    date: DateFilter | null;
+
+    active: boolean | null;
 
     sortBy: "date" | "price" | null;
     order: "asc" | "desc" | null;
@@ -11,3 +14,13 @@ export interface IAdvFilter {
     pageNumber: number;
     pageSize: number;
 }
+
+export type DateFilter = "today" | "week" | "month";
+
+export type UpdateOptions = {
+    resetPage?: boolean;
+    navigateCategory?: boolean;
+    closeFilters?: boolean;
+}
+
+export type ViewMode = 'grid' | 'list';

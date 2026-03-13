@@ -1,24 +1,24 @@
 import {FC, useEffect, useState} from "react";
 import {useGetCategoriesWithCountsQuery} from "../../services/apiCategory.ts";
 import CategoryFilterItem from "./CategoryFilterItem.tsx";
-import {IAdvFilter} from "./types.ts";
+import {IAdvFilter, UpdateOptions} from "./types.ts";
 import {Checkbox} from "antd";
+import Loader from "../../components/Loader.tsx";
 
 type FiltersWindowProps = {
-    categoryId: number | null;
-    filter: Omit<IAdvFilter, 'categoryId'>;
-    onApply: (updatedFilter: IAdvFilter) => void;
+    filter: IAdvFilter;
+    onApply: (updatedFilter: Partial<IAdvFilter>, options?: UpdateOptions) => void;
 }
 
-const FiltersWindow: FC<FiltersWindowProps> = ({categoryId, filter, onApply}) => {
+const FiltersWindow: FC<FiltersWindowProps> = ({filter, onApply}) => {
     const { data: categoriesAdvsCountData, isLoading:categoriesAdvsCountLoad, error:categoriesAdvsCountError } = useGetCategoriesWithCountsQuery();
     const categoriesAdvsCount = categoriesAdvsCountData?.payload ?? [];
 
-    const [localFilter, setLocalFilter] = useState({ ...filter, categoryId });
+    const [localFilter, setLocalFilter] = useState(filter);
 
     useEffect(() => {
-        setLocalFilter({ ...filter, categoryId });
-    }, [categoryId, filter]);
+        setLocalFilter(filter);
+    }, [filter]);
 
     const handleCategoryClick = (id: number | null) => {
         setLocalFilter(prev => ({ ...prev, categoryId: id }));
@@ -26,23 +26,21 @@ const FiltersWindow: FC<FiltersWindowProps> = ({categoryId, filter, onApply}) =>
 
     const handleApply = () => {
         console.log(localFilter)
-        onApply(localFilter);
+        onApply(localFilter, {resetPage: true, closeFilters: true, navigateCategory: true});
     }
 
     const handleReset = () => {
         const resetFilter: IAdvFilter = {
-            search: filter.search,
-            settlementRef: filter.settlementRef,
+            ...filter,
             categoryId: null,
             minPrice: null,
             maxPrice: null,
             sortBy: null,
             order: null,
-            pageNumber: 1,
-            pageSize: filter.pageSize
+            pageNumber: 1
         };
         setLocalFilter(resetFilter);
-        onApply(resetFilter);
+        onApply(resetFilter, {resetPage: true, closeFilters: true, navigateCategory: true});
     };
 
 
@@ -50,7 +48,7 @@ const FiltersWindow: FC<FiltersWindowProps> = ({categoryId, filter, onApply}) =>
         return localFilter.sortBy === sortBy && localFilter.order === order;
     };
 
-    if (categoriesAdvsCountLoad) return <div>Loading...</div>;
+    if (categoriesAdvsCountLoad) return <Loader />;
     if (categoriesAdvsCountError) return <div>Error</div>;
 
     return (

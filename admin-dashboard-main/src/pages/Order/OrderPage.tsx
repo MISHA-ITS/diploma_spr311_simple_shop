@@ -12,6 +12,8 @@ import { useParams } from "react-router-dom";
 import {useGetAdvertisementByIdQuery} from "../../services/apiAdvertisement.ts";
 import EnvConfig from "../../config/env.ts";
 import { useNavigate } from "react-router-dom";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type DeliveryMethod = "nova_poshta" | "courier";
 
@@ -33,6 +35,9 @@ const OrderPage = () => {
         useGetAdvertisementByIdQuery(advertisementId, {
             skip: !advertisementId,
         });
+
+    const mainImg = advertisement?.payload?.images?.find(img => img.isMain)?.imageUrl
+        || advertisement?.payload?.images?.[0]?.imageUrl;
 
     console.log("ADVERTISEMENT:", advertisement);
 
@@ -198,11 +203,16 @@ const OrderPage = () => {
 
         try {
             await createOrder(orderPayload).unwrap();
-            alert("Замовлення створено успішно!");
-            navigate(`/advertisement/${advertisementId}`);
+            toast.success("Замовлення створено успішно!");
+            //alert("Замовлення створено успішно!");
+            setTimeout(() => {
+                navigate("/profile?tab=sellixDelivery");
+            }, 4000);
+            //navigate("/profile");
         } catch (error) {
             console.error(error);
-            alert("Помилка при створенні замовлення");
+            //alert("Помилка при створенні замовлення");
+            toast.error("Помилка при створенні замовлення!");
         }
     };
 
@@ -243,17 +253,19 @@ const OrderPage = () => {
                             {/*/>*/}
 
                             {/* IMAGE */}
-                            {advertisement.payload.images?.length > 0 ? (
-                                <img
-                                    src={`${urlAdImage}/400_${advertisement.payload.images[0]}`}
-                                    alt={advertisement.payload.name}
-                                    className="w-36 h-36 object-cover rounded-lg"
-                                />
-                            ) : (
-                                <div className="w-36 h-36 flex items-center justify-center rounded-lg border text-xs text-gray-400 bg-gray-100">
-                                    Немає фото
-                                </div>
-                            )}
+                            <div className="w-32 h-32 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden border">
+                                {mainImg ? (
+                                    <img
+                                        src={`${urlAdImage}/400_${mainImg}`}
+                                        alt={advertisement.payload.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-36 h-36 flex items-center justify-center rounded-lg border text-xs text-gray-400 bg-gray-100">
+                                        Немає фото
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="flex flex-col p-2 justify-between">
                                 <div>
@@ -551,6 +563,18 @@ const OrderPage = () => {
                     </div>
                 </div>
             </div>
+            <ToastContainer
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 };

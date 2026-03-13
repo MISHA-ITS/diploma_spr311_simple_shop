@@ -34,9 +34,11 @@ namespace WebApi.BLL.Services.Advertisement
 
             if (dto.Images != null)
             {
-                foreach (var image in dto.Images)
+                for (int i = 0; i < dto.Images.Count; i++)
                 {
+                    var image = dto.Images[i];
                     string? imageName = await imageService.SaveImageAsync(image, Settings.AdvertisementsDir);
+
                     if (string.IsNullOrEmpty(imageName))
                     {
                         logger.LogError("Failed to save one of the images for advertisement {advertisementName}", dto.Name);
@@ -45,9 +47,14 @@ namespace WebApi.BLL.Services.Advertisement
 
                     entity.Images.Add(new AdvertisementImageEntity
                     {
-                        ImageUrl = imageName
+                        ImageUrl = imageName,
+                        // ПЕРЕВІРКА: якщо i збігається з вибраним індексом з фронтенду
+                        // Якщо з фронта нічого не прийшло (0), то перше фото за замовчуванням стане головним
+                        IsMain = (i == dto.MainImageIndex)
                     });
-                    logger.LogInformation("Saved image {ImageName} for advertisement {advertisementName}", imageName, dto.Name);
+
+                    logger.LogInformation("Saved image {ImageName} (Main: {IsMain}) for advertisement {advertisementName}",
+                        imageName, i == dto.MainImageIndex, dto.Name);
                 }
             }
 
@@ -93,8 +100,17 @@ namespace WebApi.BLL.Services.Advertisement
             {
                 var entity = pagedEntities.First(e => e.Id == dto.Id);
 
+                if (dto.Images != null && dto.Images.Any())
+                {
+                    dto.Images = dto.Images
+                        .OrderByDescending(img => img.IsMain)
+                        .ToList();
+                }
+
                 if (!string.IsNullOrEmpty(entity.SettlementRef))
+                {
                     dto.Settlement = await newPostService.GetSettlement(entity.SettlementRef);
+                }
             }
 
             var pagedResponse = new PagedResponse<AdvertisementDTO>
@@ -119,6 +135,7 @@ namespace WebApi.BLL.Services.Advertisement
             if (entity == null)
                 return ServiceResponse.Error($"advertisement with Id {id} not found");
 
+            entity.Images = entity.Images.OrderByDescending(img => img.IsMain).ToList();
             var dto = mapper.Map<AdvertisementDTO>(entity);
 
             dto.Settlement = entity.SettlementRef != null
@@ -172,9 +189,18 @@ namespace WebApi.BLL.Services.Advertisement
                     string imageName = await imageService.SaveImageAsync(file, Settings.AdvertisementsDir);
                     if (!string.IsNullOrEmpty(imageName))
                     {
-                        entity.Images.Add(new AdvertisementImageEntity { ImageUrl = imageName });
+                        entity.Images.Add(new AdvertisementImageEntity
+                        {
+                            ImageUrl = imageName,
+                            IsMain = false // Тимчасово false, оновимо нижче за індексом
+                        });
                     }
                 }
+            }
+
+            for (int i = 0; i < entity.Images.Count; i++)
+            {
+                entity.Images.ElementAt(i).IsMain = (i == dto.MainImageIndex);
             }
 
             mapper.Map(dto, entity);
@@ -206,16 +232,14 @@ namespace WebApi.BLL.Services.Advertisement
             IQueryable<AdvertisementEntity> advertisements, 
             AdvertisementFilterDto filter)
         {
-            if (!string.IsNullOrWhiteSpace(filter.Name))
-            {
-                var search = filter.Name.Trim().ToLower();
-                advertisements = advertisements.Where(a => a.Name.ToLower().Contains(search));
-            }
-
             if (filter.categoryId.HasValue)
             {
                 var categoryIds = await categoryRepository.GetAllChildCategoryIdsAsync(filter.categoryId.Value);
                 advertisements = advertisements.Where(a => categoryIds.Contains(a.CategoryId));
+            }
+            if (filter.active.HasValue)
+            {
+                advertisements = advertisements.Where(a => a.isActive == filter.active.Value);
             }
             if (filter.minPrice.HasValue)
             {
@@ -226,6 +250,27 @@ namespace WebApi.BLL.Services.Advertisement
             {
                 advertisements = advertisements
                     .Where(a => a.SettlementRef == filter.settlementRef);
+            }
+            if (!string.IsNullOrEmpty(filter.date))
+            {
+                DateTime fromDate = DateTime.UtcNow;
+                
+                switch (filter.date.ToLower())
+                {
+                    case "today":
+                        fromDate = DateTime.UtcNow.Date;
+                        break;
+
+                    case "week":
+                        fromDate = DateTime.UtcNow.AddDays(-7);
+                        break;
+
+                    case "month":
+                        fromDate = DateTime.UtcNow.AddMonths(-1);
+                        break;
+                }
+
+                advertisements = advertisements.Where(a => a.UpdateDate >= fromDate);
             }
             if (!string.IsNullOrWhiteSpace(filter.search))
             {

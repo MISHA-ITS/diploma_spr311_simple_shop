@@ -11,6 +11,7 @@ namespace WebApi.BLL.DTOs.Advertisement
         public string SettlementRef { get; init; } = string.Empty;
         public long CategoryId { get; set; }
         public string PhoneNumber { get; set; }
-        public List<IFormFile>? Images { get; set; } = [];
+        public List<IFormFile> Images { get; set; } = [];
+        public int MainImageIndex { get; set; }
     }
 }

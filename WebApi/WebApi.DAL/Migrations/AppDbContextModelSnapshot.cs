@@ -113,6 +113,9 @@ namespace WebApi.DAL.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 

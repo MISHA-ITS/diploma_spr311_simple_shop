@@ -22,6 +22,14 @@ const UserMetaCard: React.FC<Props> = ({ user }) => {
               <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
                 {user.fullName} {" "}
               </h4>
+              <div>
+                {/*<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">*/}
+                {/*  Ролі*/}
+                {/*</p>*/}
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                  {user.roles}
+                </p>
+              </div>
               <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
                 {/*<p className="text-sm text-gray-500 dark:text-gray-400">*/}
                 {/*  {user.roles}*/}

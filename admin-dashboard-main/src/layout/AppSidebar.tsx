@@ -18,6 +18,7 @@ import {
 import { useSidebar } from "../context/SidebarContext";
 import * as React from "react";
 import {RiAdvertisementLine} from "react-icons/ri";
+import SelixLogo from "../icons/Sellix.png";
 //import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
@@ -320,11 +321,13 @@ const AppSidebar: React.FC = () => {
         }`}
       >
         <Link to="/"
-              className="text-[36px] font-inter uppercase dark:text-white">
+              className="text-[36px] font-inter font-extrabold uppercase dark:text-white">
           {isExpanded || isHovered || isMobileOpen ? (
-            <>
-              <p>SELLIX</p>
-            </>
+              <img
+                  src={SelixLogo}
+                  alt="Sellix"
+                  className="h-[27px] min-w-[102px] w-auto object-contain brightness-0 dark:brightness-100"
+              />
           ) : (
             <p>S</p>
           )}

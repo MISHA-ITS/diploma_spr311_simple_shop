@@ -8,7 +8,7 @@ import {useEffect, useState} from "react";
 import noimage from "../../assets/images/noimage.jpeg";
 import EnvConfig from "../../config/env.ts";
 import {useUpdateUserMutation} from "../../services/apiUser.ts";
-import MultiSelect from "../form/MultiSelect.tsx";
+import Select from "../form/Select.tsx";
 
 const urlUserImage = `${EnvConfig.API_URL}/images/users`;
 
@@ -42,7 +42,7 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
         lastName: user.lastName,
         email: user.email,
         phoneNumber: user.phoneNumber ?? "",
-        roles: user.roles ?? [],
+        roles: user.roles?.slice(0,1) ?? ["User"],
         imageFile: null
       });
 
@@ -124,14 +124,14 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                 </p>
               </div>
 
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  Ролі
-                </p>
-                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {user.roles}
-                </p>
-              </div>
+              {/*<div>*/}
+              {/*  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">*/}
+              {/*    Ролі*/}
+              {/*  </p>*/}
+              {/*  <p className="text-sm font-medium text-gray-800 dark:text-white/90">*/}
+              {/*    {user.roles}*/}
+              {/*  </p>*/}
+              {/*</div>*/}
             </div>
           </div>
 
@@ -216,18 +216,17 @@ const UserInfoCard: React.FC<Props> = ({ user }) => {
                     </h5>
 
                     <div className="w-[220px]">
-                      {/*<Label>Ролі</Label>*/}
-                      <MultiSelect
-                          label="Ролі"
+                      <Label>Роль</Label>
+                      <Select
                           options={[
-                            { value: "Admin", text: "Admin" },
-                            { value: "User", text: "User" }
+                            { value: "Admin", label: "Admin" },
+                            { value: "User", label: "User" }
                           ]}
-                          value={formData.roles}
-                          onChange={(selected) =>
+                          defaultValue={formData.roles[0] ?? ""}
+                          onChange={(value) =>
                               setFormData(prev => ({
                                 ...prev,
-                                roles: selected
+                                roles: [value]
                               }))
                           }
                       />

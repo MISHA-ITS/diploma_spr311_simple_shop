@@ -130,7 +130,13 @@ export const apiAccount = createApi({
                 method: 'GET',
             }),
             providesTags: ["Account"],
-        })
+        }),
+        deleteProfile: builder.mutation<void, void>({
+            query: () => ({
+                url: "delete",
+                method: "DELETE",
+            }),
+        }),
     }),
 });
 
@@ -143,4 +149,5 @@ export const {
     useRemoveAllFromFavoritesMutation,
     useGetAllFavoritesQuery,
     useUpdateProfileMutation,
+    useDeleteProfileMutation
 } = apiAccount;
