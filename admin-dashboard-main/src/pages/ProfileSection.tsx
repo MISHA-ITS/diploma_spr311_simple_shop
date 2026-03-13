@@ -98,13 +98,17 @@ const ProfileSection = ({ user }: Props) => {
 
     const handleSave = async () => {
         try {
-            await updateProfile({
+            await updateUser({
+                id: user.id,
+                email: formState.email,
                 firstName: formState.firstName,
                 lastName: formState.lastName,
-                phoneNumber: formState.phoneNumber,
+                phoneNumber: formState.phoneNumber ?? "",
+                roles: formState.roles,
                 imageFile: formState.imageFile
             }).unwrap();
 
+            setIsEditing(false);
         } catch (error) {
             console.error("Update error:", error);
         }
