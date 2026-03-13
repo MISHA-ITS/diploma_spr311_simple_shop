@@ -3,11 +3,48 @@ import { IUserProfile } from "../types/Account/IUserProfile";
 import { IUserUpdate } from "./Users/types";
 import EnvConfig from "../config/env";
 import {useDeleteProfileMutation, useUpdateProfileMutation} from "../services/apiAccount.ts";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Props {
     user: IUserProfile;
     refetch: () => void;
 }
+
+const confirmDeleteToast = (onConfirm: () => void) => {
+    toast(
+        ({ closeToast }) => (
+            <div className="flex flex-col gap-3">
+                <p className="font-medium">
+                    Ви впевнені що хочете видалити профіль?
+                </p>
+
+                <div className="flex gap-2 justify-end">
+                    <button
+                        className="px-3 py-1 bg-gray-200 rounded"
+                        onClick={closeToast}
+                    >
+                        Скасувати
+                    </button>
+
+                    <button
+                        className="px-3 py-1 bg-red-600 text-white rounded"
+                        onClick={() => {
+                            closeToast?.();
+                            onConfirm();
+                        }}
+                    >
+                        Видалити
+                    </button>
+                </div>
+            </div>
+        ),
+        {
+            autoClose: false,
+            closeOnClick: false
+        }
+    );
+};
 
 const ProfileSection = ({ user, refetch }: Props) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -93,25 +130,23 @@ const ProfileSection = ({ user, refetch }: Props) => {
         return new Date(`${year}-${month}-${day}`).toLocaleDateString("uk-UA");
     };
 
-    const handleDeleteProfile = async () => {
-        const confirmDelete = window.confirm(
-            "Ви впевнені, що хочете видалити профіль? Це неможливо відмінити."
-        );
+    const handleDeleteProfile = () => {
 
-        if (!confirmDelete) return;
+        confirmDeleteToast(async () => {
+            try {
+                await deleteProfile().unwrap();
 
-        try {
-            await deleteProfile().unwrap();
+                toast.success("Профіль видалено");
 
-            alert("Профіль видалено");
+                localStorage.removeItem("token");
 
-            localStorage.removeItem("token");
+                window.location.href = "/";
+            } catch (error) {
+                console.error(error);
+                toast.error("Помилка видалення профілю");
+            }
+        });
 
-            window.location.href = "/";
-        } catch (error) {
-            console.error(error);
-            alert("Помилка видалення профілю");
-        }
     };
 
     return (
@@ -256,6 +291,18 @@ const ProfileSection = ({ user, refetch }: Props) => {
                     </form>
                 </>
             )}
+            <ToastContainer
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 };

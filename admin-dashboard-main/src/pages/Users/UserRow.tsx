@@ -124,13 +124,13 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggl
                                             }
                         `}
                         onClick={() => {
-                            const ok = confirm(
-                                locked
-                                    ? "Ви впевнені, що хочете активувати користувача?"
-                                    : "Ви впевнені, що хочете заблокувати користувача?"
-                            );
-
-                            if (!ok) return;
+                            // const ok = confirm(
+                            //     locked
+                            //         ? "Ви впевнені, що хочете активувати користувача?"
+                            //         : "Ви впевнені, що хочете заблокувати користувача?"
+                            // );
+                            //
+                            // if (!ok) return;
 
                             onToggleLock(user);
                         }}

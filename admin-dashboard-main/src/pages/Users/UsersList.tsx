@@ -58,29 +58,29 @@ const UsersList: React.FC = () => {
                 await lockUser(user.id).unwrap();
             }
 
-            alert(
-                `Користувача ${
-                    user.fullName ?? `${user.firstName} ${user.lastName}`
-                } ${isLocked ? "розблоковано" : "заблоковано"}`
-            );
+            // alert(
+            //     `Користувача ${
+            //         user.fullName ?? `${user.firstName} ${user.lastName}`
+            //     } ${isLocked ? "розблоковано" : "заблоковано"}`
+            // );
         } catch {
-            alert("Помилка при зміні статусу");
+            // alert("Помилка при зміні статусу");
         }
     };
 
     const handleDeleteUser = async (id: number) => {
-        if (!confirm("Видалити користувача?")) return;
+        // if (!confirm("Видалити користувача?")) return;
         try {
             await deleteUser(id).unwrap();
         } catch {
-            alert("Помилка при видаленні");
+            // alert("Помилка при видаленні");
         }
     };
 
     const handleChangeRole = async (user: IUserItem, role: string) => {
 
-        const ok = confirm(`Змінити роль користувача на ${role}?`);
-        if (!ok) return;
+        // const ok = confirm(`Змінити роль користувача на ${role}?`);
+        // if (!ok) return;
 
         try {
 

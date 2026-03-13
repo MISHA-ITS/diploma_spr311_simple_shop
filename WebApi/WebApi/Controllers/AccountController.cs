@@ -47,7 +47,7 @@ public class AccountController(IAccountService accountService, IUserService user
 
         if (response.IsSuccess)
         {
-            return Redirect("http://Localhost:3000");
+            return Redirect("http://localhost:5173/signin?confirmed=true");
         }
 
         return BadRequest(response);

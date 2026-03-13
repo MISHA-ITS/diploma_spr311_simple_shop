@@ -13,6 +13,10 @@ import {useDispatch} from "react-redux";
 import {useAppSelector} from "../../store";
 import {ILoginRequest} from "../../types/Account/ILoginRequest.ts";
 import {loginByGoogleApi} from "../../services/apiLoginByGoogle.ts";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const initState: ILoginRequest = {
     email: "",
@@ -20,6 +24,7 @@ const initState: ILoginRequest = {
 }
 
 const SignInForm: React.FC = () => {
+  const [params] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loginRequest, { isLoading }] = useLoginMutation();
@@ -32,6 +37,12 @@ const SignInForm: React.FC = () => {
   const {user} = useAppSelector(globalState => globalState.auth);
 
   const [form, setForm] = useState<ILoginRequest>(initState);
+
+  useEffect(() => {
+    if (params.get("confirmed") === "true") {
+      toast.success("Email успішно підтверджено!");
+    }
+  }, []);
 
   // --- Google login ---
   const loginByGoogle = useGoogleLogin({
@@ -262,6 +273,18 @@ const SignInForm: React.FC = () => {
             </div>
           </div>
         </div>
+        <ToastContainer
+            position="bottom-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+        />
       </div>
   );
 };
