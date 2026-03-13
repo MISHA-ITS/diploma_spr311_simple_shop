@@ -296,7 +296,7 @@ const AdvertisementPage: React.FC = () => {
                         className="flex gap-4 overflow-x-auto pb-4 pt-2 scrollbar-hide snap-x snap-mandatory"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                        {UserAdverts?.payload?.map((ad) => {
+                        {UserAdverts?.payload?.filter((ad) => ad.isApproved).map((ad) => {
                             // Знаходимо головне фото або беремо перше з масиву
                             const mainImgUrl = ad.images.find(img => img.isMain)?.imageUrl || ad.images[0]?.imageUrl;
 
