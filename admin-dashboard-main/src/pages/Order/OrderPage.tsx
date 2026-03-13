@@ -12,6 +12,8 @@ import { useParams } from "react-router-dom";
 import {useGetAdvertisementByIdQuery} from "../../services/apiAdvertisement.ts";
 import EnvConfig from "../../config/env.ts";
 import { useNavigate } from "react-router-dom";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type DeliveryMethod = "nova_poshta" | "courier";
 
@@ -201,11 +203,16 @@ const OrderPage = () => {
 
         try {
             await createOrder(orderPayload).unwrap();
-            alert("Замовлення створено успішно!");
-            navigate(`/advertisement/${advertisementId}`);
+            toast.success("Замовлення створено успішно!");
+            //alert("Замовлення створено успішно!");
+            setTimeout(() => {
+                navigate("/profile?tab=sellixDelivery");
+            }, 4000);
+            //navigate("/profile");
         } catch (error) {
             console.error(error);
-            alert("Помилка при створенні замовлення");
+            //alert("Помилка при створенні замовлення");
+            toast.error("Помилка при створенні замовлення!");
         }
     };
 
@@ -556,6 +563,18 @@ const OrderPage = () => {
                     </div>
                 </div>
             </div>
+            <ToastContainer
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 };

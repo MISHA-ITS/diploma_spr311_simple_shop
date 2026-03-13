@@ -7,7 +7,7 @@ interface CountryCode {
 
 interface PhoneInputProps {
   countries: CountryCode[];
-  value: string; // 👈 ДОДАТИ
+  value?: string;
   placeholder?: string;
   onChange?: (phoneNumber: string) => void;
   selectPosition?: "start" | "end";

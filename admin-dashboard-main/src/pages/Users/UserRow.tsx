@@ -3,10 +3,11 @@ import * as React from "react";
 import {Link} from "react-router-dom";
 import EnvConfig from "../../config/env.ts";
 import { Lock, UserCheck, UserX, UserRoundPen, UserLock } from "lucide-react";
+import {Select} from "antd";
 
 const urlUserImage = `${EnvConfig.API_URL}/images/users`;
 
-const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggleLock}) => {
+const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggleLock, onChangeRole}) => {
     const isLocked = (user: IUserItem) => {
         if (!user.lockoutEnd) return false;
         return new Date(user.lockoutEnd) > new Date();
@@ -65,17 +66,15 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggl
 
             <td className="px-5 py-4 text-sm text-neutral-700 dark:text-neutral-200">{user.email}</td>
 
-            <td className="px-5 py-4">
-                <div className="flex flex-wrap gap-2">
-                    {user.roles.map((r, i) => (
-                        <span
-                            key={i}
-                            className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-black/5 dark:border-white/10"
-                        >
-                            {r}
-                        </span>
-                    ))}
-                </div>
+            <td className="px-5 py-4 w-[190px]">
+                <Select className="h-9 w-21 text-xs"
+                    options={[
+                        { value: "Admin", label: "Admin" },
+                        { value: "User", label: "User" }
+                    ]}
+                    value={user.roles[0] ?? ""}
+                    onChange={(role) => onChangeRole(user, role)}
+                />
             </td>
 
             <td className="px-5 py-4">
@@ -125,13 +124,13 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggl
                                             }
                         `}
                         onClick={() => {
-                            const ok = confirm(
-                                locked
-                                    ? "Ви впевнені, що хочете активувати користувача?"
-                                    : "Ви впевнені, що хочете заблокувати користувача?"
-                            );
-
-                            if (!ok) return;
+                            // const ok = confirm(
+                            //     locked
+                            //         ? "Ви впевнені, що хочете активувати користувача?"
+                            //         : "Ви впевнені, що хочете заблокувати користувача?"
+                            // );
+                            //
+                            // if (!ok) return;
 
                             onToggleLock(user);
                         }}
@@ -174,4 +173,4 @@ const UserRow: React.FC<IUserRowProps> = ({user, initials, onDeleteUser, onToggl
     );
 }
 
-export default UserRow;
+export default React.memo(UserRow);

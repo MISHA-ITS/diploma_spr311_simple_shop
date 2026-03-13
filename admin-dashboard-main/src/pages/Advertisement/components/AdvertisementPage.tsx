@@ -7,7 +7,6 @@ import {
     useGetUserByIdQuery,
 } from "../../../services/apiUser.ts";
 import AdvertisementGallery from "./AdvertisementGallery.tsx";
-import {createParentDic, findPath} from "../utils/functions.ts";
 import {useGetAllCategoriesQuery} from "../../../services/apiCategory.ts";
 import {useNavigate} from "react-router-dom";
 
@@ -20,6 +19,8 @@ import {
     useRemoveFromFavoritesMutation
 } from "../../../services/apiAccount.ts";
 import {FaHeart, FaPen, FaRegHeart} from "react-icons/fa";
+import CategoryPath from "../../AdvsPage/CategoryPath.tsx";
+import Loader from "../../../components/Loader.tsx";
 import {IAdvertisement} from "../types.ts";
 import {toast, ToastContainer} from "react-toastify";
 
@@ -99,25 +100,13 @@ const AdvertisementPage: React.FC = () => {
         }
     }, [product]);
 
+
     if (CategoriesError || !Categories?.payload) {
         return null;
     }
 
-    console.log(product);
-    if (!product){
-        return <div>Помилка завантаження продукта</div>;
-    }
-
-    const parentDictionary = createParentDic(Categories.payload);
-    const listIdPath = findPath(product.categoryId, parentDictionary)
-    const categoryNamesDic = Categories.payload.reduce((acc, cat) => {
-        acc[cat.id] = cat.name;
-        return acc;
-    }, {} as Record<number, string>)
-    const namedPath = listIdPath.map(id => categoryNamesDic[id]).join(" / ");
-
-    if (isLoading && isSellerLoading) return <div>Завантаження оголошення...</div>;
-    if (error || !product) return <div>Оголошення не знайдено</div>;
+    if (isLoading && isSellerLoading) return <Loader />;
+    if (error || !product) return null;
 
     const handleFavoriteClick = async () => {
         if (!User) {
@@ -154,8 +143,8 @@ const AdvertisementPage: React.FC = () => {
                 <div className="flex gap-8">
                     <div className="flex flex-col gap-4 flex-[2]">
                         {/* BREADCRUMBS */}
-                        <span className="text-sm  h-[24px] flex items-center">
-                            {namedPath}
+                        <span className="text-sm font-light font-inter h-[24px] flex items-center">
+                            <CategoryPath categories={Categories.payload} targetId={product.categoryId} />
                         </span>
 
                         <AdvertisementGallery images={product.images} />
@@ -188,10 +177,10 @@ const AdvertisementPage: React.FC = () => {
                                     onClick={handleFavoriteClick}
                                     className={`cursor-pointer transition-all duration-300 transform hover:scale-105 
                                     ${(isAdding || isRemoving) ? 'opacity-50 pointer-events-none' : 'opacity-100'}
-                                    ${!User ? 'grayscale-[0.5]' : ''}`} // трохи приглушити для неавторизованих
+                                    ${!User ? 'grayscale-[0.5]' : ''}`}
                                 >
                                     {isFavorite ? (
-                                        <FaHeart size={30} color="#ff4f4f" /> // червоний??
+                                        <FaHeart size={30} color="#ff4f4f" />
                                     ) : (
                                         <FaRegHeart size={30} color="#002f34" />
                                     )}
@@ -230,6 +219,7 @@ const AdvertisementPage: React.FC = () => {
                                     ? `${EnvConfig.API_URL}/images/users/1200_${seller.image}`
                                     : `${EnvConfig.API_URL}/images/noimage.jpeg`
                                     }
+                                    alt={seller?.firstName}
                                 />
                             </div>
                             <div className="text-sm">

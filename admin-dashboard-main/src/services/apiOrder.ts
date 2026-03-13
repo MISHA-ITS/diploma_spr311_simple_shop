@@ -1,6 +1,6 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {createBaseQuery} from "../utils/createBaseQuery.ts";
-import {IOrder, OrderCreateDto, OrderResponseDto} from "../pages/Order/types.ts";
+import {IOrder, OrderCreateDto, OrderDetailsDto, OrderResponseDto, OrderStatus} from "../pages/Order/types.ts";
 
 interface ApiResponse<T> {
     isSuccess: boolean;
@@ -22,9 +22,13 @@ export const apiOrder = createApi({
             invalidatesTags: ["Order"],
         }),
 
-        getOrderById: builder.query<OrderResponseDto, number>({
+        getOrderById: builder.query<ApiResponse<OrderResponseDto>, number>({
             query: (id) => `/${id}`,
             providesTags: ["Order"],
+        }),
+
+        getOrderDetails: builder.query<ApiResponse<OrderDetailsDto>, number>({
+            query: (id) => `/orders/${id}`
         }),
 
         getMySellerOrders: builder.query<ApiResponse<IOrder[]>, void>({
@@ -37,12 +41,57 @@ export const apiOrder = createApi({
             providesTags: ["Order"],
         }),
 
+        updateOrderStatus: builder.mutation<void, { id: number; status: OrderStatus }>({
+            query: ({ id, status }) => ({
+                url: `/${id}/status`,
+                method: "PATCH",
+                body: { status }
+            }),
+            invalidatesTags: ["Order"],
+        }),
+
+        cancelOrder: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/${id}/cancel`,
+                method: "PATCH"
+            }),
+            invalidatesTags: ["Order"],
+        }),
+
         deleteOrder: builder.mutation<void, number>({
             query: (id) => ({
                 url: `/delete/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Order"],
+        }),
+
+        confirmOrder: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/orders/${id}/confirm`,
+                method: "PUT"
+            })
+        }),
+
+        rejectOrder: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/orders/${id}/reject`,
+                method: "PUT"
+            })
+        }),
+
+        shipOrder: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/orders/${id}/ship`,
+                method: "PUT"
+            })
+        }),
+
+        completeOrder: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/orders/${id}/complete`,
+                method: "PUT"
+            })
         }),
     }),
 });
@@ -52,5 +101,11 @@ export const {
     useGetOrderByIdQuery,
     useGetMyBuyerOrdersQuery,
     useGetMySellerOrdersQuery,
+    useUpdateOrderStatusMutation,
+    useCancelOrderMutation,
     useDeleteOrderMutation,
+    useConfirmOrderMutation,
+    useRejectOrderMutation,
+    useShipOrderMutation,
+    useCompleteOrderMutation,
 } = apiOrder;

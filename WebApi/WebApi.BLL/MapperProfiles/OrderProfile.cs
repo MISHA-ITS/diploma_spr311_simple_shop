@@ -62,5 +62,48 @@ public class OrderProfile : Profile
                 o => o.MapFrom(s => s.Buyer.FirstName + " " + s.Buyer.LastName))
             .ForMember(d => d.SellerFullName,
                 o => o.MapFrom(s => s.Seller.FirstName + " " + s.Seller.LastName));
+
+        // DETAILS
+        CreateMap<OrderEntity, OrderDetailsDto>()
+            .ForMember(d => d.AdvertisementName,
+                o => o.MapFrom(s => s.Advertisement.Name))
+            .ForMember(d => d.AdvertisementImage,
+                o => o.MapFrom(s =>
+                    s.Advertisement.Images
+                        .Select(i => i.ImageUrl)
+                        .FirstOrDefault()))
+            // Buyer
+            .ForMember(d => d.BuyerFirstName,
+                o => o.MapFrom(s => s.Buyer.FirstName))
+            .ForMember(d => d.BuyerLastName,
+                o => o.MapFrom(s => s.Buyer.LastName))
+            .ForMember(d => d.BuyerPhone,
+                o => o.MapFrom(s => s.Buyer.PhoneNumber))
+            // BUYER LOCATION
+            .ForMember(d => d.BuyerLocation,
+                o => o.MapFrom(s =>
+                    s.City == null
+                        ? null
+                        : s.City +
+                            (s.NewPostWarehouse != null
+                                ? ", відділення " + s.NewPostWarehouse
+                                : s.DeliveryAddress != null
+                                    ? ", " + s.DeliveryAddress
+                                    : "")))
+
+            // Seller
+            .ForMember(d => d.SellerFirstName,
+                o => o.MapFrom(s => s.Seller.FirstName))
+            .ForMember(d => d.SellerLastName,
+                o => o.MapFrom(s => s.Seller.LastName))
+            .ForMember(d => d.SellerPhone,
+                o => o.MapFrom(s => s.Seller.PhoneNumber))
+            // SELLER LOCATION
+            .ForMember(d => d.SellerLocation,
+                o => o.MapFrom(s =>
+                    s.Advertisement.Settlement != null
+                        ? s.Advertisement.Settlement.Description
+                        : null
+                ));
     }
 }

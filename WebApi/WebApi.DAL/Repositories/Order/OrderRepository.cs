@@ -26,8 +26,13 @@ public class OrderRepository(
         return await _context.Orders
             .Include(o => o.Advertisement)
                 .ThenInclude(a => a.Images)
+
+            .Include(o => o.Advertisement)
+                .ThenInclude(a => a.Settlement)
+
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
+
             .FirstOrDefaultAsync(o => o.Id == id);
     }
 }

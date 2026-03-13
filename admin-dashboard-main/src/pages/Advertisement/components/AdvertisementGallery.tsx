@@ -3,13 +3,13 @@ import EnvConfig from "../../../config/env.ts";
 import { IAdvertisementImage } from "../types.ts";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 
-// Функція для правильного формування URL картинки
 const getImageUrl = (url: string, size: '200' | '1200' = '1200') => {
     if (url.startsWith('blob:') || url.startsWith('http')) {
         return url; // Це локальне прев'ю або вже повне посилання
     }
     return `${EnvConfig.API_URL}/images/advertisements/${size}_${url}`; // Це файл з БД
 };
+
 
 const AdvertisementGallery: React.FC<{ images: IAdvertisementImage[]; }> = ({ images }) => {
     const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -80,7 +80,6 @@ const AdvertisementGallery: React.FC<{ images: IAdvertisementImage[]; }> = ({ im
                 </div>
             </div>
 
-            {/* МІНІАТЮРИ */}
             <div className="flex pl-2 gap-3 overflow-x-auto pb-2 scrollbar-hide pt-1">
                 {images.map((img, index) => (
                     <div

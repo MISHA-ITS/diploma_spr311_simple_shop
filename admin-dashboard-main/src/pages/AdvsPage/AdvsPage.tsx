@@ -1,143 +1,104 @@
-import {FC, useEffect, useMemo, useState} from "react";
-import SearchBlock from "../MainPage/SearchBlock.tsx";
-import {Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import {useGetCategoryByIdQuery} from "../../services/apiCategory.ts";
-import {IAdvFilter} from "./types.ts";
+import {FC, useState} from "react";
+import {Navigate} from "react-router-dom";
+import {useGetAllCategoriesQuery, useGetCategoryByIdQuery} from "../../services/apiCategory.ts";
+import {ViewMode} from "./types.ts";
 import {useGetAdvertisementsQuery} from "../../services/apiAdvertisement.ts";
 import AdvFilterBar from "./AdvFilterBar.tsx";
-import AdvSection from "./AdvSection.tsx";
-import PaginationContainer from "./PaginationContainer.tsx";
 import FiltersWindow from "./FiltersWindow.tsx";
-
-const createFilter = (categoryId?: string | number): IAdvFilter => ({
-    categoryId: categoryId ? Number(categoryId) : null,
-    settlementRef: null,
-    search: null,
-    minPrice: null,
-    maxPrice: null,
-    sortBy: null,
-    order: "asc",
-    pageNumber: 1,
-    pageSize: 24,
-});
+import Loader from "../../components/Loader.tsx";
+import {getLocalStorage, saveLocalStorage} from "../../utils/secureStore.ts";
+import AdvsHeader from "./AdvsHeader.tsx";
+import {AdvList} from "./AdvList.tsx";
+import {useAdvFilter} from "../../utils/useAdvFilter.tsx";
+import SearchBlock from "../MainPage/SearchBlock.tsx";
 
 const AdvsPage: FC = () => {
-    const { id } = useParams<{ id?: string }>();
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-
-    const searchParam = searchParams.get("search");
-    const settlementParam = searchParams.get("settlementRef");
+    const { filter, updateFilter, categoryId } = useAdvFilter(() => setIsOpenFilters(false));
 
     const [isOpenFilters, setIsOpenFilters] = useState(false);
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-    const [filter, setFilter] = useState<IAdvFilter>(createFilter(id));
+    const [viewMode, setViewMode] = useState<ViewMode>(() => {
+        const saved = getLocalStorage("advsViewMode");
+        return saved === "list" ? "list" : "grid";
+    });
+    const [isSearchLoading, setIsSearchLoading] = useState(false);
 
     // Запити
-    const { data: categoryData, isLoading: categoryLoad, error: categoryError } = useGetCategoryByIdQuery(id!, {
-        skip: !id
-    });
-
+    const { data: categoryData, isLoading: categoryLoad, error: categoryError } = useGetCategoryByIdQuery(categoryId ?? "", {
+        skip: !categoryId
+    })
+    const { data: allCategoriesData, isLoading: allCategoriesLoading, error: allCategoriesError } = useGetAllCategoriesQuery();
     const { data: advData, isLoading: advLoad, error: advError } = useGetAdvertisementsQuery(filter);
     //
 
-    const advs = useMemo(() => advData?.payload.items ?? [], [advData]);
-    const categoryName = id ? categoryData?.payload?.name ?? "" : "Всі оголошення";
+    const advs = advData?.payload.items ?? [];
+    const allCategories = allCategoriesData?.payload ?? [];
+    const category = categoryData?.payload ?? null;
 
-    useEffect(() => {
-        setFilter(prev => ({
-            ...prev,
-            categoryId: id ? Number(id) : null,
-            pageNumber: 1,
-        }));
-    }, [id]);
+    const handleViewModeChange = (mode: ViewMode) => {
+        if (mode === viewMode) return;
 
-    useEffect(() => {
-        setFilter(prev => ({
-            ...prev,
-            search: searchParam,
-            settlementRef: settlementParam,
-            pageNumber: 1
-        }));
-    }, [searchParam, settlementParam]);
-
-
-    const updateFilter = (updatedFields: Partial<IAdvFilter>, resetPage = false) => {
-        setFilter((prev) => ({
-            ...prev,
-            ...updatedFields,
-            pageNumber: resetPage ? 1 : prev.pageNumber,
-        }));
-    };
-
-    const handleViewModeChange = (mode: 'grid' | 'list') => {
         setViewMode(mode);
-        updateFilter({pageSize: mode === 'grid' ? 24 : 8}, true);
+        saveLocalStorage("advsViewMode", mode);
+        updateFilter({ pageSize: mode === 'grid' ? 24 : 8 }, { resetPage: true });
     };
 
-    const handleApplyFilters = (updatedFilter: IAdvFilter) => {
-        if (updatedFilter.categoryId !== filter.categoryId) {
-            navigate(
-                updatedFilter.categoryId
-                    ? `/advertisements/${updatedFilter.categoryId}`
-                    : `/advertisements`
-            );
-        }
+    if (categoryError || advError || allCategoriesError) return <Navigate to="/" replace />;
 
-        setFilter({
-            ...updatedFilter,
-            pageNumber: 1,
-        });
-
-        setIsOpenFilters(false);
-    };
-
-    if (categoryError || advError) return <Navigate to="/" replace />;
-
-    if (categoryLoad || advLoad) return <div></div>;
+    const shouldShowLoader = allCategoriesLoading || isSearchLoading || categoryLoad || advLoad;
 
     return (
         <>
             <div className="flex flex-col bg-[#F8FAFF] items-center w-full">
                 <SearchBlock
                     search={filter.search}
-                    onSearchChange={(searchWords) => updateFilter({ search: searchWords })}
+                    onSearchChange={(searchWords) => updateFilter({ search: searchWords }, { resetPage: true })}
                     settlementRef={filter.settlementRef}
-                    onSettlementChange={(settlement) => updateFilter({ settlementRef: settlement ? settlement.ref : null })}
+                    onSettlementChange={(settlement) => updateFilter({ settlementRef: settlement ? settlement.ref : null }, { resetPage: true })}
+                    onLoadingChange={setIsSearchLoading}
                 />
-
-                {!isOpenFilters &&
-                    <div className="w-full max-w-[1430px] mt-[50px]">
-                        <span className="font-inter font-light text-[14px] leading-[14px] tracking-normal antialiased text-[#071739]">
-                            <Link to="/" className="hover:underline">Головна сторінка</Link>{" / "}{categoryName}
-                        </span>
+                {shouldShowLoader ? (
+                    <div className="flex justify-center items-center w-full mt-10">
+                        <Loader />
                     </div>
-                }
-
-                <AdvFilterBar
-                    countAdvs={advs.length}
-                    viewMode={viewMode}
-                    onViewModeChange={handleViewModeChange}
-                    isOpenFilters={isOpenFilters}
-                    onToggleFilters={() => setIsOpenFilters(prev => !prev)}
-                />
-
-                {isOpenFilters ? (
-                    <FiltersWindow
-                        categoryId={filter.categoryId}
-                        filter={filter}
-                        onApply={handleApplyFilters}
-                    />
                 ) : (
                     <>
-                        <AdvSection viewMode={viewMode} advertisements={advs} />
+                        {!isOpenFilters && (
+                            <AdvsHeader
+                                filter={filter}
+                                allCategories={allCategories}
+                            />
+                        )}
 
-                        <PaginationContainer
-                            totalCount={advData?.payload.totalCount ?? 0}
-                            adsOnPage={filter.pageSize}
-                            pageNumber={filter.pageNumber}
-                            onPageChange={(page) => updateFilter({ pageNumber: page })}
+                        <AdvFilterBar
+                            countAdvs={advData?.payload.totalCount ?? 0}
+                            viewMode={viewMode}
+                            onViewModeChange={handleViewModeChange}
+                            isOpenFilters={isOpenFilters}
+                            onToggleFilters={() => setIsOpenFilters(prev => !prev)}
+                            category={category}
+                            onCategoryChange={(childId) => updateFilter({ categoryId: childId }, { resetPage: true, navigateCategory: true})}
+                            dateFrom={filter.date}
+                            onDateChange={(fromDate) => updateFilter({ date: fromDate }, { resetPage: true})}
                         />
+
+                        {isOpenFilters ? (
+                            <FiltersWindow
+                                filter={filter}
+                                onApply={updateFilter}
+                            />
+                        ) : (
+
+                            <AdvList
+                                viewMode={viewMode}
+                                advs={advs}
+                                filter={filter}
+                                totalCount={advData?.payload.totalCount ?? 0}
+                                onPageChange={(page) => {
+                                    updateFilter({ pageNumber: page });
+                                    window.scrollTo({ top: 0, behavior: "auto"});
+                                }}
+                            />
+                        )}
                     </>
                 )}
             </div>

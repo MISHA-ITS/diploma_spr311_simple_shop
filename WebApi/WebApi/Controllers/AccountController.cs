@@ -47,7 +47,7 @@ public class AccountController(IAccountService accountService, IUserService user
 
         if (response.IsSuccess)
         {
-            return Redirect("http://Localhost:3000");
+            return Redirect("http://www.sellix.somee.com/signin?confirmed=true");
         }
 
         return BadRequest(response);
@@ -106,5 +106,16 @@ public class AccountController(IAccountService accountService, IUserService user
         var response = await accountService.UpdateProfileAsync(user.Id, dto);
 
         return response.IsSuccess ? Ok(response) : BadRequest(response);
+    }
+
+    [Authorize]
+    [HttpDelete("delete")]
+    public async Task<IActionResult> DeleteProfile()
+    {
+        var userId = long.Parse(User.FindFirst("id")!.Value);
+
+        await accountService.DeleteUserAsync(userId);
+
+        return Ok(new { message = "Профіль видалено" });
     }
 }

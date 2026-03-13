@@ -64,7 +64,7 @@ const AdvCard: FC<AdvCardProps> = ({advertisement, viewMode}) => {
 
     return viewMode === "grid" ? (
         <div onClick={() => clickHandle(advertisement.id)}
-            className="flex flex-row justify-center items-center px-5 gap-2.5 w-[232px] h-[345px] bg-[rgba(217,217,217,0.3)] hover:scale-102 transition-all rounded-[5px] flex-none cursor-pointer">
+             className="flex flex-row justify-center items-center px-5 gap-2.5 w-[232px] h-[345px] bg-[rgba(217,217,217,0.3)] hover:scale-102 transition-all rounded-[5px] flex-none cursor-pointer">
             <div className="flex flex-col justify-center items-center gap-1 w-[203px] h-[317px] flex-none">
                 <img
                     src={

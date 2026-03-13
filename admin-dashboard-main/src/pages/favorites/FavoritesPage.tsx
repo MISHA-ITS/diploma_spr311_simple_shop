@@ -9,6 +9,7 @@ import {
 } from "../../services/apiAccount.ts";
 import { IoStatsChart } from "react-icons/io5";
 import { IAdvertisement } from "../Advertisement/types.ts";
+import Loader from "../../components/Loader.tsx";
 
 const FavoritesPage: React.FC = () => {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const FavoritesPage: React.FC = () => {
         }
     }, []);
 
-    if (isLoading) return <div className="p-10 text-center text-[#002f34] font-medium">Завантаження...</div>;
+    if (isLoading) return <Loader />;
 
     const handleDeleteFavorite = async (id: number) => {
         try {
@@ -54,7 +55,7 @@ const FavoritesPage: React.FC = () => {
             <div className="max-w-[1250px] mx-auto px-4 pt-10">
                 <h1 className="text-3xl font-bold text-[#002f34] text-center mb-10">Обрані</h1>
 
-                {/* TABS HEADER */}
+                {/* Таби та кнопка очищення */}
                 <div className="flex justify-between items-center border-b border-gray-200 mb-8 min-h-[62px]">
                     <div className="flex gap-10">
                         <button
@@ -125,7 +126,6 @@ const FavoritesPage: React.FC = () => {
                                     >
                                         Купити товар <RiArrowRightLine />
                                     </button>
-
                                     {activeTab == 'favorites' && (
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleDeleteFavorite(ad.id); }}

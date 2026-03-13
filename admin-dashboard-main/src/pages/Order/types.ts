@@ -38,9 +38,24 @@ export interface OrderCreateDto {
 export interface OrderResponseDto {
     id: number;
     advertisementId: number;
-    status: string;
-    totalPrice: number;
-    createdAt: string;
+    advertisementName: string | null;
+    advertisementImage: string | null;
+
+    buyerId: number;
+    buyerFirstName: string | null;
+    buyerLastName?: string | null;
+    buyerPhone?: string | null;
+    buyerLocation?: string | null;
+
+    sellerId: number;
+    sellerFirstName: string | null;
+    sellerLastName?: string | null;
+    sellerPhone?: string | null;
+    sellerLocation?: string | null;
+
+    price: number;
+    status: number;
+    createDate: string;
 }
 
 export interface IOrder {
@@ -50,4 +65,24 @@ export interface IOrder {
     status: OrderStatus;
     createDate: string;
     advertisementImage?: string | null;
+}
+
+export interface OrderDetailsDto {
+    id: number
+    advertisementId: number
+    advertisementName: string
+    advertisementImage?: string
+    price: number
+    status: number
+    createDate: string
+
+    buyerFirstName?: string
+    buyerLastName?: string
+    buyerPhone?: string
+    buyerLocation?: string
+
+    sellerFirstName?: string
+    sellerLastName?: string
+    sellerPhone?: string
+    sellerLocation?: string
 }

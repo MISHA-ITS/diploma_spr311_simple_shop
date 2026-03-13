@@ -36,6 +36,7 @@ export interface IUserRowProps {
     initials: (name: string) => string;
     onDeleteUser: (userId: number) => Promise<void>;
     onToggleLock: (user: IUserItem) => void | Promise<void>;
+    onChangeRole: (user: IUserItem, role: string) => void;
     //onEditUser: (user: IUserItem) => void;
 }
 

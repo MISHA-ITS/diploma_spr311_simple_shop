@@ -53,7 +53,6 @@ const AdvertisementPreview: React.FC = () => {
         }
     };
 
-    //fix картинок
     const mappedImages = formData.previews.map((url, index) => ({
         imageUrl: url,
         isMain: index === 0
@@ -73,7 +72,6 @@ const AdvertisementPreview: React.FC = () => {
 
                 {/* MAIN CONTENT */}
                 <div className="flex gap-8">
-                    {/* LEFT COLUMN */}
                     <div className="flex flex-col gap-6 flex-[2]">
                         <AdvertisementGallery images={mappedImages} />
 
@@ -88,7 +86,7 @@ const AdvertisementPreview: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN */}
+                    {/* RIGHT */}
                     <div className="flex flex-col gap-4 flex-[1]">
                         {/* PRICE BOX */}
                         <div className="bg-[#dae5f9] rounded-lg p-6 flex flex-col gap-4 relative">
@@ -96,6 +94,7 @@ const AdvertisementPreview: React.FC = () => {
                                 <div className="opacity-30"><FaRegHeart size={30} color="#002f34" /></div>
                             </div>
 
+                        {/* PRICE */}
                             <span className="text-2xl font-medium text-[#002f34] pr-14 break-words leading-tight">
                                 {formData.title || "Назва оголошення"}
                             </span>
@@ -113,7 +112,7 @@ const AdvertisementPreview: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* SELLER BOX */}
+                        {/* SELLER */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6 flex gap-4 items-center">
                             <div className="w-12 h-12 bg-[#BDBDBD] rounded-full overflow-hidden flex-shrink-0">
                                 <img
@@ -131,7 +130,7 @@ const AdvertisementPreview: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* LOCATION BOX */}
+                        {/* LOCATION */}
                         <div className="bg-[#E0E0E0] rounded-lg p-6">
                             <h3 className="text-xl font-bold text-[#002f34] mb-4">
                                 Місцезнаходження
@@ -151,7 +150,7 @@ const AdvertisementPreview: React.FC = () => {
                     </div>
                 </div>
 
-                {/* BOTTOM BUTTONS */}
+                {/* DESCRIPTION */}
                 <div className="border-t border-gray-200 pt-8 mt-4 flex justify-end gap-4">
                     <button
                         onClick={handleBack}

@@ -64,15 +64,15 @@ const Profile = () => {
                     </button>
                 </div>
 
-                {mainTab === "ads" && (
-                    <AdvertisementsSection advertisements={adsData?.payload ?? []} />
-                )}
-
                 {mainTab === "delivery" && (
                     <DeliverySection
                         buyerOrders={buyerOrders?.payload ?? []}
                         sellerOrders={sellerOrders?.payload ?? []}
                     />
+                )}
+
+                {mainTab === "ads" && (
+                    <AdvertisementsSection advertisements={adsData?.payload ?? []} />
                 )}
 
                 {mainTab === "myProfile" && (

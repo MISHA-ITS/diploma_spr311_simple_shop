@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-
 import { Link } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
-//import NotificationDropdown from "../components/header/NotificationDropdown";
 import UserDropdown from "../components/header/UserDropdown";
 import {useAppSelector} from "../store";
+import SelixLogo from "../icons/Sellix.png";
+import * as React from "react";
+//import NotificationDropdown from "../components/header/NotificationDropdown";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -86,16 +87,11 @@ const AppHeader: React.FC = () => {
             {/* Cross Icon */}
           </button>
 
-          <Link to="/" className="lg:hidden">
+          <Link to="/" className="text-[36px] font-inter font-extrabold uppercase dark:text-white lg:hidden">
             <img
-              className="dark:hidden"
-              src="./images/logo/logo.svg"
-              alt="Logo"
-            />
-            <img
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
-              alt="Logo"
+                src={SelixLogo}
+                alt="Sellix"
+                className="h-[27px] min-w-[102px] w-auto object-contain brightness-0 dark:brightness-100"
             />
           </Link>
 
