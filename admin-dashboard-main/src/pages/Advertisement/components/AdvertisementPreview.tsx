@@ -62,7 +62,7 @@ const AdvertisementPreview: React.FC = () => {
         <div className="w-full flex justify-center">
             <div className="w-full max-w-[1430px] px-4 py-8 flex flex-col gap-10">
 
-                {/* BACK */}
+                {/* BACK BUTTON */}
                 <button
                     onClick={handleBack}
                     className="w-fit flex items-center text-sm text-gray-600 hover:text-black transition-colors"
@@ -70,7 +70,7 @@ const AdvertisementPreview: React.FC = () => {
                     <RiArrowLeftSLine /> Повернутись до редагування
                 </button>
 
-                {/* MAIN */}
+                {/* MAIN CONTENT */}
                 <div className="flex gap-8">
                     <div className="flex flex-col gap-6 flex-[2]">
                         <AdvertisementGallery images={mappedImages} />

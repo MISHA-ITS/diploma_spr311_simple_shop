@@ -93,6 +93,7 @@ const FavoritesPage: React.FC = () => {
                     </div>
                 </div>
 
+                {/* GRID */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {displayItems.map((ad) => {
                         const mainImgUrl = ad.images?.find(img => img.isMain)?.imageUrl || ad.images?.[0]?.imageUrl;
@@ -139,9 +140,10 @@ const FavoritesPage: React.FC = () => {
                     })}
                 </div>
 
-                {favorites.length === 0 && (
+                {((activeTab === 'favorites' && favorites.length === 0) ||
+                    (activeTab === 'recent' && recentViewed.length === 0)) && (
                     <div className="flex flex-col items-center mt-20 text-gray-400">
-                        <div className="text-6xl mb-4"><IoStatsChart size={100}/></div>
+                        <div className="text-6xl mb-4"><IoStatsChart size={100} /></div>
                         <p className="text-lg">Тут порожньо :(</p>
                     </div>
                 )}
