@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { apiOrder } from "../../services/apiOrder";
-import { OrderStatus, OrderResponseDto } from "./types";
+import {OrderStatus, IOrder} from "./types";
 import EnvConfig from "../../config/env";
 import {useAppSelector} from "../../store";
 
 interface OrderCardProps {
-    order: OrderResponseDto;
+    order: IOrder;
 }
 
 const OrderDetailsSkeleton = () => {
@@ -32,23 +32,13 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         skip: !isExpanded,
     });
     const orderDetails = fullOrder?.payload;
-    console.log("Order details", order);
 
     const currentUserId = useAppSelector(state => state.auth.user?.id);
 
     const userId = Number(currentUserId);
 
-    const isBuyer = userId === order.buyerId;
-    const isSeller = userId === order.sellerId;
-
-    console.log({
-        user: currentUserId,
-        buyer: order.buyerId,
-        seller: order.sellerId,
-        isBuyer,
-        isSeller,
-        status: order.status
-    });
+    const isBuyer = userId === orderDetails?.buyerId;
+    const isSeller = userId === orderDetails?.sellerId;
 
     const [cancelOrder] = apiOrder.useCancelOrderMutation();
     const [updateStatus] = apiOrder.useUpdateOrderStatusMutation();
