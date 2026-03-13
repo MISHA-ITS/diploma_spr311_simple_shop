@@ -7,6 +7,7 @@ const AdvertisementsSection = ({ advertisements }: Props) => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<AdvertisementsTab>("all");
 
+
     // ===============================
     // 📊 COUNTERS
     // ===============================
@@ -106,6 +107,7 @@ const AdvertisementsSection = ({ advertisements }: Props) => {
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     {filteredAds.map(ad => (
+
                         <div
                             key={ad.id}
                             onClick={() => navigate(`/advertisement/${ad.id}`)}
@@ -115,7 +117,10 @@ const AdvertisementsSection = ({ advertisements }: Props) => {
                             <div className="h-32 bg-gray-100">
                                 {ad.images?.length > 0 ? (
                                     <img
-                                        src={`${urlAdImage}/400_${ad.images[0]}`}
+                                        src={`${urlAdImage}/1200_${
+                                            // Шукаємо фото, де isMain === true, якщо не знайдено - беремо [0]
+                                            ad.images.find(img => img.isMain)?.imageUrl || ad.images[0].imageUrl
+                                        }`}
                                         alt={ad.name}
                                         className="w-full h-full object-cover"
                                     />

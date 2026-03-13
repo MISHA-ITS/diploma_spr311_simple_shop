@@ -12,6 +12,7 @@ namespace WebApi.BLL.DTOs.Advertisement
         public bool IsContractPrice { get; set; }
         public string SettlementRef { get; init; } = string.Empty;
         public string PhoneNumber { get; set; }
+        public int MainImageIndex { get; set; }
         public List<string>? ExistingImages { get; set; } = new();
         public List<IFormFile>? Images { get; set; } = new();
     }

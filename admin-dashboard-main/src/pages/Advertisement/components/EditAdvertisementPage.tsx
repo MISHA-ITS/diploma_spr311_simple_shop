@@ -15,7 +15,8 @@ import { useGetAdvertisementByIdQuery, useUpdateAdvertisementMutation } from "..
 import EnvConfig from "../../../config/env.ts";
 import { IArea, ISettlement } from "../../../models/newPost.ts";
 import { useGetUserByIdQuery } from "../../../services/apiUser.ts";
-import {useProfileQuery} from "../../../services/apiAccount.ts";
+import { useProfileQuery } from "../../../services/apiAccount.ts";
+import { IAdvertisementImage } from "../types.ts";
 
 const EditAdvertisementPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -55,32 +56,22 @@ const EditAdvertisementPage: React.FC = () => {
 
     useEffect(() => {
         if (isAdLoaded && adData?.payload && User) {
-            // Перевіряємо, чи збігаються ID (приводимо до одного типу)
             if (String(adData.payload.userId) === String(User.id)) {
                 setIsAuthorized(true);
             } else {
                 setIsAuthorized(false);
                 toast.error("Ви не можете редагувати чуже оголошення!");
-                navigate(-1); // Викидаємо на головну
+                navigate(-1);
             }
         }
     }, [isAdLoaded, adData, User, navigate]);
 
-
-
-    //tree
     useEffect(() => {
         const categories = allCategories?.payload ?? [];
         if (categories.length === 0) return;
         try {
-            const tree = buildTree(
-                categories,
-                null,
-            );
-            setCategoryFilterData(prev => ({
-                ...prev,
-                categoryTree: tree,
-            }));
+            const tree = buildTree(categories, null);
+            setCategoryFilterData({ categoryTree: tree });
         } catch (error) {
             console.error("Помилка побудови дерева:", error);
         }
@@ -89,9 +80,17 @@ const EditAdvertisementPage: React.FC = () => {
     useEffect(() => {
         if (isAdLoaded && adData?.payload) {
             const data = adData.payload;
-            const serverPreviews = data.images?.map((img: string) =>
-                `${EnvConfig.API_URL}/images/advertisements/1200_${img}`
-            ) || [];
+
+            // Важливо: сортуємо або беремо в правильному порядку, щоб головне фото було першим
+            const sortedImages = [...(data.images || [])].sort((a, b) => {
+                if (a.isMain && !b.isMain) return -1;
+                if (!a.isMain && b.isMain) return 1;
+                return 0;
+            });
+
+            const serverPreviews = sortedImages.map((img: IAdvertisementImage) =>
+                `${EnvConfig.API_URL}/images/advertisements/1200_${img.imageUrl}`
+            );
 
             updateFormData({
                 title: data.name || "",
@@ -103,7 +102,7 @@ const EditAdvertisementPage: React.FC = () => {
                     description: data.settlement.description,
                 } as ISettlement : null,
                 previews: serverPreviews,
-                images: []
+                images: [],
             });
         }
     }, [isAdLoaded, adData]);
@@ -145,13 +144,12 @@ const EditAdvertisementPage: React.FC = () => {
         const urlToRemove = formData.previews[index];
         if (urlToRemove.startsWith('blob:')) {
             URL.revokeObjectURL(urlToRemove);
-            const blobPreviews = formData.previews.filter(p => p.startsWith('blob:'));
-            const blobIndex = blobPreviews.indexOf(urlToRemove);
-            if (blobIndex !== -1) {
-                const newImages = [...formData.images];
-                newImages.splice(blobIndex, 1);
-                updateFormData({ images: newImages });
-            }
+            const blobPreviewsBefore = formData.previews.slice(0, index).filter(p => p.startsWith('blob:'));
+            const blobIndex = blobPreviewsBefore.length;
+
+            const newImages = [...formData.images];
+            newImages.splice(blobIndex, 1);
+            updateFormData({ images: newImages });
         }
         updateFormData({ previews: formData.previews.filter((_, i) => i !== index) });
     };
@@ -170,12 +168,13 @@ const EditAdvertisementPage: React.FC = () => {
                 data.append("SettlementRef", formData.selectedSettlement.ref);
             }
 
+            // Додаємо індекс першого фото як головного
+            data.append("MainImageIndex", "0");
+
             formData.previews.forEach((url) => {
                 if (!url.startsWith("blob:")) {
                     const fileName = url.split('/').pop()?.replace("1200_", "");
-                    if (fileName) {
-                        data.append("ExistingImages", fileName);
-                    }
+                    if (fileName) data.append("ExistingImages", fileName);
                 }
             });
 
@@ -187,10 +186,10 @@ const EditAdvertisementPage: React.FC = () => {
             toast.success("Оголошення оновлено!");
             navigate(`/advertisement/${id}`);
         } catch (error) {
-            toast.error("Помилка при збереженні");
-            console.error(error);
+            toast.error("Помилка при збереженні: " + error);
         }
     };
+
     if (isAdLoading || isAuthorized === null) {
         return <div className="text-center py-20">Перевірка доступу...</div>;
     }
@@ -230,7 +229,7 @@ const EditAdvertisementPage: React.FC = () => {
                         )}
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span className={formData.title.length > 0 && formData.title.length < 14 ? "text-red-500" : "text-gray-500"}>
+                        <span className={formData.title.length >= 0 && formData.title.length < 14 ? "text-red-500" : "text-gray-500"}>
                             {"Назва має містити не менше 14 символів"}
                         </span>
                         <span className="text-gray-500">{formData.title.length}/60</span>
@@ -269,13 +268,7 @@ const EditAdvertisementPage: React.FC = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {formData.previews.length < 8 && (
                             <label className="aspect-square border-2 border-dashed border-amber-200 bg-amber-50 flex flex-col items-center justify-center cursor-pointer text-xs hover:bg-amber-100 transition-colors">
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={handleImageChange}
-                                />
+                                <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
                                 <span className="text-amber-800 font-medium">+ Додати фото</span>
                             </label>
                         )}
@@ -284,16 +277,19 @@ const EditAdvertisementPage: React.FC = () => {
                             <div key={url} className="aspect-square relative group">
                                 <img
                                     src={url}
-                                    className="w-full h-full object-cover rounded-md border"
+                                    className={`w-full h-full object-cover rounded-md border transition-all ${
+                                        index === 0 ? 'border-gray-300 shadow-sm' : 'border-gray-200'
+                                    }`}
                                 />
                                 <button
                                     onClick={() => removeImage(index)}
-                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
                                 >
                                     <TiDelete size={'100%'} />
                                 </button>
+
                                 {index === 0 && (
-                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center py-1">
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gray-700/80 text-white text-[10px] text-center py-1 rounded-b-md">
                                         Головне фото
                                     </div>
                                 )}
@@ -301,14 +297,14 @@ const EditAdvertisementPage: React.FC = () => {
                         ))}
 
                         {[...Array(Math.max(0, 7 - formData.previews.length))].map((_, i) => (
-                            <div key={i} className="aspect-square bg-[#D1D1D1] flex items-center justify-center opacity-40 text-xl border rounded-md">
+                            <div key={`empty-${i}`} className="aspect-square bg-[#D1D1D1] flex items-center justify-center opacity-40 text-xl border rounded-md">
                                 <MdOutlineInsertPhoto size={'30%'} />
                             </div>
                         ))}
                     </div>
                     <p className={`text-[10px] ${formData.previews.length === 0 ? "text-red-500" : "text-gray-400"}`}>
                         {formData.previews.length === 0
-                            ? "Будь ласка, залиште або додайте хоча б одне фото"
+                            ? "Будь ласка, додайте хоча б одне фото"
                             : "Перше фото буде на обкладинці. Ви можете додати до 8 зображень."}
                     </p>
                 </div>
@@ -331,7 +327,7 @@ const EditAdvertisementPage: React.FC = () => {
                         )}
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span className={formData.description.length > 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
+                        <span className={formData.description.length >= 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
                             Внесіть сюди щонайменше 30 символів
                         </span>
                         <span className="text-gray-500">{formData.description.length}/10 000</span>
@@ -340,8 +336,6 @@ const EditAdvertisementPage: React.FC = () => {
 
                 {/* Контактна інформація */}
                 <div className="flex flex-col space-y-6 pt-4 max-w-md">
-
-                    {/* Місцезнаходження */}
                     <div className="space-y-1 relative">
                         <label className="text-sm font-medium text-gray-600">Місцезнаходження*</label>
                         <div className="relative">
@@ -362,45 +356,29 @@ const EditAdvertisementPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Номер телефону */}
-                    <div className="space-y-1 border-b-2 border-green-500 relative">
-                        <label className="text-sm font-medium text-gray-600">
-                            Номер телефону* <span className="text-xs font-normal text-gray-400">(щоб змінити номер телефону перейдіть у профіль)</span>
-                        </label>
-                        <input
-                            type="tel"
-                            readOnly={true}
-                            value={seller.phoneNumber ?? ""}
-                            className="w-full py-2 outline-none bg-transparent text-gray-800 cursor-not-allowed"
-                        />
-                        {seller.phoneNumber && (
-                            <span className="absolute right-0 bottom-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
-                        )}
+                    <div className="space-y-1 border-b-2 border-green-500">
+                        <label className="text-sm font-medium text-gray-600">Номер телефону*</label>
+                        <input type="tel" readOnly value={seller.phoneNumber ?? ""} className="w-full py-2 outline-none bg-transparent text-gray-800 cursor-not-allowed" />
                     </div>
 
-                    {/* Ціна */}
                     <div className="space-y-1 relative">
-                        <label className="text-sm font-medium text-gray-600">Ціна <span className="text-xs font-normal text-gray-400">(грн)</span></label>
+                        <label className="text-sm font-medium text-gray-600">Ціна (грн)</label>
                         <div className={`relative border-b-2 transition-colors ${Number(formData.price) > 0 ? "border-green-500" : "border-[#212121]"}`}>
                             <input
                                 type="number"
                                 min="1"
                                 placeholder="000"
                                 value={formData.price ?? ""}
-                                onChange={(e) => {
-                                    const val = e.target.value;
-                                    updateFormData({ price: val });
-                                }}
+                                onChange={(e) => updateFormData({ price: e.target.value })}
                                 className="w-full py-2 outline-none bg-transparent"
                             />
                             {Number(formData.price) > 0 && (
-                                <span className="absolute right-5 bottom-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
+                                <span className="absolute right-5 top-2 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Кнопки */}
                 <div className="flex justify-end gap-4 pt-10">
                     <button
                         onClick={handleSubmit}

@@ -9,9 +9,14 @@ export interface IAdvertisement {
     isContractPrice: boolean;
     userId: number;
     categoryId: number;
-    images: string[];
+    images: IAdvertisementImage[];
     updateDate: string;
     settlement: SettlementDto;
+}
+
+export interface IAdvertisementImage {
+    imageUrl: string;
+    isMain: boolean;
 }
 
 type SettlementDto = {

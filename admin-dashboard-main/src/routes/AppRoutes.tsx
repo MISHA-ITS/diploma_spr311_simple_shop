@@ -36,7 +36,6 @@ import FavoritesPage from "../pages/favorites/FavoritesPage.tsx";
 import EditAdvertisementPage from "../pages/Advertisement/components/EditAdvertisementPage.tsx";
 import AdvertisementList from "../pages/Advertisement/components/Admin/AdvertisementList.tsx";
 import AdvsPage from "../pages/AdvsPage/AdvsPage.tsx";
-import OrderDetailsPage from "../pages/Order/OrderDetailsPage.tsx";
 
 const AppRoutes : React.FC = () => {
     return (
@@ -59,7 +58,6 @@ const AppRoutes : React.FC = () => {
                         <Route path="/edit-advertisement/:id" element={<EditAdvertisementPage />} />
                         <Route path="/createAdvertisement" element={<CreateAdvertisementPage />} />
                         <Route path="/advertpreview" element={<AdvertisementPreview />} />
-                        <Route path="/orderDetails/:id" element={<OrderDetailsPage />} />
                     </Route>
                     <Route
                         path="/order/:id"

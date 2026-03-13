@@ -18,10 +18,11 @@ import {useProfileQuery} from "../../../services/apiAccount.ts";
 const CreateAdvertisementPage: React.FC = () => {
     const navigate = useNavigate();
     const [createAdvertisement] = useCreateAdvertisementMutation();
-    const { data:profileData} = useProfileQuery();
+    const { data: profileData } = useProfileQuery();
     const { data: areas } = useGetAreasQuery();
-    const {data: settlements, isLoading } = useGetSettlementsQuery();
+    const { data: settlements, isLoading } = useGetSettlementsQuery();
     const { formData, clearForm, updateFormData } = useAdForm();
+
     const [categoryFilterData, setCategoryFilterData] = useState<{
         categoryTree: ICategoryTreeNode[];
         excludedFilters: number[];
@@ -29,20 +30,14 @@ const CreateAdvertisementPage: React.FC = () => {
         categoryTree: [],
         excludedFilters: [],
     });
-    const { data: allCategories  } = useGetAllCategoriesQuery();
+    const { data: allCategories } = useGetAllCategoriesQuery();
 
-    //tree
+    // Побудова дерева категорій
     useEffect(() => {
         const categories = allCategories?.payload ?? [];
-
         if (categories.length === 0) return;
-
         try {
-            const tree = buildTree(
-                categories,
-                null,
-            );
-
+            const tree = buildTree(categories, null);
             setCategoryFilterData(prev => ({
                 ...prev,
                 categoryTree: tree,
@@ -75,7 +70,6 @@ const CreateAdvertisementPage: React.FC = () => {
 
     const removeImage = (index: number) => {
         URL.revokeObjectURL(formData.previews[index]);
-
         updateFormData({
             images: formData.images.filter((_, i) => i !== index),
             previews: formData.previews.filter((_, i) => i !== index)
@@ -84,18 +78,17 @@ const CreateAdvertisementPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!formData.selectedSettlement) return;
 
-        if (!formData.selectedSettlement) {
-            return;
-        }
         try {
             const data = new FormData();
             data.append("Name", formData.title);
             data.append("Description", formData.description);
             data.append("Price", formData.price.toString());
-            // data.append("Phone", formData.phone);
             data.append("CategoryId", String(formData.categoryId));
             data.append("SettlementRef", formData.selectedSettlement.ref);
+
+            data.append("MainImageIndex", "0");
 
             if (formData.images.length > 0) {
                 formData.images.forEach((file) => {
@@ -127,7 +120,8 @@ const CreateAdvertisementPage: React.FC = () => {
             <section className="space-y-8">
                 <h2 className="text-lg font-semibold">Опишіть у подробицях</h2>
 
-                <div className="space-y-1 relative"> {/* Додано relative */}
+                {/* Назва */}
+                <div className="space-y-1 relative">
                     <label className="text-sm font-medium">Вкажіть назву*</label>
                     <div className="relative">
                         <input
@@ -172,6 +166,7 @@ const CreateAdvertisementPage: React.FC = () => {
                     </div>
                 </div>
 
+                {/* Фото */}
                 <div className="space-y-3 relative">
                     <label className="text-sm font-medium flex justify-between items-center">
                         Фото*
@@ -180,36 +175,30 @@ const CreateAdvertisementPage: React.FC = () => {
                         )}
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-
-                        {/* Кнопка "Додати фото" */}
                         {formData.images.length < 8 && (
                             <label className="aspect-square border-2 border-dashed border-amber-200 bg-amber-50 flex flex-col items-center justify-center cursor-pointer text-xs hover:bg-amber-100 transition-colors">
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={handleImageChange}
-                                />
+                                <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
                                 <span className="text-amber-800 font-medium">+ Додати фото</span>
                             </label>
                         )}
 
-                        {/* Відображення прев'ю */}
                         {formData.previews.map((url, index) => (
                             <div key={url} className="aspect-square relative group">
                                 <img
                                     src={url}
-                                    className="w-full h-full object-cover rounded-md border"
+                                    className={`w-full h-full object-cover rounded-md border transition-all ${
+                                        index === 0 ? 'border-gray-300 shadow-sm' : 'border-gray-200'
+                                    }`}
                                 />
                                 <button
                                     onClick={() => removeImage(index)}
-                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
                                 >
                                     <TiDelete size={'100%'} />
                                 </button>
+
                                 {index === 0 && (
-                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center py-1">
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gray-700/80 text-white text-[10px] text-center py-1 rounded-b-md">
                                         Головне фото
                                     </div>
                                 )}
@@ -233,32 +222,29 @@ const CreateAdvertisementPage: React.FC = () => {
                 <div className="space-y-1 relative">
                     <label className="text-sm font-medium">Опис*</label>
                     <div className="relative">
-                    <textarea
-                        rows={6}
-                        placeholder="Подумайте, що б ви хотіли дізнатись побачивши це оголошення..."
-                        value={formData.description}
-                        onChange={(e) => updateFormData({ description: e.target.value })}
-                        className={`w-full border-2 p-3 rounded-md outline-none resize-none transition-colors ${
-                            formData.description.length >= 30 ? "border-green-500" : "border-[#212121]"
-                        }`}
-                    />
+                        <textarea
+                            rows={6}
+                            placeholder="Подумайте, що б ви хотіли дізнатись побачивши це оголошення..."
+                            value={formData.description}
+                            onChange={(e) => updateFormData({ description: e.target.value })}
+                            className={`w-full border-2 p-3 rounded-md outline-none resize-none transition-colors ${
+                                formData.description.length >= 30 ? "border-green-500" : "border-[#212121]"
+                            }`}
+                        />
                         {formData.description.length >= 30 && (
                             <span className="absolute right-3 top-3 text-green-600 font-bold animate-in fade-in duration-300">✓</span>
                         )}
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span
-                            className={formData.description.length >= 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
+                        <span className={formData.description.length >= 0 && formData.description.length < 30 ? "text-red-500" : "text-gray-500"}>
                             Внесіть сюди щонайменше 30 символів
                         </span>
                         <span className="text-gray-500">{formData.description.length}/10 000</span>
                     </div>
                 </div>
 
-                {/* Контактна інформація */}
+                {/* Місцезнаходження */}
                 <div className="flex flex-col space-y-6 pt-4 max-w-md">
-
-                    {/* Місцезнаходження */}
                     <div className="space-y-1 relative">
                         <label className="text-sm font-medium text-gray-600">Місцезнаходження*</label>
                         <div className="relative">
@@ -279,21 +265,18 @@ const CreateAdvertisementPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Номер телефону */}
                     <div className="space-y-1 border-b-2 border-green-500">
-                        <label className="text-sm font-medium text-gray-600">
-                            Номер телефону* <span className="text-xs font-normal text-gray-400">(щоб змінити номер телефону перейдіть у профіль)</span>
-                        </label>
+                        <label className="text-sm font-medium text-gray-600">Номер телефону*</label>
                         <input
                             type="tel"
                             readOnly={true}
-                            value={profileData?.payload.phoneNumber || "+380987654321"}
+                            value={profileData?.payload.phoneNumber || ""}
                             className="w-full py-2 outline-none bg-transparent text-gray-800 cursor-not-allowed"
                         />
                     </div>
 
                     {/* Ціна */}
-                    <div className="space-y-1 border-b-2 relative">
+                    <div className="space-y-1 relative">
                         <label className="text-sm font-medium text-gray-600">Ціна <span className="text-xs font-normal text-gray-400">(грн)</span></label>
                         <div className={`relative border-b-2 transition-colors ${Number(formData.price) > 0 ? "border-green-500" : "border-[#212121]"}`}>
                             <input
@@ -311,15 +294,14 @@ const CreateAdvertisementPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Кнопки */}
                 <div className="flex flex-col sm:flex-row justify-end gap-4 pt-10">
-                    <button onClick={() => navigate("/advertpreview")} disabled={isFormValid} className="px-6 py-2 border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
+                    <button onClick={() => navigate("/advertpreview")} disabled={isFormValid} className="px-6 py-2 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-50 transition-colors">
                         Попередній перегляд
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={isFormValid}
-                        className="px-8 py-2 bg-[#212121] text-white rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black transition-colors"
+                        className="px-8 py-2 bg-[#212121] text-white rounded font-medium disabled:opacity-50 hover:bg-black transition-colors"
                     >
                         Опублікувати
                     </button>
